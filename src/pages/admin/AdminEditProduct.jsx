@@ -17,7 +17,7 @@ import {
 import "./AdminEditProduct.css";
 
 const API_BASE_URL =
-  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+  `${import.meta.env.VITE_API_URL}`;
 
 const IMAGE_FIELDS = ["image", "image2", "image3", "image4"];
 

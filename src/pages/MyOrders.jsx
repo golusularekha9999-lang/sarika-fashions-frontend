@@ -28,7 +28,7 @@ import { Link } from 'react-router-dom'
 import './MyOrders.css'
 
 const API_BASE =
-  `${window.location.protocol}//${window.location.hostname}:5000/api`
+  `${import.meta.env.VITE_API_URL}`
 
 // ============================================================
 // DATE HELPERS

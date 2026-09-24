@@ -16,7 +16,7 @@ import {
 import { Link } from 'react-router-dom'
 import './AdminDashboard.css'
 
-const API_BASE = `http://${window.location.hostname}:5000/api`
+const API_BASE = import.meta.env.VITE_API_URL
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState([])
@@ -636,4 +636,5 @@ export default function AdminDashboard() {
     </div>
   )
 }
+
 

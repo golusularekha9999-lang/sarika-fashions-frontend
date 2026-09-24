@@ -4,7 +4,7 @@ import axios from 'axios'
 // The storefront works entirely on mock data/localStorage without this
 // running — nothing here is called until the real API exists.
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: 'https://sarika-fashions-backend-rfwh.onrender.com/api',
   timeout: 8000,
   headers: {
     'Content-Type': 'application/json',
@@ -41,3 +41,4 @@ export const authApi = {
 }
 
 export default api
+

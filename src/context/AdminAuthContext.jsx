@@ -12,7 +12,7 @@ const AdminAuthContext = createContext(null)
 // ============================================================
 
 const API_BASE =
-  `${window.location.protocol}//${window.location.hostname}:5000/api`
+  `${import.meta.env.VITE_API_URL}`
 
 export { API_BASE }
 

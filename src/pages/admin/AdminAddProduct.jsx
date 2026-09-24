@@ -11,18 +11,18 @@ import './AdminAddProduct.css'
   If frontend is:
   http://localhost:5173
   backend becomes:
-  http://localhost:5000/api
+  https://sarika-fashions-backend-rfwh.onrender.com/api
 
   If frontend is:
   http://127.0.0.1:5173
   backend becomes:
-  http://127.0.0.1:5000/api
+  ${import.meta.env.VITE_API_URL}
 
   This prevents localhost / 127.0.0.1
   session-cookie mismatch.
 */
 const API_BASE =
-  `${window.location.protocol}//${window.location.hostname}:5000/api`
+  `${import.meta.env.VITE_API_URL}`
 
 const EMPTY_FORM = {
   name: '',
@@ -808,3 +808,5 @@ export default function AdminAddProduct() {
     </div>
   )
 }
+
+
