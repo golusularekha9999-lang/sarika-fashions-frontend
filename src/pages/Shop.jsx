@@ -95,7 +95,7 @@ export default function Shop() {
   // ============================================================
 
   useEffect(() => {
-    fetch('${import.meta.env.VITE_API_URL}/products')
+    fetch(`${import.meta.env.VITE_API_URL}/products`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to load products')
@@ -466,3 +466,4 @@ export default function Shop() {
     </div>
   )
 }
+
