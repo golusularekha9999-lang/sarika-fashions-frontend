@@ -1,0 +1,468 @@
+import React, { useEffect, useState, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { SlidersHorizontal } from 'lucide-react'
+
+import FilterSidebar from '../components/FilterSidebar.jsx'
+import ProductCard from '../components/ProductCard.jsx'
+import { colors } from '../data/products.js'
+
+import './Shop.css'
+
+// ============================================================
+// COLOR DETECTION
+// ============================================================
+
+const getProductColors = (product) => {
+  // If backend already provides colors, use them
+  if (Array.isArray(product.colors) && product.colors.length > 0) {
+    return product.colors
+  }
+
+  // If backend provides a single color field
+  if (product.color) {
+    const backendColor = String(product.color).toLowerCase().trim()
+
+    const matchedColor = colors.find(
+      (c) =>
+        c.id.toLowerCase() === backendColor ||
+        c.name.toLowerCase() === backendColor
+    )
+
+    if (matchedColor) {
+      return [matchedColor.id]
+    }
+  }
+
+  // ============================================================
+  // FALLBACK:
+  // Detect color from product name/category/description
+  // ============================================================
+
+  const text = [
+    product.name,
+    product.category,
+    product.description,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  const detectedColors = []
+
+  colors.forEach((color) => {
+    const colorName = color.name.toLowerCase()
+    const colorId = color.id.toLowerCase()
+
+    if (
+      text.includes(colorName) ||
+      text.includes(colorId)
+    ) {
+      detectedColors.push(color.id)
+    }
+  })
+
+  return detectedColors
+}
+
+export default function Shop() {
+  const [searchParams] = useSearchParams()
+
+  const initialCategory = searchParams.get('category')
+
+  const searchQuery =
+    searchParams.get('search')?.toLowerCase() || ''
+
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  // ============================================================
+  // FILTER STATE
+  // ============================================================
+
+  const [filters, setFilters] = useState({
+    categories: initialCategory ? [initialCategory] : [],
+    colors: [],
+    minPrice: 300,
+    maxPrice: 1000,
+  })
+
+  const [sortBy, setSortBy] = useState('newest')
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+
+  // ============================================================
+  // LOAD PRODUCTS
+  // ============================================================
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/api/products')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to load products')
+        }
+
+        return response.json()
+      })
+      .then((data) => {
+        const formattedProducts = (data.products || []).map(
+          (product) => {
+            const productColors = getProductColors(product)
+
+            return {
+              ...product,
+
+              id: product.id,
+
+              price: Number(product.price),
+
+              originalPrice: Number(product.old_price),
+
+              rating: Number(product.rating) || 0,
+
+              reviews: 0,
+
+              stock:
+                product.stock === null
+                  ? null
+                  : Number(product.stock),
+
+              discount:
+                Number(product.old_price) > Number(product.price)
+                  ? Math.round(
+                      (
+                        (Number(product.old_price) -
+                          Number(product.price)) /
+                        Number(product.old_price)
+                      ) * 100
+                    )
+                  : 0,
+
+              fabric: product.category,
+
+              images: [
+                product.image,
+                product.image2,
+                product.image3,
+                product.image4,
+              ].filter(Boolean),
+
+              variant: 0,
+
+              // IMPORTANT:
+              // Product colors are now actually populated
+              colors: productColors,
+            }
+          }
+        )
+
+        setProducts(formattedProducts)
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error('Product loading error:', error)
+
+        setError('Unable to load products.')
+        setLoading(false)
+      })
+  }, [])
+
+  // ============================================================
+  // CATEGORY FILTER
+  // ============================================================
+
+  const toggleCategory = (id) => {
+    setFilters((f) => ({
+      ...f,
+
+      categories: f.categories.includes(id)
+        ? f.categories.filter((c) => c !== id)
+        : [...f.categories, id],
+    }))
+  }
+
+  // ============================================================
+  // COLOR FILTER
+  // ============================================================
+
+  const toggleColor = (id) => {
+    setFilters((f) => ({
+      ...f,
+
+      colors: f.colors.includes(id)
+        ? f.colors.filter((c) => c !== id)
+        : [...f.colors, id],
+    }))
+  }
+
+  // ============================================================
+  // CLEAR FILTERS
+  // ============================================================
+
+  const clearFilters = () => {
+    setFilters({
+      categories: [],
+      colors: [],
+      minPrice: 300,
+      maxPrice: 1000,
+    })
+  }
+
+  // ============================================================
+  // FILTER + SORT
+  // ============================================================
+
+  const filtered = useMemo(() => {
+    let result = products.filter((product) => {
+
+      // --------------------------------------------------------
+      // CATEGORY
+      // --------------------------------------------------------
+
+      const matchesCategory =
+        filters.categories.length === 0 ||
+        filters.categories.includes(product.category)
+
+      // --------------------------------------------------------
+      // COLOR
+      // --------------------------------------------------------
+
+      const matchesColor =
+        filters.colors.length === 0 ||
+        filters.colors.some((selectedColor) =>
+          (product.colors || []).includes(selectedColor)
+        )
+
+      // --------------------------------------------------------
+      // PRICE
+      // --------------------------------------------------------
+
+      const productPrice = Number(product.price)
+
+      const matchesPrice =
+        productPrice >= filters.minPrice &&
+        productPrice <= filters.maxPrice
+
+      // --------------------------------------------------------
+      // SEARCH
+      // --------------------------------------------------------
+
+      const productName =
+        String(product.name || '').toLowerCase()
+
+      const productDescription =
+        String(product.description || '').toLowerCase()
+
+      const matchesSearch =
+        !searchQuery ||
+        productName.includes(searchQuery) ||
+        productDescription.includes(searchQuery)
+
+      return (
+        matchesCategory &&
+        matchesColor &&
+        matchesPrice &&
+        matchesSearch
+      )
+    })
+
+    // ==========================================================
+    // SORT
+    // ==========================================================
+
+    switch (sortBy) {
+      case 'price-low':
+        result = [...result].sort(
+          (a, b) => a.price - b.price
+        )
+        break
+
+      case 'price-high':
+        result = [...result].sort(
+          (a, b) => b.price - a.price
+        )
+        break
+
+      case 'rating':
+        result = [...result].sort(
+          (a, b) => b.rating - a.rating
+        )
+        break
+
+      default:
+        result = [...result].sort(
+          (a, b) => b.id - a.id
+        )
+    }
+
+    return result
+  }, [
+    products,
+    filters,
+    sortBy,
+    searchQuery,
+  ])
+
+  // ============================================================
+  // LOADING
+  // ============================================================
+
+  if (loading) {
+    return (
+      <div
+        className="container"
+        style={{
+          padding: '100px 24px',
+          textAlign: 'center',
+        }}
+      >
+        <h2>Loading sarees...</h2>
+      </div>
+    )
+  }
+
+  // ============================================================
+  // ERROR
+  // ============================================================
+
+  if (error) {
+    return (
+      <div
+        className="container"
+        style={{
+          padding: '100px 24px',
+          textAlign: 'center',
+        }}
+      >
+        <h2>{error}</h2>
+
+        <p style={{ marginTop: '10px' }}>
+          Make sure the Flask backend is running.
+        </p>
+      </div>
+    )
+  }
+
+  // ============================================================
+  // PAGE
+  // ============================================================
+
+  return (
+    <div className="container shop-page">
+
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
+
+      <div className="shop-header">
+
+        <div>
+
+          <h1 className="section-title">
+            {searchQuery
+              ? `Results for "${searchQuery}"`
+              : 'Shop All Sarees'}
+          </h1>
+
+          <p className="shop-count">
+            Showing {filtered.length} of {products.length} results
+          </p>
+
+        </div>
+
+        <div className="shop-header-actions">
+
+          <button
+            type="button"
+            className="btn btn-outline btn-sm mobile-only"
+            onClick={() => setMobileFiltersOpen(true)}
+          >
+            <SlidersHorizontal size={15} />
+            Filters
+          </button>
+
+          <select
+            className="shop-sort"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="newest">
+              Sort by: Newest
+            </option>
+
+            <option value="price-low">
+              Price: Low to High
+            </option>
+
+            <option value="price-high">
+              Price: High to Low
+            </option>
+
+            <option value="rating">
+              Rating
+            </option>
+          </select>
+
+        </div>
+
+      </div>
+
+      {/* ======================================================
+          SHOP LAYOUT
+      ====================================================== */}
+
+      <div className="shop-layout">
+
+        <FilterSidebar
+          filters={filters}
+
+          onCategoryToggle={toggleCategory}
+
+          onColorToggle={toggleColor}
+
+          onPriceChange={(value) =>
+            setFilters((f) => ({
+              ...f,
+              maxPrice: Number(value),
+            }))
+          }
+
+          onClear={clearFilters}
+
+          mobileOpen={mobileFiltersOpen}
+
+          onCloseMobile={() =>
+            setMobileFiltersOpen(false)
+          }
+        />
+
+        {/* ====================================================
+            PRODUCTS
+        ==================================================== */}
+
+        <div className="shop-grid">
+
+          {filtered.length === 0 ? (
+
+            <p className="shop-empty">
+              No sarees match your filters.
+              Try adjusting them.
+            </p>
+
+          ) : (
+
+            filtered.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
+            ))
+
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  )
+}

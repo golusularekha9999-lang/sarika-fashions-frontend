@@ -1,0 +1,2049 @@
+/* =========================================================
+   SARIKA FASHIONS - MOBILE RESPONSIVE FIXES
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* =======================================================
+     1. CATEGORY SECTION
+     Small square boxes like reference
+     ======================================================= */
+
+  .category-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 14px !important;
+
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    padding: 4px 0 14px !important;
+    margin: 0 !important;
+
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .category-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .category-card {
+    flex: 0 0 105px !important;
+    width: 105px !important;
+    min-width: 105px !important;
+    max-width: 105px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+
+    text-align: center !important;
+  }
+
+  .category-card-image {
+    width: 105px !important;
+    height: 105px !important;
+
+    min-width: 105px !important;
+    max-width: 105px !important;
+    min-height: 105px !important;
+    max-height: 105px !important;
+
+    overflow: hidden !important;
+
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .category-card-image img {
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+
+    display: block !important;
+  }
+
+  .category-card h3,
+  .category-card h4,
+  .category-card p,
+  .category-card-title {
+    width: 105px !important;
+
+    margin: 8px 0 0 !important;
+
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+
+    text-align: center !important;
+
+    white-space: normal !important;
+  }
+
+
+  /* =======================================================
+     2. ART OF DRAPING
+     Image must remain visible on mobile
+     ======================================================= */
+
+  .editorial-home {
+    position: relative !important;
+
+    width: 100% !important;
+    min-height: 280px !important;
+
+    overflow: hidden !important;
+
+    /* DO NOT use background shorthand here.
+       The image comes from Home.jsx inline backgroundImage. */
+
+    background-size: cover !important;
+    background-position: center right !important;
+    background-repeat: no-repeat !important;
+
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  /*
+     IMPORTANT:
+     The overlay must NOT cover the image with a solid color.
+  */
+
+  .editorial-home .editorial-image-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+
+    z-index: 1 !important;
+
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.62) 0%,
+      rgba(0, 0, 0, 0.38) 45%,
+      rgba(0, 0, 0, 0.08) 100%
+    ) !important;
+  }
+
+  .editorial-home .editorial-full-content {
+    position: relative !important;
+
+    z-index: 2 !important;
+
+    width: 100% !important;
+    min-height: 280px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    padding: 30px 18px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .editorial-home .editorial-copy {
+    width: 58% !important;
+    max-width: 58% !important;
+  }
+
+  .editorial-home .eyebrow {
+    display: block !important;
+
+    margin-bottom: 12px !important;
+
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+
+    letter-spacing: 0.14em !important;
+  }
+
+  .editorial-home h2 {
+    margin: 0 0 12px !important;
+
+    font-size: 30px !important;
+    line-height: 1.05 !important;
+  }
+
+  .editorial-home p {
+    margin: 0 0 18px !important;
+
+    max-width: 100% !important;
+
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+  }
+
+  .editorial-home .editorial-story-button {
+    display: inline-flex !important;
+
+    min-height: 44px !important;
+
+    padding: 10px 15px !important;
+
+    box-sizing: border-box !important;
+
+    font-size: 11px !important;
+  }
+
+
+  /* =======================================================
+     3. FESTIVE EDIT
+     Horizontal image card
+     ======================================================= */
+
+  .festive-section-bg {
+    width: 100% !important;
+
+    padding-top: 28px !important;
+    padding-bottom: 28px !important;
+
+    overflow: hidden !important;
+  }
+
+  .festive-section-bg .container {
+    width: 100% !important;
+
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .festive-horizontal-card {
+    position: relative !important;
+
+    width: 100% !important;
+    min-height: 250px !important;
+
+    overflow: hidden !important;
+
+    border-radius: 12px !important;
+
+    background-size: cover !important;
+    background-position: center right !important;
+    background-repeat: no-repeat !important;
+
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /*
+     If Home.css has a background color/gradient,
+     keep the actual festive image visible.
+  */
+
+  .festive-horizontal-card::before {
+    content: "" !important;
+
+    position: absolute !important;
+    inset: 0 !important;
+
+    z-index: 1 !important;
+
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.68) 0%,
+      rgba(0, 0, 0, 0.40) 45%,
+      rgba(0, 0, 0, 0.08) 100%
+    ) !important;
+
+    pointer-events: none !important;
+  }
+
+  .festive-horizontal-content {
+    position: relative !important;
+
+    z-index: 2 !important;
+
+    width: 58% !important;
+
+    padding: 28px 20px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .festive-horizontal-content .eyebrow {
+    display: block !important;
+
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+
+    margin-bottom: 9px !important;
+  }
+
+  .festive-horizontal-content h2 {
+    margin: 0 0 10px !important;
+
+    font-size: 24px !important;
+    line-height: 1.1 !important;
+  }
+
+  .festive-horizontal-content p {
+    margin: 0 0 16px !important;
+
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+  }
+
+  .festive-horizontal-content .btn {
+    display: inline-flex !important;
+
+    min-height: 40px !important;
+
+    padding: 9px 13px !important;
+
+    font-size: 10px !important;
+  }
+
+
+  /* =======================================================
+     4. SMALL PHONES
+     ======================================================= */
+
+  @media (max-width: 480px) {
+
+    .category-card {
+      flex-basis: 95px !important;
+      width: 95px !important;
+      min-width: 95px !important;
+      max-width: 95px !important;
+    }
+
+    .category-card-image {
+      width: 95px !important;
+      height: 95px !important;
+
+      min-width: 95px !important;
+      max-width: 95px !important;
+
+      min-height: 95px !important;
+      max-height: 95px !important;
+    }
+
+    .category-card h3,
+    .category-card h4,
+    .category-card p,
+    .category-card-title {
+      width: 95px !important;
+      font-size: 11px !important;
+    }
+
+    .editorial-home {
+      min-height: 260px !important;
+    }
+
+    .editorial-home .editorial-full-content {
+      min-height: 260px !important;
+      padding: 24px 15px !important;
+    }
+
+    .editorial-home .editorial-copy {
+      width: 60% !important;
+      max-width: 60% !important;
+    }
+
+    .editorial-home h2 {
+      font-size: 26px !important;
+    }
+
+    .editorial-home p {
+      font-size: 12px !important;
+    }
+
+    .festive-horizontal-card {
+      min-height: 230px !important;
+    }
+
+    .festive-horizontal-content {
+      width: 60% !important;
+      padding: 22px 16px !important;
+    }
+
+    .festive-horizontal-content h2 {
+      font-size: 21px !important;
+    }
+
+    .festive-horizontal-content p {
+      font-size: 11px !important;
+    }
+  }
+
+
+  /* =======================================================
+     IMPORTANT
+     FEATURE CARDS ARE NOT TOUCHED
+     ======================================================= */
+
+}/* =========================================================
+   FINAL DESKTOP FESTIVE CARD FIX
+   ========================================================= */
+
+@media screen and (min-width: 769px) {
+
+  body .section.festive-section-bg {
+    padding-top: 70px !important;
+    padding-bottom: 70px !important;
+  }
+
+  body .section.festive-section-bg .container {
+    width: 100% !important;
+    max-width: 1400px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 40px !important;
+    padding-right: 40px !important;
+    box-sizing: border-box !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-card {
+    position: relative !important;
+
+    width: 100% !important;
+    height: 420px !important;
+    min-height: 420px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    overflow: hidden !important;
+
+    border-radius: 18px !important;
+
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+
+    box-sizing: border-box !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-card::before {
+    content: "" !important;
+
+    position: absolute !important;
+    inset: 0 !important;
+
+    z-index: 1 !important;
+
+    background: linear-gradient(
+      90deg,
+      rgba(20, 8, 10, 0.92) 0%,
+      rgba(20, 8, 10, 0.78) 28%,
+      rgba(20, 8, 10, 0.42) 52%,
+      rgba(20, 8, 10, 0.08) 100%
+    ) !important;
+
+    pointer-events: none !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content {
+    position: relative !important;
+
+    z-index: 5 !important;
+
+    width: 50% !important;
+    max-width: 560px !important;
+
+    padding: 45px 50px !important;
+
+    box-sizing: border-box !important;
+
+    flex: none !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content .eyebrow {
+    display: block !important;
+
+    margin-bottom: 18px !important;
+
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+
+    letter-spacing: 0.25em !important;
+
+    color: #e8c39e !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content h2 {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 18px !important;
+
+    font-family: Georgia, "Times New Roman", serif !important;
+
+    font-size: 48px !important;
+    line-height: 1.08 !important;
+
+    font-weight: 400 !important;
+
+    color: #fffaf3 !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content h2 em {
+    color: #e8c39e !important;
+    font-style: italic !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content p {
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 500px !important;
+
+    margin: 0 0 28px !important;
+
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+
+    color: rgba(255, 250, 243, 0.92) !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content .btn {
+    display: inline-flex !important;
+
+    width: auto !important;
+
+    min-height: 50px !important;
+
+    padding: 14px 25px !important;
+
+    font-size: 12px !important;
+
+    letter-spacing: 0.08em !important;
+  }
+}
+
+
+/* =========================================================
+   MEDIUM LAPTOP
+   ========================================================= */
+
+@media screen and (min-width: 769px) and (max-width: 1100px) {
+
+  body .section.festive-section-bg
+  .festive-horizontal-card {
+    height: 350px !important;
+    min-height: 350px !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content {
+    width: 55% !important;
+    padding: 35px !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content h2 {
+    font-size: 38px !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content p {
+    font-size: 14px !important;
+  }
+}
+
+
+/* =========================================================
+   LARGE LAPTOP / DESKTOP
+   ========================================================= */
+
+@media screen and (min-width: 1400px) {
+
+  body .section.festive-section-bg
+  .festive-horizontal-card {
+    height: 440px !important;
+    min-height: 440px !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content {
+    padding-left: 60px !important;
+  }
+
+  body .section.festive-section-bg
+  .festive-horizontal-content h2 {
+    font-size: 54px !important;
+  }
+}/* =========================================================
+   MOBILE ONLY - FINAL TEXT VISIBILITY FIXES
+   DESKTOP IS NOT TOUCHED
+   ========================================================= */
+
+@media screen and (max-width: 768px) {
+
+  /* =======================================================
+     1. ART OF DRAPING
+     ======================================================= */
+
+  .editorial-home {
+    position: relative !important;
+  }
+
+  /*
+     Light/transparent overlay so the original image remains
+     clearly visible while black text can be read.
+  */
+  .editorial-home .editorial-image-overlay {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.38) 0%,
+      rgba(255, 255, 255, 0.16) 45%,
+      rgba(255, 255, 255, 0) 75%
+    ) !important;
+
+    z-index: 1 !important;
+  }
+
+  .editorial-home .editorial-full-content {
+    position: relative !important;
+
+    z-index: 3 !important;
+
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+
+    padding: 28px 16px !important;
+  }
+
+  /*
+     Keep all Art of Draping content on the left
+     and make it compact.
+  */
+  .editorial-home .editorial-copy {
+    width: 55% !important;
+    max-width: 55% !important;
+
+    text-align: left !important;
+  }
+
+  .editorial-home .eyebrow {
+    margin: 0 0 10px !important;
+
+    color: #111111 !important;
+
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+
+    letter-spacing: 0.14em !important;
+    font-weight: 600 !important;
+  }
+
+  .editorial-home h2 {
+    margin: 0 0 10px !important;
+
+    color: #111111 !important;
+
+    font-size: 25px !important;
+    line-height: 1.08 !important;
+
+    text-align: left !important;
+  }
+
+  .editorial-home h2 em {
+    color: #8d174d !important;
+    font-style: italic !important;
+  }
+
+  .editorial-home p {
+    margin: 0 0 14px !important;
+
+    color: #222222 !important;
+
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+
+    text-align: left !important;
+  }
+
+  /*
+     Small button that fits the mobile card.
+  */
+  .editorial-home .editorial-story-button {
+    display: inline-flex !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    min-height: 38px !important;
+
+    padding: 8px 12px !important;
+
+    color: #111111 !important;
+    background: rgba(255, 255, 255, 0.28) !important;
+
+    border: 1.5px solid #111111 !important;
+    border-radius: 6px !important;
+
+    font-size: 9px !important;
+    line-height: 1 !important;
+
+    letter-spacing: 0.08em !important;
+
+    white-space: nowrap !important;
+  }
+
+  .editorial-home .editorial-story-button svg {
+    width: 13px !important;
+    height: 13px !important;
+    margin-left: 5px !important;
+  }
+
+
+  /* =======================================================
+     2. FESTIVE CARD
+     KEEP IMAGE + CARD SIZE EXACTLY AS THEY ARE
+     ONLY FIX TEXT VISIBILITY
+     ======================================================= */
+
+  .festive-horizontal-card {
+    position: relative !important;
+  }
+
+  /*
+     Darker gradient only on the LEFT where the text sits.
+     The saree image on the right remains visible.
+  */
+  .festive-horizontal-card::before {
+    content: "" !important;
+
+    position: absolute !important;
+    inset: 0 !important;
+
+    z-index: 1 !important;
+
+    background: linear-gradient(
+      90deg,
+      rgba(20, 8, 12, 0.82) 0%,
+      rgba(20, 8, 12, 0.62) 38%,
+      rgba(20, 8, 12, 0.20) 65%,
+      rgba(20, 8, 12, 0) 100%
+    ) !important;
+
+    pointer-events: none !important;
+  }
+
+  .festive-horizontal-content {
+    position: relative !important;
+
+    z-index: 3 !important;
+
+    width: 60% !important;
+
+    padding: 24px 16px !important;
+
+    box-sizing: border-box !important;
+
+    text-align: left !important;
+  }
+
+  .festive-horizontal-content .eyebrow {
+    margin: 0 0 9px !important;
+
+    color: #f1d09d !important;
+
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+
+    letter-spacing: 0.16em !important;
+    font-weight: 600 !important;
+  }
+
+  .festive-horizontal-content h2 {
+    margin: 0 0 10px !important;
+
+    color: #ffffff !important;
+
+    font-size: 23px !important;
+    line-height: 1.08 !important;
+
+    text-align: left !important;
+  }
+
+  .festive-horizontal-content h2 em {
+    color: #f1d09d !important;
+    font-style: italic !important;
+  }
+
+  .festive-horizontal-content p {
+    margin: 0 0 15px !important;
+
+    color: rgba(255, 255, 255, 0.94) !important;
+
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+
+    text-align: left !important;
+  }
+
+  /*
+     Smaller festive button.
+  */
+  .festive-horizontal-content .btn {
+    display: inline-flex !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    min-height: 38px !important;
+
+    padding: 9px 13px !important;
+
+    background: #d1a15c !important;
+    color: #ffffff !important;
+
+    border: none !important;
+    border-radius: 6px !important;
+
+    font-size: 9px !important;
+    line-height: 1 !important;
+
+    letter-spacing: 0.07em !important;
+
+    white-space: nowrap !important;
+  }
+}
+
+
+/* =========================================================
+   EXTRA SMALL PHONES
+   ========================================================= */
+
+@media screen and (max-width: 480px) {
+
+  .editorial-home .editorial-copy {
+    width: 57% !important;
+    max-width: 57% !important;
+  }
+
+  .editorial-home h2 {
+    font-size: 22px !important;
+  }
+
+  .editorial-home p {
+    font-size: 10px !important;
+    line-height: 1.4 !important;
+  }
+
+  .editorial-home .editorial-story-button {
+    min-height: 35px !important;
+    padding: 7px 10px !important;
+    font-size: 8px !important;
+  }
+
+  .festive-horizontal-content {
+    width: 60% !important;
+    padding: 22px 15px !important;
+  }
+
+  .festive-horizontal-content h2 {
+    font-size: 21px !important;
+  }
+
+  .festive-horizontal-content p {
+    font-size: 10px !important;
+  }
+
+  .festive-horizontal-content .btn {
+    min-height: 35px !important;
+    padding: 8px 11px !important;
+    font-size: 8px !important;
+  }
+}/* =========================================================
+   ART OF DRAPING
+   MOBILE ONLY
+   MATCH REFERENCE DESIGN
+   ========================================================= */
+
+@media screen and (max-width: 768px) {
+
+  /* Keep the original card/image */
+  .editorial-home {
+    position: relative !important;
+    width: 100% !important;
+    overflow: hidden !important;
+
+    background-size: cover !important;
+    background-position: center right !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* Light overlay on LEFT only */
+  .editorial-home .editorial-image-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+
+    z-index: 1 !important;
+
+    background: linear-gradient(
+      90deg,
+      rgba(255, 250, 243, 0.88) 0%,
+      rgba(255, 250, 243, 0.72) 38%,
+      rgba(255, 250, 243, 0.25) 62%,
+      rgba(255, 250, 243, 0) 100%
+    ) !important;
+  }
+
+  /*
+     Content area
+     Similar placement to your reference image.
+  */
+  .editorial-home .editorial-full-content {
+    position: relative !important;
+
+    z-index: 5 !important;
+
+    width: 100% !important;
+    min-height: 280px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    padding: 20px 16px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  /*
+     LEFT CONTENT WIDTH
+     Leaves the models visible on the right.
+  */
+  .editorial-home .editorial-copy {
+    width: 48% !important;
+    max-width: 48% !important;
+
+    margin: 0 !important;
+
+    text-align: left !important;
+  }
+
+  /* -----------------------------------------
+     THE ART OF TRADITION
+     ----------------------------------------- */
+
+  .editorial-home .eyebrow {
+    display: block !important;
+
+    margin: 0 0 7px !important;
+
+    color: #b28a55 !important;
+
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+
+    letter-spacing: 0.14em !important;
+
+    font-weight: 600 !important;
+
+    text-align: left !important;
+  }
+
+  /* -----------------------------------------
+     THE ART OF DRAPING
+     ----------------------------------------- */
+
+  .editorial-home h2 {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 8px !important;
+
+    color: #171717 !important;
+
+    font-family: Georgia, "Times New Roman", serif !important;
+
+    font-size: 25px !important;
+    line-height: 1.02 !important;
+
+    font-weight: 400 !important;
+
+    text-align: left !important;
+  }
+
+  .editorial-home h2 em {
+    color: #a51d62 !important;
+
+    font-style: italic !important;
+  }
+
+  /* -----------------------------------------
+     DESCRIPTION
+     ----------------------------------------- */
+
+  .editorial-home p {
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 190px !important;
+
+    margin: 0 0 12px !important;
+
+    color: #333333 !important;
+
+    font-size: 9.5px !important;
+    line-height: 1.42 !important;
+
+    text-align: left !important;
+  }
+
+  /* -----------------------------------------
+     DISCOVER OUR STORY BUTTON
+     ----------------------------------------- */
+
+  .editorial-home .editorial-story-button {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: auto !important;
+
+    min-width: 0 !important;
+    min-height: 34px !important;
+
+    padding: 7px 10px !important;
+
+    background: rgba(255, 255, 255, 0.55) !important;
+
+    color: #222222 !important;
+
+    border: 1px solid #555555 !important;
+    border-radius: 4px !important;
+
+    font-size: 7.5px !important;
+    line-height: 1 !important;
+
+    font-weight: 600 !important;
+
+    letter-spacing: 0.06em !important;
+
+    white-space: nowrap !important;
+  }
+
+  .editorial-home .editorial-story-button svg {
+    width: 10px !important;
+    height: 10px !important;
+
+    margin-left: 4px !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media screen and (max-width: 480px) {
+
+  .editorial-home .editorial-full-content {
+    min-height: 260px !important;
+
+    padding: 18px 14px !important;
+  }
+
+  .editorial-home .editorial-copy {
+    width: 49% !important;
+    max-width: 49% !important;
+  }
+
+  .editorial-home .eyebrow {
+    font-size: 7.5px !important;
+  }
+
+  .editorial-home h2 {
+    font-size: 22px !important;
+  }
+
+  .editorial-home p {
+    font-size: 9px !important;
+    max-width: 175px !important;
+  }
+
+  .editorial-home .editorial-story-button {
+    min-height: 32px !important;
+
+    padding: 7px 9px !important;
+
+    font-size: 7px !important;
+  }
+
+  .editorial-home .editorial-story-button svg {
+    width: 9px !important;
+    height: 9px !important;
+  }
+}/* =========================================================
+   SARIKA FASHIONS
+   MOBILE NAVBAR - REFERENCE STYLE
+   MOBILE ONLY
+   ========================================================= */
+
+@media screen and (max-width: 768px) {
+
+  /* -------------------------------------------------------
+     TOP ANNOUNCEMENT BAR
+     ------------------------------------------------------- */
+
+  .site-header .topbar,
+  .site-header .top-bar {
+    height: 26px !important;
+    min-height: 26px !important;
+
+    padding: 0 10px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #9b0f4e !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .site-header .topbar *,
+  .site-header .top-bar * {
+    font-size: 8px !important;
+    line-height: 1 !important;
+    letter-spacing: 0.12em !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MAIN NAVBAR
+     ------------------------------------------------------- */
+
+  .site-header .navbar {
+    width: 100% !important;
+
+    height: 70px !important;
+    min-height: 70px !important;
+
+    background: #ffffff !important;
+
+    border-bottom: 1px solid #eeeeee !important;
+
+    box-sizing: border-box !important;
+  }
+
+
+  /* -------------------------------------------------------
+     NAVBAR INNER
+     ------------------------------------------------------- */
+
+  .site-header .navbar-inner {
+    width: 100% !important;
+    max-width: none !important;
+
+    height: 70px !important;
+    min-height: 70px !important;
+
+    padding: 0 14px !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    box-sizing: border-box !important;
+  }
+
+
+  /* -------------------------------------------------------
+     LOGO
+     ------------------------------------------------------- */
+
+  .site-header .navbar-logo {
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    width: auto !important;
+    height: 100% !important;
+
+    margin: 0 !important;
+
+    flex-shrink: 0 !important;
+  }
+
+  .site-header .navbar-logo img {
+    display: block !important;
+
+    width: 64px !important;
+    height: 64px !important;
+
+    max-width: 64px !important;
+    max-height: 64px !important;
+
+    object-fit: contain !important;
+
+    margin: 0 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     HIDE DESKTOP NAVIGATION
+     ------------------------------------------------------- */
+
+  .site-header .navbar-links.desktop-only {
+    display: none !important;
+  }
+
+
+  /* -------------------------------------------------------
+     RIGHT ICON CLUSTER
+     ------------------------------------------------------- */
+
+  .site-header .navbar-icons {
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    gap: 7px !important;
+
+    margin-left: auto !important;
+
+    height: 100% !important;
+  }
+
+
+  /* -------------------------------------------------------
+     SEARCH / HEART / CART BUTTONS
+     ------------------------------------------------------- */
+
+  .site-header .navbar-icons .btn-icon {
+    position: relative !important;
+
+    width: 34px !important;
+    height: 34px !important;
+
+    min-width: 34px !important;
+    min-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+
+    border: none !important;
+
+    color: #171717 !important;
+
+    border-radius: 50% !important;
+  }
+
+  .site-header .navbar-icons .btn-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+
+    stroke-width: 1.8 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     BADGES
+     ------------------------------------------------------- */
+
+  .site-header .navbar-badge {
+    position: absolute !important;
+
+    top: -1px !important;
+    right: -1px !important;
+
+    min-width: 14px !important;
+    height: 14px !important;
+
+    padding: 0 3px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    background: #9b0f4e !important;
+    color: #ffffff !important;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+
+    font-weight: 700 !important;
+
+    box-sizing: border-box !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MOBILE MENU / HAMBURGER
+     ------------------------------------------------------- */
+
+  .site-header .navbar-menu-btn {
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 34px !important;
+    height: 34px !important;
+
+    min-width: 34px !important;
+    min-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+
+    border: none !important;
+
+    color: #171717 !important;
+  }
+
+  .site-header .navbar-menu-btn svg {
+    width: 23px !important;
+    height: 23px !important;
+
+    stroke-width: 1.8 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     SEARCH BAR
+     ------------------------------------------------------- */
+
+  .site-header .navbar-search-bar {
+    position: absolute !important;
+
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+
+    z-index: 100 !important;
+
+    background: #ffffff !important;
+
+    border-bottom: 1px solid #eeeeee !important;
+  }
+
+  .site-header .navbar-search-bar form {
+    width: 100% !important;
+
+    padding: 12px 14px !important;
+
+    box-sizing: border-box !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MOBILE DRAWER
+     ------------------------------------------------------- */
+
+  .site-header .mobile-drawer {
+    width: 82% !important;
+    max-width: 340px !important;
+
+    background: #fffaf5 !important;
+  }
+
+  .site-header .mobile-drawer-header {
+    min-height: 70px !important;
+
+    padding: 8px 16px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    border-bottom: 1px solid #eeeeee !important;
+  }
+
+  .site-header .mobile-logo img {
+    width: 58px !important;
+    height: 58px !important;
+
+    object-fit: contain !important;
+  }
+
+  .site-header .mobile-drawer-links a {
+    font-size: 15px !important;
+
+    padding: 14px 20px !important;
+
+    color: #222222 !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media screen and (max-width: 480px) {
+
+  .site-header .navbar {
+    height: 66px !important;
+    min-height: 66px !important;
+  }
+
+  .site-header .navbar-inner {
+    height: 66px !important;
+    min-height: 66px !important;
+
+    padding: 0 11px !important;
+  }
+
+  .site-header .navbar-logo img {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .site-header .navbar-icons {
+    gap: 3px !important;
+  }
+
+  .site-header .navbar-icons .btn-icon {
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+  }
+
+  .site-header .navbar-icons .btn-icon svg {
+    width: 19px !important;
+    height: 19px !important;
+  }
+
+  .site-header .navbar-menu-btn {
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+  }
+
+  .site-header .navbar-menu-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}/* =========================================================
+   FEATURE CARDS - MOBILE ONLY
+   SIZE UNCHANGED
+   ONLY SLIGHT FONT SIZE INCREASE
+   ========================================================= */
+
+@media screen and (max-width: 768px) {
+
+  .features-section .feature-card h3 {
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+  }
+
+  .features-section .feature-card p {
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+  }
+
+  .features-section .feature-card svg {
+    width: 21px !important;
+    height: 21px !important;
+  }
+}
+
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+
+  .features-section .feature-card h3 {
+    font-size: 12px !important;
+  }
+
+  .features-section .feature-card p {
+    font-size: 9.5px !important;
+  }
+
+  .features-section .feature-card svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+/* =====================================================
+   HERO BANNER — MOBILE TEXT ONLY
+   Images & hero card are NOT changed
+   ===================================================== */
+
+@media screen and (max-width: 768px) {
+
+  /* Small top text */
+  .hero-section .eyebrow,
+  .hero .eyebrow {
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.12em !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Main hero heading */
+  .hero-section h1,
+  .hero h1 {
+    font-size: 25px !important;
+    line-height: 1.05 !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Hero description */
+  .hero-section p,
+  .hero p {
+    font-size: 10px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Hero buttons */
+  .hero-section .btn,
+  .hero .btn {
+    font-size: 8px !important;
+    line-height: 1 !important;
+    padding: 8px 11px !important;
+    min-height: 32px !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  /* If there are multiple buttons */
+  .hero-section .hero-actions,
+  .hero .hero-actions {
+    gap: 6px !important;
+  }
+
+  /* Hero stats */
+  .hero-section .hero-stat,
+  .hero .hero-stat {
+    font-size: 9px !important;
+  }
+
+  .hero-section .hero-stat strong,
+  .hero .hero-stat strong {
+    font-size: 13px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+
+  .hero-section .eyebrow,
+  .hero .eyebrow {
+    font-size: 7px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .hero-section h1,
+  .hero h1 {
+    font-size: 22px !important;
+    line-height: 1.04 !important;
+    margin-bottom: 7px !important;
+  }
+
+  .hero-section p,
+  .hero p {
+    font-size: 9px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 9px !important;
+  }
+
+  .hero-section .btn,
+  .hero .btn {
+    font-size: 7px !important;
+    padding: 7px 9px !important;
+    min-height: 29px !important;
+  }
+
+  .hero-section .hero-actions,
+  .hero .hero-actions {
+    gap: 5px !important;
+  }
+
+  .hero-section .hero-stat,
+  .hero .hero-stat {
+    font-size: 8px !important;
+  }
+
+  .hero-section .hero-stat strong,
+  .hero .hero-stat strong {
+    font-size: 12px !important;
+  }
+}/* =====================================================
+   CONTACT PAGE — SHORTER FORM BOXES ON MOBILE ONLY
+   ===================================================== */
+
+@media screen and (max-width: 768px) {
+
+  /* Name, Phone, Email inputs */
+  .contact-page input {
+    height: 20px !important;
+    min-height: 20px !important;
+    padding: 10px 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Message textarea */
+  .contact-page textarea {
+    height: 110px !important;
+    min-height: 110px !important;
+    padding: 10px 14px !important;
+    box-sizing: border-box !important;
+    resize: vertical !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+
+  /* Name, Phone, Email */
+  .contact-page input {
+    height: 15px !important;
+    min-height: 15px !important;
+  }
+
+  /* Message */
+  .contact-page textarea {
+    height: 15px !important;
+    min-height: 15px !important;
+  }
+}/* =========================================
+   CONTACT PAGE - GET IN TOUCH BANNER
+   MOBILE ONLY
+   ========================================= */
+
+@media screen and (max-width: 768px) {
+
+  /* Contact page top banner */
+  .contact-header,
+  .contact-hero-section,
+  .contact-banner,
+  .page-hero {
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+}
+
+@media screen and (max-width: 480px) {
+
+  .contact-header,
+  .contact-hero-section,
+  .contact-banner,
+  .page-hero {
+    height: 230px !important;
+    min-height: 230px !important;
+    max-height: 230px !important;
+  }
+
+}/* =====================================================
+   CONTACT PAGE — COMPACT MOBILE LAYOUT
+   EVERYTHING COMPRESSED — MOBILE ONLY
+   ===================================================== */
+
+@media screen and (max-width: 768px) {
+
+  /* ---------- GET IN TOUCH ---------- */
+  .contact-page .simple-page-hero {
+    padding: 28px 14px !important;
+  }
+
+  .contact-page .simple-page-hero .eyebrow {
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .contact-page .simple-page-hero h1 {
+    font-size: 32px !important;
+    line-height: 1 !important;
+    margin: 5px 0 7px !important;
+  }
+
+  .contact-page .simple-page-hero p {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+    margin: 0 auto !important;
+  }
+
+
+  /* ---------- CONTACT SECTION ---------- */
+  .contact-page .section {
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+  }
+
+  .contact-page .contact-grid {
+    gap: 14px !important;
+  }
+
+
+  /* ---------- CONTACT INFO CARD ---------- */
+  .contact-page .contact-info-card {
+    padding: 18px !important;
+    border-radius: 12px !important;
+  }
+
+  .contact-page .contact-info-card .eyebrow {
+    font-size: 8px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .contact-page .contact-info-card h2 {
+    font-size: 20px !important;
+    line-height: 1.1 !important;
+    margin-bottom: 12px !important;
+  }
+
+
+  /* ---------- EMAIL / PHONE / HOURS ---------- */
+  .contact-page .contact-line {
+    gap: 10px !important;
+    padding: 9px 0 !important;
+  }
+
+  .contact-page .contact-line svg {
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .contact-page .contact-line div {
+    gap: 1px !important;
+  }
+
+  .contact-page .contact-line strong {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  .contact-page .contact-line span {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+  }
+
+
+  /* ---------- SEND MESSAGE CARD ---------- */
+  .contact-page .contact-form-card {
+    padding: 18px !important;
+    border-radius: 12px !important;
+  }
+
+  .contact-page .contact-form-card h3 {
+    font-size: 18px !important;
+    margin-bottom: 12px !important;
+  }
+
+
+  /* ---------- FORM FIELDS ---------- */
+  .contact-page .field {
+    margin-bottom: 9px !important;
+  }
+
+  .contact-page .field-row {
+    gap: 9px !important;
+  }
+
+  .contact-page .field label {
+    font-size: 9px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .contact-page input {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 7px 10px !important;
+    font-size: 11px !important;
+    box-sizing: border-box !important;
+  }
+
+  .contact-page textarea {
+    height: 75px !important;
+    min-height: 75px !important;
+    padding: 7px 10px !important;
+    font-size: 11px !important;
+    box-sizing: border-box !important;
+  }
+
+
+  /* ---------- SEND BUTTON ---------- */
+  .contact-page .contact-form-card .btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 7px 12px !important;
+    font-size: 9px !important;
+  }
+
+  .contact-page .contact-form-card .btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
+
+/* =====================================================
+   EXTRA COMPRESSION — SMALL PHONES
+   ===================================================== */
+
+@media screen and (max-width: 480px) {
+
+  .contact-page .simple-page-hero {
+    padding: 24px 12px !important;
+  }
+
+  .contact-page .simple-page-hero h1 {
+    font-size: 28px !important;
+  }
+
+  .contact-page .simple-page-hero p {
+    font-size: 9px !important;
+  }
+
+  .contact-page .section {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .contact-page .contact-grid {
+    gap: 10px !important;
+  }
+
+  .contact-page .contact-info-card,
+  .contact-page .contact-form-card {
+    padding: 15px !important;
+    border-radius: 10px !important;
+  }
+
+  .contact-page .contact-info-card h2 {
+    font-size: 18px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .contact-page .contact-line {
+    padding: 7px 0 !important;
+  }
+
+  .contact-page .contact-form-card h3 {
+    font-size: 16px !important;
+    margin-bottom: 9px !important;
+  }
+
+  .contact-page .field {
+    margin-bottom: 7px !important;
+  }
+
+  .contact-page input {
+    height: 34px !important;
+    min-height: 34px !important;
+    font-size: 10px !important;
+  }
+
+  .contact-page textarea {
+    height: 65px !important;
+    min-height: 65px !important;
+  }
+
+  .contact-page .contact-form-card .btn {
+    height: 31px !important;
+    min-height: 31px !important;
+    font-size: 8px !important;
+    padding: 6px 10px !important;
+  }
+}@media screen and (max-width: 768px) {
+
+  /* Keep navbar as positioning reference */
+  .navbar .navbar-inner {
+    position: relative !important;
+  }
+
+  /* MENU */
+  .navbar .navbar-menu-btn {
+    position: absolute !important;
+    left: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 100 !important;
+  }
+
+  /* LOGO - force it to move right */
+  .navbar .navbar-logo {
+    position: relative !important;
+    left: 42px !important;
+    margin-left: 0 !important;
+  }
+
+}@media screen and (min-width: 769px) {
+
+  .hero.hero-fullscreen .hero-title {
+    width: max-content !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    font-size: clamp(3rem, 5vw, 5rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .hero.hero-fullscreen .hero-copy {
+    max-width: none !important;
+    width: auto !important;
+  }
+
+}
+/* =====================================================
+   ABOUT US PAGE - MOBILE RESPONSIVE
+   DESKTOP IS NOT TOUCHED
+   ===================================================== */
+
+@media screen and (max-width: 768px) {
+
+  /* Main About section */
+  .about-page {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* About hero / heritage section */
+  .about-page .simple-page-hero {
+    min-height: auto !important;
+    padding: 28px 18px !important;
+    text-align: left !important;
+  }
+
+  .about-page .simple-page-hero .eyebrow {
+    font-size: 8px !important;
+    letter-spacing: 0.14em !important;
+    line-height: 1.2 !important;
+  }
+
+  .about-page .simple-page-hero h1 {
+    font-size: 30px !important;
+    line-height: 1.05 !important;
+    margin: 7px 0 10px !important;
+  }
+
+  .about-page .simple-page-hero p {
+    font-size: 10px !important;
+    line-height: 1.4 !important;
+  }
+
+
+  /* About content section */
+  .about-page .section {
+    padding-top: 22px !important;
+    padding-bottom: 22px !important;
+  }
+
+  .about-page .container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+
+  /* Background image/content area */
+  .about-page .about-story,
+  .about-page .about-content,
+  .about-page .about-hero {
+    min-height: auto !important;
+  }
+
+
+  /* Main heading */
+  .about-page h2 {
+    font-size: 28px !important;
+    line-height: 1.08 !important;
+    margin-bottom: 16px !important;
+  }
+
+
+  /* Paragraphs */
+  .about-page p {
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+  }
+
+
+  /* Buttons */
+  .about-page .btn {
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 8px 14px !important;
+    font-size: 9px !important;
+  }
+
+}
+
+
+/* EXTRA SMALL PHONES */
+@media screen and (max-width: 480px) {
+
+  .about-page .simple-page-hero {
+    padding: 24px 14px !important;
+  }
+
+  .about-page .simple-page-hero h1 {
+    font-size: 26px !important;
+  }
+
+  .about-page .simple-page-hero p {
+    font-size: 9px !important;
+  }
+
+  .about-page .section {
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+  }
+
+  .about-page .container {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .about-page h2 {
+    font-size: 24px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .about-page p {
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+  }
+
+  .about-page .btn {
+    height: 33px !important;
+    min-height: 33px !important;
+    padding: 7px 12px !important;
+    font-size: 8px !important;
+  }
+
+}

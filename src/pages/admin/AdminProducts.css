@@ -1,0 +1,602 @@
+/* =========================================================
+   SARIKA FASHIONS
+   ADMIN PRODUCTS PAGE
+   Elegant • Minimal • Luxury
+========================================================= */
+
+.admin-products-page {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 8px 6px 45px;
+
+  color: #2f2422;
+
+  animation: pageReveal 0.45s ease both;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.admin-products-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.admin-products-header h2 {
+  margin: 0;
+
+  color: #35191a;
+
+  font-size: 29px;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.admin-products-header h2::after {
+  content: "";
+
+  display: block;
+
+  width: 38px;
+  height: 2px;
+
+  margin-top: 9px;
+
+  border-radius: 10px;
+
+  background: #9a7042;
+}
+
+
+/* =========================================================
+   ADD PRODUCT BUTTON
+========================================================= */
+
+.add-btn {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 132px;
+  height: 42px;
+
+  padding: 0 18px;
+
+  border: 1px solid #542324;
+  border-radius: 8px;
+
+  background: #542324;
+
+  color: #fffaf5;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  letter-spacing: 0.15px;
+
+  cursor: pointer;
+
+  box-shadow: 0 5px 14px rgba(84, 35, 36, 0.13);
+
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.add-btn:hover {
+  background: #682d2f;
+  border-color: #682d2f;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 8px 18px rgba(84, 35, 36, 0.18);
+}
+
+.add-btn:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   PRODUCTS TABLE CARD
+========================================================= */
+
+.products-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+
+  background: #fffdfa;
+
+  border: 1px solid #e9dfd7;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 5px 24px rgba(52, 34, 30, 0.055);
+
+  animation: tableReveal 0.5s ease 0.05s both;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.products-table-wrapper table {
+  width: 100%;
+  min-width: 900px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.products-table-wrapper thead {
+  background: #f7f1eb;
+}
+
+.products-table-wrapper th {
+  height: 52px;
+
+  padding: 0 16px;
+
+  color: #634e47;
+
+  font-size: 10.5px;
+  font-weight: 700;
+
+  text-align: left;
+
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+
+  border-bottom: 1px solid #e6dbd3;
+
+  white-space: nowrap;
+}
+
+.products-table-wrapper th:first-child {
+  padding-left: 22px;
+}
+
+.products-table-wrapper th:last-child {
+  padding-right: 22px;
+}
+
+
+/* =========================================================
+   TABLE ROWS
+========================================================= */
+
+.products-table-wrapper tbody tr {
+  background: #fffdfa;
+
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.products-table-wrapper tbody tr:hover {
+  background: #fcf7f2;
+
+  box-shadow:
+    inset 3px 0 0 #8d4d4d;
+}
+
+.products-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   TABLE CELLS
+========================================================= */
+
+.products-table-wrapper td {
+  height: 82px;
+
+  padding: 10px 16px;
+
+  color: #403432;
+
+  font-size: 13px;
+
+  vertical-align: middle;
+
+  border-bottom: 1px solid #eee6df;
+}
+
+.products-table-wrapper td:first-child {
+  padding-left: 22px;
+}
+
+.products-table-wrapper td:last-child {
+  padding-right: 22px;
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE
+========================================================= */
+
+.products-table-wrapper td img {
+  width: 52px !important;
+  height: 66px !important;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 7px !important;
+
+  border: 1px solid #ded0c5;
+
+  background: #f2ebe5;
+
+  box-shadow:
+    0 3px 10px rgba(54, 34, 30, 0.1);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.products-table-wrapper tbody tr:hover td img {
+  transform: scale(1.04);
+
+  box-shadow:
+    0 6px 14px rgba(54, 34, 30, 0.15);
+}
+
+
+/* =========================================================
+   PRODUCT NAME
+========================================================= */
+
+.products-table-wrapper td:nth-child(2) {
+  min-width: 300px;
+
+  color: #302323;
+
+  font-size: 13.5px;
+  font-weight: 600;
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.products-table-wrapper td:nth-child(3) {
+  color: #5b292b;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   CATEGORY
+========================================================= */
+
+.products-table-wrapper td:nth-child(4) {
+  color: #75645d;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   STOCK
+========================================================= */
+
+.products-table-wrapper td:nth-child(5) {
+  color: #4f654f;
+
+  font-size: 12.5px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.products-table-wrapper td:last-child {
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   EDIT BUTTON
+========================================================= */
+
+.edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 55px;
+  height: 31px;
+
+  padding: 0 12px;
+
+  border: 1px solid #d8c6b8;
+  border-radius: 6px;
+
+  background: #fffaf6;
+
+  color: #633d35;
+
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: #f4e9df;
+
+  border-color: #b99b82;
+
+  color: #4d2929;
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+========================================================= */
+
+.delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 61px;
+  height: 31px;
+
+  padding: 0 12px;
+
+  margin-left: 6px;
+
+  border: 1px solid #e4c9c6;
+  border-radius: 6px;
+
+  background: #fffafa;
+
+  color: #9b4b48;
+
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #f9e9e7;
+
+  border-color: #d7a6a2;
+
+  color: #823936;
+
+  transform: translateY(-1px);
+}
+
+.edit-btn:active,
+.delete-btn:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   ACTION CELL
+========================================================= */
+
+.product-actions {
+  white-space: nowrap;
+}
+
+.product-actions .edit-btn,
+.product-actions .delete-btn {
+  vertical-align: middle;
+}
+
+
+/* =========================================================
+   SUBTLE SCROLLBAR
+========================================================= */
+
+.products-table-wrapper::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.products-table-wrapper::-webkit-scrollbar-track {
+  background: #f5eee8;
+}
+
+.products-table-wrapper::-webkit-scrollbar-thumb {
+  background: #c4aa91;
+
+  border-radius: 20px;
+}
+
+.products-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #a7896d;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.admin-products-page
+> div[style*="padding"] {
+  min-height: 280px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #6f5b54;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   VERY SUBTLE — NO MESS
+========================================================= */
+
+@keyframes pageReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tableReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .admin-products-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .add-btn {
+    width: auto;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .admin-products-page {
+    padding: 5px 0 30px;
+  }
+
+  .admin-products-header {
+    margin-bottom: 18px;
+  }
+
+  .admin-products-header h2 {
+    font-size: 25px;
+  }
+
+  .add-btn {
+    width: 100%;
+  }
+
+  .products-table-wrapper {
+    border-radius: 11px;
+  }
+
+  .products-table-wrapper th {
+    height: 48px;
+    padding: 0 12px;
+  }
+
+  .products-table-wrapper td {
+    height: 76px;
+    padding: 8px 12px;
+  }
+
+  .products-table-wrapper td:first-child {
+    padding-left: 14px;
+  }
+
+  .products-table-wrapper td:last-child {
+    padding-right: 14px;
+  }
+
+  .products-table-wrapper td img {
+    width: 48px !important;
+    height: 61px !important;
+  }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-products-page,
+  .products-table-wrapper {
+    animation: none;
+  }
+
+  .add-btn,
+  .edit-btn,
+  .delete-btn,
+  .products-table-wrapper td img {
+    transition: none;
+  }
+}

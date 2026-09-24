@@ -1,0 +1,458 @@
+/* ============================================================
+   SARIKA FASHIONS
+   CART PAGE
+   ============================================================ */
+
+.cart-page {
+  width: 100%;
+  padding: 55px 0 70px;
+}
+
+
+/* ============================================================
+   CART TITLE
+   ============================================================ */
+
+.cart-page .section-title {
+  margin: 0 0 30px;
+}
+
+
+/* ============================================================
+   CART LAYOUT
+   ============================================================ */
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 32px;
+  align-items: start;
+}
+
+
+/* ============================================================
+   CART ITEMS
+   ============================================================ */
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
+/* ============================================================
+   CART ITEM
+   ============================================================ */
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  min-height: 150px;
+
+  padding: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #eadfd8;
+
+  border-radius: 12px;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.cart-item:hover {
+  transform: translateY(-2px);
+
+  border-color: #dfc9c0;
+
+  box-shadow:
+    0 10px 28px rgba(70, 30, 40, 0.07);
+}
+
+
+/* ============================================================
+   PRODUCT IMAGE
+   ============================================================ */
+
+.cart-item img {
+  width: 90px !important;
+  height: 120px !important;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 8px;
+
+  border: 1px solid #eee2dc;
+
+  background: #f7f1ec;
+}
+
+
+/* ============================================================
+   PRODUCT DETAILS
+   ============================================================ */
+
+.cart-item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-details h4 {
+  margin: 0 0 7px;
+
+  color: #302124;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+.cart-item-details p {
+  margin: 0 0 14px;
+
+  color: #8e1748;
+
+  font-size: 15px;
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   QUANTITY CONTROLS
+   ============================================================ */
+
+.qty-controls {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  width: fit-content;
+
+  padding: 5px 9px;
+
+  border: 1px solid #e2d4cd;
+
+  border-radius: 20px;
+
+  background: #fffdfa;
+}
+
+.qty-controls button {
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #55152f;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.qty-controls button:hover {
+  background: #f3e5eb;
+
+  color: #8e1748;
+}
+
+.qty-controls span {
+  min-width: 14px;
+
+  text-align: center;
+
+  color: #33252a;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   DELETE BUTTON
+   ============================================================ */
+
+.cart-item > button {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid #ead9d9;
+
+  border-radius: 50%;
+
+  background: #fffafa;
+
+  color: #9a4c55;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.cart-item > button:hover {
+  background: #f8e9eb;
+
+  color: #7d2734;
+
+  transform: scale(1.05);
+}
+
+
+/* ============================================================
+   EMPTY CART
+   ============================================================ */
+
+.empty-state {
+  width: 100%;
+
+  min-height: 500px;
+
+  padding: 80px 20px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  color: #2c2024;
+
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(142, 23, 72, 0.035),
+      transparent 35%
+    );
+}
+
+
+/* Shopping bag icon */
+
+.empty-state > svg {
+  width: 68px;
+  height: 68px;
+
+  margin-bottom: 22px;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  color: #8e1748;
+
+  border: 1px solid #e4d5d0;
+
+  border-radius: 50%;
+
+  background: #fff;
+
+  box-shadow:
+    0 8px 25px rgba(70, 30, 40, 0.07);
+}
+
+
+/* Empty heading */
+
+.empty-state h2 {
+  margin: 0 0 9px;
+
+  color: #321f26;
+
+  font-family:
+    "Playfair Display",
+    Georgia,
+    serif;
+
+  font-size: 30px;
+
+  font-weight: 500;
+
+  line-height: 1.2;
+}
+
+
+/* Empty description */
+
+.empty-state p {
+  margin: 0 0 25px;
+
+  color: #806f75;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   CONTINUE SHOPPING
+   ============================================================ */
+
+.empty-state .btn-primary {
+  min-width: 190px;
+
+  min-height: 48px;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 24px;
+
+  border-radius: 7px;
+
+  background: #8e1748;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.8px;
+
+  text-decoration: none;
+
+  box-shadow:
+    0 8px 20px rgba(142, 23, 72, 0.18);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.empty-state .btn-primary:hover {
+  background: #711238;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 25px rgba(142, 23, 72, 0.25);
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .cart-layout {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .cart-page {
+    padding: 35px 0 50px;
+  }
+
+  .cart-item {
+    gap: 13px;
+
+    padding: 13px;
+  }
+
+  .cart-item img {
+    width: 70px !important;
+    height: 95px !important;
+  }
+
+  .cart-item-details h4 {
+    font-size: 14px;
+  }
+
+  .cart-item-details p {
+    font-size: 14px;
+  }
+
+  .empty-state {
+    min-height: 430px;
+
+    padding: 55px 20px;
+  }
+
+  .empty-state > svg {
+    width: 62px;
+    height: 62px;
+  }
+
+  .empty-state h2 {
+    font-size: 26px;
+  }
+
+  .empty-state p {
+    font-size: 13px;
+  }
+
+  .empty-state .btn-primary {
+    width: auto;
+
+    min-width: 180px;
+  }
+}
+
+
+@media (max-width: 380px) {
+
+  .cart-item {
+    gap: 10px;
+  }
+
+  .cart-item > button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .empty-state h2 {
+    font-size: 24px;
+  }
+}

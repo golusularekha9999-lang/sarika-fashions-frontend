@@ -1,0 +1,2460 @@
+/* =========================================================
+   SARIKA FASHIONS - HOME PAGE
+   FINAL RESPONSIVE VERSION
+========================================================= */
+
+.home-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  background: var(--color-cream);
+}
+
+.home-page *,
+.home-page *::before,
+.home-page *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   COMMON
+========================================================= */
+
+.home-page .container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   HERO - DESKTOP
+========================================================= */
+
+.hero-fullscreen {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 104px);
+
+  display: flex;
+  align-items: center;
+
+  isolation: isolate;
+  overflow: hidden;
+
+  background: #211016;
+  color: #fff;
+}
+
+/* Background photo (used by Home.jsx's .hero-background div) */
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -4;
+  transition: opacity 0.6s ease;
+}
+
+/* Background artwork (legacy/unused fallback) */
+
+.hero-art-bg {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: 0.28;
+
+  z-index: -4;
+}
+
+.hero-art-bg svg {
+  width: 100%;
+  height: 100%;
+  transform: scale(1.25);
+}
+
+/* Gradient */
+
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+
+  z-index: -3;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(26, 8, 14, 0.96) 0%,
+      rgba(42, 13, 24, 0.84) 40%,
+      rgba(57, 20, 31, 0.42) 70%,
+      rgba(255, 249, 240, 0.06) 100%
+    );
+}
+
+/* Decorative orbs */
+
+.hero-orb {
+  position: absolute;
+
+  width: 38vw;
+  height: 38vw;
+
+  border-radius: 50%;
+
+  filter: blur(20px);
+  opacity: 0.2;
+
+  z-index: -2;
+}
+
+.hero-orb-one {
+  background: var(--color-primary);
+  top: -15%;
+  right: -10%;
+}
+
+.hero-orb-two {
+  background: var(--color-gold);
+  bottom: -30%;
+  left: 25%;
+}
+
+/* =========================================================
+   HERO CONTENT
+========================================================= */
+
+.hero-full-inner {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(340px, 0.9fr);
+
+  align-items: center;
+
+  gap: 5vw;
+
+  padding-top: 56px;
+  padding-bottom: 56px;
+
+  position: relative;
+  z-index: 2;
+}
+
+.hero-copy {
+  width: 100%;
+  max-width: 680px;
+
+  animation:
+    heroEnter
+    0.8s
+    cubic-bezier(.2, .8, .2, 1)
+    both;
+}
+
+/* Kicker */
+
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  font-size: 0.72rem;
+  letter-spacing: 0.17em;
+
+  color: var(--color-gold-light);
+
+  margin-bottom: 20px;
+}
+
+/* Brand */
+
+.hero-overline {
+  font-family: var(--font-accent);
+
+  font-size: 0.67rem;
+
+  letter-spacing: 0.32em;
+
+  color: #ead6bd;
+
+  margin-bottom: 14px;
+}
+
+/* Title */
+
+.hero-title {
+  color: #fff;
+
+  font-size: clamp(3rem, 6vw, 6rem);
+
+  line-height: 1.02;
+
+  letter-spacing: -0.035em;
+
+  margin: 0 0 22px;
+}
+
+.hero-title em {
+  color: var(--color-gold-light);
+  font-weight: 500;
+}
+
+/* Text */
+
+.hero-text {
+  color: #f5e7e8;
+
+  max-width: 540px;
+
+  font-size: 1rem;
+
+  line-height: 1.65;
+
+  margin-bottom: 28px;
+}
+
+/* Buttons */
+
+.hero-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+
+  flex-wrap: wrap;
+}
+
+.hero-primary {
+  padding: 15px 23px;
+
+  box-shadow:
+    0 15px 35px
+    rgba(0, 0, 0, 0.24);
+}
+
+.hero-text-button {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  color: #fff;
+
+  font-size: 0.8rem;
+
+  letter-spacing: 0.09em;
+
+  text-transform: uppercase;
+
+  font-weight: 600;
+}
+
+.hero-text-button span {
+  font-size: 1.2rem;
+}
+
+/* =========================================================
+   HERO STATS
+========================================================= */
+
+.hero-mini-stats {
+  display: flex;
+
+  gap: 28px;
+
+  margin-top: 48px;
+
+  padding-top: 20px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.18);
+}
+
+.hero-mini-stats div {
+  display: grid;
+
+  gap: 3px;
+
+  min-width: 0;
+}
+
+.hero-mini-stats strong {
+  font-family: var(--font-display);
+
+  color: #fff;
+
+  font-size: 1.4rem;
+}
+
+.hero-mini-stats span {
+  color: #d7c5c7;
+
+  font-size: 0.65rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.07em;
+}
+
+/* =========================================================
+   HERO SHOWCASE
+========================================================= */
+
+.hero-showcase {
+  position: relative;
+
+  min-height: 570px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+.hero-frame {
+  position: relative;
+
+  width: min(420px, 34vw);
+
+  min-width: 320px;
+
+  aspect-ratio: 4 / 5.2;
+
+  overflow: hidden;
+
+  border-radius:
+    180px
+    180px
+    26px
+    26px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.24);
+
+  background: #f7e8ea;
+
+  box-shadow:
+    0 30px 90px
+    rgba(0, 0, 0, 0.38);
+}
+
+.hero-frame svg {
+  width: 100%;
+  height: 100%;
+
+  transform: scale(1.06);
+}
+
+.hero-frame-glow {
+  position: absolute;
+
+  width: 85%;
+  height: 70%;
+
+  border-radius: 50%;
+
+  background:
+    rgba(199, 154, 91, 0.18);
+
+  filter: blur(45px);
+}
+
+/* Floating note */
+
+.hero-floating-note {
+  position: absolute;
+
+  right: -5px;
+  bottom: 55px;
+
+  min-width: 175px;
+
+  padding: 15px 18px;
+
+  background:
+    rgba(255, 249, 240, 0.95);
+
+  color: var(--color-dark);
+
+  border-left:
+    3px solid
+    var(--color-gold);
+
+  border-radius: 10px;
+
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-floating-note span {
+  display: block;
+
+  font-size: 0.56rem;
+
+  letter-spacing: 0.14em;
+
+  color: var(--color-primary);
+
+  font-weight: 700;
+
+  margin-bottom: 4px;
+}
+
+.hero-floating-note strong {
+  font-family: var(--font-display);
+
+  font-size: 1.05rem;
+
+  line-height: 1.05;
+}
+
+/* Circular badge */
+
+.hero-scroll-badge {
+  position: absolute;
+
+  left: -20px;
+  top: 45px;
+
+  width: 110px;
+  height: 110px;
+
+  border-radius: 50%;
+
+  display: grid;
+
+  place-items: center;
+
+  border:
+    1px dashed
+    rgba(255, 255, 255, 0.4);
+
+  color: #f4dcb8;
+
+  font-size: 0.5rem;
+
+  letter-spacing: 0.07em;
+
+  text-align: center;
+
+  padding: 15px;
+}
+
+/* =========================================================
+   HERO BOTTOM
+========================================================= */
+
+.hero-bottom-hint {
+  position: absolute;
+
+  left: 50%;
+  bottom: 20px;
+
+  transform:
+    translateX(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  color: #d7c5c7;
+
+  font-size: 0.6rem;
+
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+.hero-bottom-hint span {
+  width: 36px;
+  height: 1px;
+
+  background: var(--color-gold);
+}
+
+/* =========================================================
+   HERO SLIDER
+========================================================= */
+
+.hero-slider-controls {
+  position: absolute;
+
+  right: 30px;
+  bottom: 25px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  z-index: 10;
+
+  padding: 7px 10px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(33, 16, 22, 0.55);
+
+  backdrop-filter: blur(8px);
+}
+
+.hero-slider-arrow {
+  width: 31px;
+  height: 31px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.35);
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  color: #fff;
+
+  display: grid;
+
+  place-items: center;
+
+  cursor: pointer;
+}
+
+.hero-slider-dots {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+}
+
+.hero-slider-dot {
+  width: 7px;
+  height: 7px;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.45);
+
+  cursor: pointer;
+}
+
+.hero-slider-dot.active {
+  width: 21px;
+
+  border-radius: 999px;
+
+  background:
+    var(--color-gold-light);
+}
+
+/* =========================================================
+   FEATURES
+========================================================= */
+
+.features-section {
+  padding-top: 34px;
+  padding-bottom: 42px;
+
+  background:
+    var(--color-cream);
+}
+
+.features-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+/* =========================================================
+   SECTION COMMON
+========================================================= */
+
+.section {
+  width: 100%;
+}
+
+.section-header {
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+.section-title {
+  margin: 0;
+
+  line-height: 1.05;
+}
+
+.section-title em,
+.editorial-copy em {
+  color: var(--color-primary);
+
+  font-weight: 500;
+}
+
+.eyebrow {
+  display: inline-block;
+
+  font-size: 0.68rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.15em;
+
+  color: var(--color-primary);
+
+  font-weight: 700;
+}
+
+.section-link {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   SCROLLERS
+========================================================= */
+
+.scroller-wrap {
+  position: relative;
+
+  width: 100%;
+}
+
+.category-scroller,
+.product-scroller {
+  display: flex;
+
+  gap: 20px;
+
+  width: 100%;
+
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+  padding:
+    8px
+    2px
+    12px;
+
+  scroll-snap-type:
+    x proximity;
+
+  scrollbar-width: none;
+}
+
+.category-scroller::-webkit-scrollbar,
+.product-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Products */
+
+.product-scroller-item {
+  min-width: 268px;
+
+  scroll-snap-align: start;
+}
+
+/* Scroller buttons */
+
+.scroller-arrow {
+  position: absolute;
+
+  top: 42%;
+
+  transform:
+    translateY(-50%);
+
+  width: 44px;
+  height: 44px;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: #fff;
+
+  box-shadow:
+    var(--shadow-md);
+
+  display: grid;
+
+  place-items: center;
+
+  z-index: 5;
+
+  cursor: pointer;
+}
+
+.scroller-arrow-left {
+  left: -22px;
+}
+
+.scroller-arrow-right {
+  right: -22px;
+}
+
+/* =========================================================
+   EDITORIAL
+========================================================= */
+
+.editorial-home {
+  width: 100%;
+
+  padding: 72px 0;
+
+  background:
+    linear-gradient(
+      115deg,
+      #f3e5e5,
+      #fffaf3
+    );
+
+  overflow: hidden;
+}
+
+.editorial-home-grid {
+  display: grid;
+
+  grid-template-columns:
+    0.9fr
+    1.1fr;
+
+  align-items: center;
+
+  gap: 7vw;
+}
+
+.editorial-art {
+  width: 100%;
+
+  aspect-ratio: 1 / 1.12;
+
+  overflow: hidden;
+
+  border-radius:
+    28px
+    120px
+    28px
+    120px;
+
+  background: #f7e8ea;
+
+  box-shadow:
+    var(--shadow-lg);
+}
+
+.editorial-art svg {
+  width: 100%;
+  height: 100%;
+}
+
+.editorial-copy {
+  width: 100%;
+
+  max-width: 520px;
+}
+
+.editorial-copy h2 {
+  font-size:
+    clamp(
+      2.4rem,
+      5vw,
+      4.4rem
+    );
+
+  line-height: 1.05;
+
+  margin:
+    12px
+    0
+    20px;
+}
+
+.editorial-copy p {
+  color: #5a4a4e;
+
+  max-width: 500px;
+
+  line-height: 1.7;
+
+  margin-bottom: 28px;
+}
+
+/* =========================================================
+   PROMO / FESTIVE
+========================================================= */
+
+.promo-banner {
+  width: 100%;
+
+  background:
+    linear-gradient(
+      115deg,
+      var(--color-primary-dark),
+      var(--color-primary)
+    );
+
+  color: #fff;
+
+  overflow: hidden;
+}
+
+.promo-banner-inner {
+  min-height: 420px;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    360px;
+
+  align-items: center;
+
+  gap: 30px;
+}
+
+.promo-banner-inner h2 {
+  color: #fff;
+
+  font-size:
+    clamp(
+      2rem,
+      4vw,
+      3.5rem
+    );
+
+  line-height: 1.08;
+
+  margin:
+    10px
+    0
+    12px;
+}
+
+.promo-banner-inner p {
+  color: #f0d9df;
+
+  max-width: 520px;
+
+  line-height: 1.6;
+
+  margin-bottom: 24px;
+}
+
+.promo-art {
+  align-self: end;
+
+  height: 360px;
+
+  overflow: hidden;
+
+  border-radius:
+    120px
+    120px
+    0
+    0;
+}
+
+.promo-art svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+.reveal {
+  animation:
+    revealUp
+    0.65s
+    var(--delay, 0ms)
+    both;
+}
+
+@keyframes heroEnter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: none;
+  }
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: none;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .hero-full-inner {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(300px, 0.8fr);
+
+    gap: 30px;
+  }
+
+  .hero-showcase {
+    min-height: 520px;
+  }
+
+  .hero-frame {
+    width: 32vw;
+
+    min-width: 280px;
+  }
+
+  .features-grid {
+    gap: 14px;
+  }
+
+  .editorial-home-grid {
+    gap: 5vw;
+  }
+
+  .promo-banner-inner {
+    grid-template-columns:
+      1fr
+      300px;
+  }
+}
+
+/* =========================================================
+   MOBILE - MAIN
+========================================================= */
+
+@media (max-width: 760px) {
+
+  /* -------------------------------------------------------
+     GLOBAL
+  ------------------------------------------------------- */
+
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: hidden;
+  }
+
+  .home-page {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: hidden;
+  }
+
+  .home-page .container {
+    width: 100%;
+    max-width: 100%;
+
+    margin: 0 auto;
+
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* -------------------------------------------------------
+     HERO
+  ------------------------------------------------------- */
+
+  .hero-fullscreen {
+    width: 100%;
+
+    min-height: auto;
+    height: auto;
+
+    display: block;
+
+    overflow: hidden;
+  }
+
+  /* Keep background artwork */
+
+  .hero-art-bg {
+    display: block;
+
+    opacity: 0.18;
+  }
+
+  .hero-art-bg svg {
+    width: 100%;
+    height: 100%;
+
+    transform:
+      scale(1.15);
+  }
+
+  .hero-gradient {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(30, 7, 15, 0.94) 0%,
+        rgba(45, 10, 25, 0.72) 45%,
+        rgba(45, 10, 25, 0.25) 100%
+      );
+  }
+
+  .hero-orb {
+    opacity: 0.1;
+  }
+
+  /* Main hero layout */
+
+  .hero-full-inner {
+    width: 100%;
+
+    min-height: auto;
+    height: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 18px;
+
+    padding:
+      16px
+      14px
+      42px;
+  }
+
+  /* -------------------------------------------------------
+     MOBILE HERO IMAGE
+     
+     Horizontal banner.
+     Image itself is NOT changed.
+  ------------------------------------------------------- */
+
+  .hero-showcase {
+    order: -1;
+
+    width: 100%;
+
+    min-height: 0;
+
+    height: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+  }
+
+  .hero-frame {
+    width: 100%;
+
+    min-width: 0;
+
+    max-width: 100%;
+
+    height: auto;
+
+    /*
+      Horizontal mobile banner
+    */
+
+    aspect-ratio: 16 / 8.5;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow:
+      0 12px 35px
+      rgba(0, 0, 0, 0.3);
+  }
+
+  .hero-frame svg {
+    width: 100%;
+    height: 100%;
+
+    transform: none;
+  }
+
+  .hero-frame-glow {
+    display: none;
+  }
+
+  .hero-floating-note {
+    display: none;
+  }
+
+  .hero-scroll-badge {
+    display: none;
+  }
+
+  /* -------------------------------------------------------
+     HERO TEXT
+  ------------------------------------------------------- */
+
+  .hero-copy {
+    width: 100%;
+
+    max-width: 100%;
+
+    animation:
+      heroEnter
+      0.7s
+      ease
+      both;
+  }
+
+  .hero-kicker {
+    font-size: 0.58rem;
+
+    letter-spacing: 0.10em;
+
+    gap: 5px;
+
+    margin-bottom: 8px;
+  }
+
+  .hero-kicker svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .hero-overline {
+    font-size: 0.52rem;
+
+    letter-spacing: 0.20em;
+
+    margin-bottom: 6px;
+  }
+
+  .hero-title {
+    width: 100%;
+
+    font-size:
+      clamp(
+        2rem,
+        9vw,
+        2.8rem
+      );
+
+    line-height: 1.03;
+
+    letter-spacing: -0.025em;
+
+    margin:
+      0
+      0
+      11px;
+  }
+
+  .hero-text {
+    width: 100%;
+
+    max-width: 100%;
+
+    font-size: 0.74rem;
+
+    line-height: 1.5;
+
+    margin-bottom: 15px;
+  }
+
+  /* Buttons */
+
+  .hero-actions {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    flex-wrap: nowrap;
+  }
+
+  .hero-primary {
+    flex: 0 1 auto;
+
+    width: auto;
+
+    min-width: 0;
+
+    padding:
+      10px
+      13px;
+
+    font-size: 0.62rem;
+
+    white-space: nowrap;
+  }
+
+  .hero-primary svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .hero-text-button {
+    display: flex;
+
+    flex-shrink: 0;
+
+    font-size: 0.58rem;
+
+    letter-spacing: 0.05em;
+
+    gap: 5px;
+
+    white-space: nowrap;
+  }
+
+  .hero-text-button span {
+    font-size: 1rem;
+  }
+
+  /* -------------------------------------------------------
+     HERO STATS
+  ------------------------------------------------------- */
+
+  .hero-mini-stats {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 7px;
+
+    margin-top: 20px;
+
+    padding-top: 13px;
+  }
+
+  .hero-mini-stats strong {
+    font-size: 0.92rem;
+
+    line-height: 1.1;
+  }
+
+  .hero-mini-stats span {
+    font-size: 0.42rem;
+
+    line-height: 1.2;
+
+    letter-spacing: 0.03em;
+  }
+
+  .hero-bottom-hint {
+    display: none;
+  }
+
+  /* -------------------------------------------------------
+     HERO SLIDER
+  ------------------------------------------------------- */
+
+  .hero-slider-controls {
+    left: 50%;
+
+    right: auto;
+
+    bottom: 10px;
+
+    transform:
+      translateX(-50%);
+
+    gap: 7px;
+
+    padding:
+      5px
+      8px;
+  }
+
+  .hero-slider-arrow {
+    width: 25px;
+    height: 25px;
+  }
+
+  .hero-slider-arrow svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .hero-slider-dots {
+    gap: 5px;
+  }
+
+  .hero-slider-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .hero-slider-dot.active {
+    width: 15px;
+  }
+
+  /* =======================================================
+     FEATURES
+     
+     SMALL 4 CARDS IN ONE ROW
+  ======================================================= */
+
+  .features-section {
+    width: 100%;
+
+    padding:
+      12px
+      7px
+      20px;
+
+    overflow: hidden;
+  }
+
+  .features-section .container {
+    width: 100%;
+
+    padding: 0;
+
+    margin: 0;
+  }
+
+  .features-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap: 4px;
+
+    padding: 0;
+    margin: 0;
+  }
+
+  .features-grid > .reveal {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+  /* Feature card */
+
+  .features-grid .feature-card {
+    width: 100%;
+
+    min-width: 0;
+
+    height: 96px;
+
+    min-height: 96px;
+
+    padding:
+      7px
+      2px;
+
+    margin: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    gap: 4px;
+
+    text-align: center;
+
+    border-radius: 7px;
+
+    overflow: hidden;
+  }
+
+  /* Correct FeatureCard icon class */
+
+  .features-grid .feature-card .feature-card-icon {
+    width: 27px;
+
+    height: 27px;
+
+    min-width: 27px;
+    min-height: 27px;
+
+    flex-shrink: 0;
+
+    margin: 0;
+  }
+
+  .features-grid .feature-card .feature-card-icon svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* Correct FeatureCard title */
+
+  .features-grid .feature-card .feature-card-title {
+    width: 100%;
+
+    min-width: 0;
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 0.49rem;
+
+    line-height: 1.1;
+
+    font-weight: 700;
+
+    text-align: center;
+
+    white-space: normal;
+
+    word-break: normal;
+
+    overflow-wrap: normal;
+  }
+
+  /* Correct FeatureCard description */
+
+  .features-grid .feature-card .feature-card-text {
+    width: 100%;
+
+    min-width: 0;
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 0.39rem;
+
+    line-height: 1.15;
+
+    text-align: center;
+
+    white-space: normal;
+
+    word-break: normal;
+
+    overflow-wrap: normal;
+  }
+
+  /* =======================================================
+     COMMON SECTIONS
+  ======================================================= */
+
+  .section {
+    padding:
+      34px
+      0;
+  }
+
+  .section-header {
+    width: 100%;
+
+    margin-bottom: 15px;
+
+    gap: 10px;
+
+    align-items: flex-end;
+  }
+
+  .eyebrow {
+    font-size: 0.53rem;
+
+    letter-spacing: 0.11em;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+
+    line-height: 1.08;
+  }
+
+  .section-link {
+    font-size: 0.6rem;
+
+    gap: 3px;
+  }
+
+  .section-link svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* =======================================================
+     CATEGORY
+     
+     4 ITEMS VISIBLE, ROUNDED-SQUARE THUMBNAILS
+     HORIZONTAL SLIDING
+  ======================================================= */
+
+  .home-section-soft {
+    width: 100%;
+
+    overflow: hidden;
+
+    background: #fffdf9;
+  }
+
+  .home-section-soft .container {
+    width: 100%;
+
+    max-width: 100%;
+
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .category-scroller {
+    width: 100%;
+
+    display: flex;
+
+    gap: 10px;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    padding:
+      4px
+      0
+      12px;
+
+    margin: 0;
+
+    scroll-snap-type:
+      x mandatory;
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .category-scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+    4 categories visible on screen.
+
+    12px left/right container
+    + three 10px gaps
+    = remaining width divided by 4.
+  */
+
+  .category-scroller > * {
+    flex: 0 0 calc((100% - 30px) / 4);
+    width: calc((100% - 30px) / 4);
+    min-width: calc((100% - 30px) / 4);
+    max-width: calc((100% - 30px) / 4);
+
+    scroll-snap-align: start;
+
+    margin: 0;
+  }
+
+  /* Category card */
+
+  .category-scroller .category-card {
+    width: 100%;
+
+    min-width: 0;
+
+    max-width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin: 0;
+  }
+
+  /*
+    Rounded square thumbnail (matches reference design) —
+    NOT a circle.
+  */
+
+  .category-scroller .category-card-image {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .category-scroller
+  .category-card-image img {
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+  }
+
+  /* Category name */
+
+  .category-scroller .category-card-name {
+    width: 100%;
+
+    min-height: 25px;
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 0.58rem;
+
+    line-height: 1.15;
+
+    text-align: center;
+
+    white-space: normal;
+
+    overflow-wrap: normal;
+
+    word-break: normal;
+  }
+
+  /* Hide desktop arrows */
+
+  .home-section-soft .scroller-arrow {
+    display: none !important;
+  }
+
+  /* =======================================================
+     FEATURED PRODUCTS
+     
+     HORIZONTAL SCROLL
+  ======================================================= */
+
+  .featured-section {
+    width: 100%;
+
+    overflow: hidden;
+  }
+
+  .product-scroller {
+    width: 100%;
+
+    display: flex;
+
+    gap: 10px;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    padding:
+      4px
+      0
+      12px;
+
+    scroll-snap-type:
+      x proximity;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .product-scroller-item {
+    flex:
+      0 0
+      185px;
+
+    width: 185px;
+
+    min-width: 185px;
+
+    scroll-snap-align: start;
+  }
+
+  /* =======================================================
+     EDITORIAL
+  ======================================================= */
+
+  .editorial-home {
+    width: 100%;
+
+    padding:
+      40px
+      0;
+
+    overflow: hidden;
+  }
+
+  .editorial-home-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 22px;
+  }
+
+  .editorial-art {
+    width: 100%;
+
+    aspect-ratio: 16 / 10;
+
+    border-radius:
+      18px
+      60px
+      18px
+      60px;
+  }
+
+  .editorial-art svg {
+    width: 100%;
+    height: 100%;
+
+    transform: none;
+  }
+
+  .editorial-copy {
+    width: 100%;
+
+    max-width: 100%;
+  }
+
+  .editorial-copy h2 {
+    font-size: 2.1rem;
+
+    line-height: 1.05;
+
+    margin:
+      8px
+      0
+      12px;
+  }
+
+  .editorial-copy p {
+    width: 100%;
+
+    max-width: 100%;
+
+    font-size: 0.78rem;
+
+    line-height: 1.5;
+
+    margin-bottom: 18px;
+  }
+
+  .editorial-copy .btn {
+    padding:
+      10px
+      14px;
+
+    font-size: 0.61rem;
+  }
+
+  /* =======================================================
+     FESTIVE / PROMO
+  ======================================================= */
+
+  .promo-banner {
+    width: 100%;
+
+    overflow: hidden;
+  }
+
+  .promo-banner-inner {
+    width: 100%;
+
+    min-height: auto;
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 0;
+
+    padding:
+      38px
+      14px;
+  }
+
+  .promo-banner-inner h2 {
+    font-size: 1.9rem;
+
+    line-height: 1.08;
+
+    margin:
+      8px
+      0
+      12px;
+  }
+
+  .promo-banner-inner p {
+    max-width: 100%;
+
+    font-size: 0.78rem;
+
+    line-height: 1.5;
+
+    margin-bottom: 18px;
+  }
+
+  .promo-banner-inner .btn {
+    padding:
+      10px
+      14px;
+
+    font-size: 0.61rem;
+  }
+
+  .promo-art {
+    display: none;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+   480px AND BELOW
+========================================================= */
+
+@media (max-width: 480px) {
+
+  .home-page .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* -------------------------------------------------------
+     HERO
+  ------------------------------------------------------- */
+
+  .hero-full-inner {
+    padding:
+      12px
+      10px
+      38px;
+
+    gap: 15px;
+  }
+
+  .hero-frame {
+    aspect-ratio: 16 / 8.2;
+
+    border-radius: 14px;
+  }
+
+  .hero-kicker {
+    font-size: 0.53rem;
+
+    margin-bottom: 7px;
+  }
+
+  .hero-overline {
+    font-size: 0.48rem;
+
+    margin-bottom: 5px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+
+    line-height: 1.02;
+
+    margin-bottom: 9px;
+  }
+
+  .hero-text {
+    font-size: 0.68rem;
+
+    line-height: 1.45;
+
+    margin-bottom: 13px;
+  }
+
+  .hero-primary {
+    padding:
+      9px
+      11px;
+
+    font-size: 0.58rem;
+  }
+
+  .hero-text-button {
+    font-size: 0.55rem;
+  }
+
+  .hero-mini-stats {
+    gap: 5px;
+
+    margin-top: 18px;
+
+    padding-top: 12px;
+  }
+
+  .hero-mini-stats strong {
+    font-size: 0.86rem;
+  }
+
+  .hero-mini-stats span {
+    font-size: 0.39rem;
+  }
+
+  /* -------------------------------------------------------
+     FEATURES
+     
+     SMALLER
+  ------------------------------------------------------- */
+
+  .features-section {
+    padding:
+      10px
+      6px
+      18px;
+  }
+
+  .features-grid {
+    gap: 3px;
+  }
+
+  .features-grid .feature-card {
+    height: 88px;
+
+    min-height: 88px;
+
+    padding:
+      6px
+      2px;
+
+    gap: 3px;
+
+    border-radius: 6px;
+  }
+
+  .features-grid .feature-card .feature-card-icon {
+    width: 25px;
+    height: 25px;
+
+    min-width: 25px;
+    min-height: 25px;
+  }
+
+  .features-grid
+  .feature-card
+  .feature-card-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .features-grid
+  .feature-card
+  .feature-card-title {
+    font-size: 0.45rem;
+
+    line-height: 1.08;
+  }
+
+  .features-grid
+  .feature-card
+  .feature-card-text {
+    font-size: 0.36rem;
+
+    line-height: 1.12;
+  }
+
+  /* -------------------------------------------------------
+     CATEGORY
+     
+     STILL 4 ON SCREEN
+  ------------------------------------------------------- */
+
+  .home-section-soft .container {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .category-scroller {
+    gap: 8px;
+
+    padding:
+      4px
+      0
+      10px;
+  }
+
+  .category-scroller > * {
+    flex-basis: calc((100% - 24px) / 4);
+    width: calc((100% - 24px) / 4);
+    min-width: calc((100% - 24px) / 4);
+    max-width: calc((100% - 24px) / 4);
+  }
+
+  .category-scroller .category-card {
+    gap: 5px;
+  }
+
+  .category-scroller
+  .category-card-name {
+    font-size: 0.53rem;
+
+    line-height: 1.1;
+  }
+
+  /* -------------------------------------------------------
+     PRODUCTS
+  ------------------------------------------------------- */
+
+  .product-scroller-item {
+    width: 172px;
+
+    min-width: 172px;
+  }
+
+  /* -------------------------------------------------------
+     EDITORIAL
+  ------------------------------------------------------- */
+
+  .editorial-home {
+    padding:
+      34px
+      0;
+  }
+
+  .editorial-home-grid {
+    gap: 18px;
+  }
+
+  .editorial-art {
+    aspect-ratio: 16 / 10;
+  }
+
+  .editorial-copy h2 {
+    font-size: 1.9rem;
+  }
+
+  .editorial-copy p {
+    font-size: 0.73rem;
+  }
+
+  /* -------------------------------------------------------
+     PROMO
+  ------------------------------------------------------- */
+
+  .promo-banner-inner {
+    padding:
+      32px
+      12px;
+  }
+
+  .promo-banner-inner h2 {
+    font-size: 1.7rem;
+  }
+
+  .promo-banner-inner p {
+    font-size: 0.71rem;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   360px AND BELOW
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .home-page .container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  /* HERO */
+
+  .hero-full-inner {
+    padding:
+      10px
+      8px
+      34px;
+
+    gap: 13px;
+  }
+
+  .hero-frame {
+    aspect-ratio: 16 / 8;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-text {
+    font-size: 0.63rem;
+  }
+
+  .hero-primary {
+    font-size: 0.53rem;
+
+    padding:
+      8px
+      9px;
+  }
+
+  .hero-text-button {
+    font-size: 0.50rem;
+  }
+
+  .hero-mini-stats strong {
+    font-size: 0.78rem;
+  }
+
+  .hero-mini-stats span {
+    font-size: 0.35rem;
+  }
+
+  /* FEATURES */
+
+  .features-section {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .features-grid {
+    gap: 3px;
+  }
+
+  .features-grid .feature-card {
+    height: 84px;
+
+    min-height: 84px;
+
+    padding:
+      5px
+      1px;
+
+    border-radius: 6px;
+  }
+
+  .features-grid
+  .feature-card
+  .feature-card-icon {
+    width: 23px;
+    height: 23px;
+
+    min-width: 23px;
+    min-height: 23px;
+  }
+
+  .features-grid
+  .feature-card
+  .feature-card-icon svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .features-grid
+  .feature-card
+  .feature-card-title {
+    font-size: 0.42rem;
+  }
+
+  .features-grid
+  .feature-card
+  .feature-card-text {
+    font-size: 0.34rem;
+  }
+
+  /* CATEGORY */
+
+  .home-section-soft .container {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .category-scroller {
+    gap: 7px;
+  }
+
+  .category-scroller > * {
+    flex-basis: calc((100% - 21px) / 4);
+    width: calc((100% - 21px) / 4);
+    min-width: calc((100% - 21px) / 4);
+    max-width: calc((100% - 21px) / 4);
+  }
+
+  .category-scroller
+  .category-card-name {
+    font-size: 0.48rem;
+
+    line-height: 1.05;
+  }
+
+  /* PRODUCTS */
+
+  .product-scroller-item {
+    width: 160px;
+
+    min-width: 160px;
+  }
+
+  /* EDITORIAL */
+
+  .editorial-home {
+    padding:
+      30px
+      0;
+  }
+
+  .editorial-copy h2 {
+    font-size: 1.7rem;
+  }
+
+  /* PROMO */
+
+  .promo-banner-inner {
+    padding:
+      28px
+      10px;
+  }
+
+  .promo-banner-inner h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .home-page *,
+  .home-page *::before,
+  .home-page *::after {
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
+
+    scroll-behavior:
+      auto !important;
+  }
+}
+
+/* =========================================================
+   SARIKA FASHIONS
+   FEATURE CARDS - FINAL POSITION & RESPONSIVE LAYOUT
+   ========================================================= */
+
+/*
+   The feature section has been moved in Home.jsx
+   so it naturally appears immediately before the footer.
+
+   Desktop:
+   4 cards in one row.
+
+   Mobile:
+   4 compact cards in one row.
+
+   This does NOT affect the hero, category images,
+   editorial section or festive section.
+*/
+
+/* =========================================================
+   DESKTOP / LAPTOP
+   ========================================================= */
+
+.features-section {
+  width: 100%;
+  background: var(--color-cream);
+  padding-top: 42px;
+  padding-bottom: 42px;
+}
+
+.features-section .features-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.features-section .features-grid > .reveal {
+  width: 100%;
+  min-width: 0;
+}
+
+.features-section .feature-card {
+  width: 100%;
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .features-section {
+    padding: 20px 6px 25px;
+  }
+
+  .features-section .features-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+  }
+
+  .features-section .feature-card {
+    height: 88px;
+    min-height: 88px;
+
+    padding: 6px 3px;
+
+    gap: 4px;
+
+    border-radius: 8px;
+  }
+
+  .features-section .feature-card-icon {
+    width: 26px;
+    height: 26px;
+
+    min-width: 26px;
+    min-height: 26px;
+  }
+
+  .features-section .feature-card-icon svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .features-section .feature-card-title {
+    font-size: 0.47rem;
+    line-height: 1.1;
+  }
+
+  .features-section .feature-card-text {
+    font-size: 0.36rem;
+    line-height: 1.15;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+  .features-section {
+    padding: 18px 5px 22px;
+  }
+
+  .features-section .features-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+  }
+
+  .features-section .feature-card {
+    height: 84px;
+    min-height: 84px;
+
+    padding: 5px 2px;
+
+    gap: 3px;
+
+    border-radius: 7px;
+  }
+
+  .features-section .feature-card-icon {
+    width: 24px;
+    height: 24px;
+
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  .features-section .feature-card-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .features-section .feature-card-title {
+    font-size: 0.43rem;
+  }
+
+  .features-section .feature-card-text {
+    font-size: 0.33rem;
+  }
+}

@@ -1,0 +1,445 @@
+/* =========================================================
+   PRODUCT GALLERY
+========================================================= */
+
+.product-gallery {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   MAIN IMAGE CONTAINER
+========================================================= */
+
+.product-gallery-main {
+  position: relative;
+  width: 100%;
+  height: 650px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: #faf9f7;
+  border: 1px solid #eee8e5;
+  border-radius: 4px;
+
+  box-shadow:
+    0 8px 30px rgba(43, 27, 32, 0.05);
+
+  transition: box-shadow 0.3s ease;
+}
+
+.product-gallery-main:hover {
+  box-shadow:
+    0 12px 40px rgba(43, 27, 32, 0.08);
+}
+
+
+/* =========================================================
+   MAIN PRODUCT IMAGE
+========================================================= */
+
+.product-main-image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+
+  padding: 18px;
+
+  box-sizing: border-box;
+
+  user-select: none;
+
+  transition:
+    transform 0.4s ease,
+    opacity 0.3s ease;
+}
+
+/* Slight premium zoom when hovering */
+.product-gallery-main:hover .product-main-image {
+  transform: scale(1.015);
+}
+
+
+/* =========================================================
+   IMAGE CHANGE ANIMATION
+========================================================= */
+
+.product-gallery-main-animated {
+  animation: gallerySwap 0.35s ease both;
+}
+
+@keyframes gallerySwap {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* =========================================================
+   GALLERY ARROWS
+========================================================= */
+
+.gallery-arrow {
+  position: absolute;
+
+  top: 50%;
+  transform: translateY(-50%);
+
+  z-index: 10;
+
+  width: 44px;
+  height: 44px;
+
+  padding: 0;
+
+  border: 1px solid rgba(43, 27, 32, 0.1);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  color: #2b1b20;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.10);
+
+  opacity: 0;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Show arrows when hovering gallery */
+.product-gallery-main:hover .gallery-arrow {
+  opacity: 1;
+}
+
+.gallery-arrow:hover {
+  background: #ffffff;
+
+  transform:
+    translateY(-50%)
+    scale(1.08);
+
+  box-shadow:
+    0 7px 20px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-arrow:active {
+  transform:
+    translateY(-50%)
+    scale(0.94);
+}
+
+.gallery-arrow-left {
+  left: 16px;
+}
+
+.gallery-arrow-right {
+  right: 16px;
+}
+
+
+/* =========================================================
+   THUMBNAILS
+========================================================= */
+
+.product-gallery-thumbs {
+  display: flex;
+
+  gap: 12px;
+
+  margin-top: 16px;
+
+  padding: 2px 2px 8px;
+
+  overflow-x: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: #c8b8bc transparent;
+}
+
+/* Chrome / Edge scrollbar */
+
+.product-gallery-thumbs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.product-gallery-thumbs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.product-gallery-thumbs::-webkit-scrollbar-thumb {
+  background: #c8b8bc;
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   THUMBNAIL BUTTON
+========================================================= */
+
+.product-gallery-thumb {
+  position: relative;
+
+  flex: 0 0 82px;
+
+  width: 82px;
+  height: 102px;
+
+  padding: 0;
+
+  overflow: hidden;
+
+  border: 1px solid #e5dedb;
+  border-radius: 3px;
+
+  background: #faf9f7;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.product-gallery-thumb:hover {
+  border-color: #9a737d;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 5px 15px rgba(43, 27, 32, 0.08);
+}
+
+/* Active thumbnail */
+
+.product-gallery-thumb.is-active {
+  border: 2px solid #2b1b20;
+
+  box-shadow:
+    0 4px 12px rgba(43, 27, 32, 0.10);
+}
+
+
+/* =========================================================
+   ACTIVE THUMBNAIL INDICATOR
+========================================================= */
+
+.product-gallery-thumb.is-active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 8px;
+  right: 8px;
+  bottom: 5px;
+
+  height: 2px;
+
+  background: #2b1b20;
+
+  border-radius: 2px;
+}
+
+
+/* =========================================================
+   THUMBNAIL IMAGE
+========================================================= */
+
+.product-thumbnail-image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 4px;
+
+  box-sizing: border-box;
+
+  object-fit: contain;
+  object-position: center;
+
+  user-select: none;
+}
+
+
+/* =========================================================
+   NO IMAGE STATE
+========================================================= */
+
+.product-gallery-main p {
+  margin: 0;
+
+  color: #777;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1200px) {
+
+  .product-gallery {
+    max-width: 640px;
+  }
+
+  .product-gallery-main {
+    height: 680px;
+  }
+
+  .product-main-image {
+    padding: 20px;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .product-gallery {
+    max-width: 100%;
+  }
+
+  .product-gallery-main {
+    height: 560px;
+  }
+
+  .gallery-arrow {
+    opacity: 1;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .product-gallery {
+    width: 100%;
+  }
+
+  .product-gallery-main {
+    height: 430px;
+
+    border-radius: 3px;
+
+    box-shadow:
+      0 5px 20px rgba(43, 27, 32, 0.05);
+  }
+
+  .product-main-image {
+    padding: 10px;
+  }
+
+  .gallery-arrow {
+    width: 38px;
+    height: 38px;
+
+    opacity: 1;
+
+    box-shadow:
+      0 3px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .gallery-arrow-left {
+    left: 10px;
+  }
+
+  .gallery-arrow-right {
+    right: 10px;
+  }
+
+  .product-gallery-thumbs {
+    gap: 9px;
+
+    margin-top: 12px;
+  }
+
+  .product-gallery-thumb {
+    flex: 0 0 68px;
+
+    width: 68px;
+    height: 86px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .product-gallery-main {
+    height: 390px;
+  }
+
+  .product-gallery-thumb {
+    flex: 0 0 62px;
+
+    width: 62px;
+    height: 78px;
+  }
+
+  .gallery-arrow {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .product-main-image,
+  .gallery-arrow,
+  .product-gallery-thumb {
+    transition: none;
+  }
+
+  .product-gallery-main-animated {
+    animation: none;
+  }
+}
