@@ -13,7 +13,7 @@ export default function FilterSidebar({
   onCloseMobile,
 }) {
   // Price range for Sarika Fashions products
-  const MIN_PRICE = 300
+  const MIN_PRICE = 1
   const MAX_PRICE = 1000
   const PRICE_STEP = 50
 
