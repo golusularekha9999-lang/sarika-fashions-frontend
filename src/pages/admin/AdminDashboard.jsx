@@ -16,7 +16,9 @@ import {
 import { Link } from 'react-router-dom'
 import './AdminDashboard.css'
 
-const API_BASE = import.meta.env.VITE_API_URL
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  'https://sarika-fashions-backend-rfwh.onrender.com/api'
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState([])

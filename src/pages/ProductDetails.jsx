@@ -25,7 +25,9 @@ import { useWishlist } from '../context/WishlistContext.jsx'
 
 import './ProductDetails.css'
 
-const API_BASE = import.meta.env.VITE_API_URL
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  'https://sarika-fashions-backend-rfwh.onrender.com/api'
 
 export default function ProductDetails() {
   const { id } = useParams()

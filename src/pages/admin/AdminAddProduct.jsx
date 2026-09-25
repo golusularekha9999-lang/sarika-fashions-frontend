@@ -22,7 +22,8 @@ import './AdminAddProduct.css'
   session-cookie mismatch.
 */
 const API_BASE =
-  `${import.meta.env.VITE_API_URL}`
+  import.meta.env.VITE_API_URL ||
+  'https://sarika-fashions-backend-rfwh.onrender.com/api'
 
 const EMPTY_FORM = {
   name: '',
