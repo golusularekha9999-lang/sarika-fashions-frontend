@@ -1,6 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+} from 'react'
 
 const CartContext = createContext(null)
+
 const STORAGE_KEY = 'sarika_cart'
 
 export function CartProvider({ children }) {
@@ -13,72 +20,200 @@ export function CartProvider({ children }) {
     }
   })
 
+  // ============================================================
+  // SAVE CART TO LOCAL STORAGE
+  // ============================================================
+
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(items)
+    )
   }, [items])
 
-  const addToCart = (product, quantity = 1, color = null) => {
+  // ============================================================
+  // ADD TO CART
+  // ============================================================
+
+  const addToCart = (
+    product,
+    quantity = 1,
+    color = null
+  ) => {
     setItems((prev) => {
       const key = `${product.id}-${color || 'default'}`
-      const existing = prev.find((i) => i.key === key)
+
+      const existing = prev.find(
+        (i) => i.key === key
+      )
+
       if (existing) {
         return prev.map((i) =>
-          i.key === key ? { ...i, quantity: i.quantity + quantity } : i
+          i.key === key
+            ? {
+                ...i,
+                quantity:
+                  i.quantity + quantity,
+              }
+            : i
         )
       }
+
       return [
         ...prev,
         {
           key,
+
           id: product.id,
+
           name: product.name,
+
           price: product.price,
-          originalPrice: product.originalPrice,
+
+          originalPrice:
+            product.originalPrice,
+
           image: product.image,
+
           variant: product.variant,
+
           color,
+
           quantity,
         },
       ]
     })
   }
 
+  // ============================================================
+  // REMOVE FROM CART
+  // ============================================================
+
   const removeFromCart = (key) => {
-    setItems((prev) => prev.filter((i) => i.key !== key))
+    setItems((prev) =>
+      prev.filter((i) => i.key !== key)
+    )
   }
 
-  const updateQuantity = (key, quantity) => {
+  // ============================================================
+  // UPDATE QUANTITY
+  // ============================================================
+
+  const updateQuantity = (
+    key,
+    quantity
+  ) => {
     if (quantity < 1) return
-    setItems((prev) => prev.map((i) => (i.key === key ? { ...i, quantity } : i)))
+
+    setItems((prev) =>
+      prev.map((i) =>
+        i.key === key
+          ? {
+              ...i,
+              quantity,
+            }
+          : i
+      )
+    )
   }
 
-  const clearCart = () => setItems([])
+  // ============================================================
+  // CLEAR CART
+  // ============================================================
+
+  const clearCart = () => {
+    setItems([])
+  }
+
+  // ============================================================
+  // SUBTOTAL
+  // ============================================================
 
   const subtotal = useMemo(
-    () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    () =>
+      items.reduce(
+        (sum, i) =>
+          sum +
+          Number(i.price) *
+            Number(i.quantity),
+        0
+      ),
     [items]
   )
-  const shipping = subtotal > 0 && subtotal < 999 ? 75 : 0
-  const total = subtotal + shipping
-  const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
+
+  // ============================================================
+  // SHIPPING
+  // ₹1 SHIPPING CHARGE
+  // ============================================================
+
+  const shipping =
+    subtotal > 0 ? 1 : 0
+
+  // ============================================================
+  // TOTAL
+  // ============================================================
+
+  const total =
+    subtotal + shipping
+
+  // ============================================================
+  // ITEM COUNT
+  // ============================================================
+
+  const itemCount =
+    items.reduce(
+      (sum, i) =>
+        sum + Number(i.quantity),
+      0
+    )
+
+  // ============================================================
+  // CONTEXT VALUE
+  // ============================================================
 
   const value = {
     items,
+
     addToCart,
+
     removeFromCart,
+
     updateQuantity,
+
     clearCart,
+
     subtotal,
+
     shipping,
+
     total,
+
     itemCount,
   }
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>
+  return (
+    <CartContext.Provider
+      value={value}
+    >
+      {children}
+    </CartContext.Provider>
+  )
 }
 
+// ============================================================
+// USE CART HOOK
+// ============================================================
+
 export const useCart = () => {
-  const ctx = useContext(CartContext)
-  if (!ctx) throw new Error('useCart must be used within CartProvider')
+  const ctx = useContext(
+    CartContext
+  )
+
+  if (!ctx) {
+    throw new Error(
+      'useCart must be used within CartProvider'
+    )
+  }
+
   return ctx
 }
