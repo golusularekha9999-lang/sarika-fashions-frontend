@@ -69,6 +69,8 @@ body {
   -webkit-font-smoothing: antialiased;
 
   overflow-x: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 #root {
@@ -80,16 +82,12 @@ body {
 
 
 /* =========================================================
-   IMPORTANT RESPONSIVE SAFETY
+   CRITICAL FIX FOR WHITE LINE BUG — ALL DEVICES
    ========================================================= */
-
-/*
-   This prevents children with fixed desktop widths
-   from forcing the entire mobile page wider.
-*/
 
 * {
   min-width: 0;
+  max-width: 100%;
 }
 
 img,
@@ -98,6 +96,7 @@ video,
 canvas {
   display: block;
   max-width: 100%;
+  width: auto;
 }
 
 img {
@@ -106,6 +105,14 @@ img {
 
 iframe {
   max-width: 100%;
+}
+
+section,
+.section-wrapper,
+[role="main"] {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 
@@ -125,6 +132,7 @@ h6 {
   color: var(--color-dark);
 
   overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 p,
@@ -132,6 +140,7 @@ span,
 a,
 li {
   overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 
@@ -194,11 +203,14 @@ textarea {
 
   padding-left: 24px;
   padding-right: 24px;
+
+  overflow-x: hidden;
 }
 
 .section {
   width: 100%;
   padding: 64px 0;
+  overflow-x: hidden;
 }
 
 .section-header {
@@ -602,6 +614,13 @@ textarea {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* -----------------------------------------
@@ -610,6 +629,7 @@ textarea {
 
   .container {
     width: 100%;
+    overflow-x: hidden;
 
     padding-left: 16px;
     padding-right: 16px;
@@ -621,6 +641,8 @@ textarea {
 
   .section {
     padding: 40px 0;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   /* -----------------------------------------
@@ -703,6 +725,8 @@ textarea {
   svg,
   video {
     max-width: 100%;
+    width: auto;
+    display: block;
   }
 }
 
@@ -720,6 +744,7 @@ textarea {
   .container {
     padding-left: 14px;
     padding-right: 14px;
+    overflow-x: hidden;
   }
 
   /* -----------------------------------------
@@ -728,6 +753,8 @@ textarea {
 
   .section {
     padding: 32px 0;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   /* -----------------------------------------
@@ -780,12 +807,24 @@ textarea {
 @media (max-width: 480px) {
 
   /* -----------------------------------------
+     BODY
+     ----------------------------------------- */
+
+  body {
+    width: 100%;
+    overflow-x: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* -----------------------------------------
      CONTAINER
      ----------------------------------------- */
 
   .container {
     padding-left: 12px;
     padding-right: 12px;
+    overflow-x: hidden;
   }
 
   /* -----------------------------------------
@@ -794,6 +833,8 @@ textarea {
 
   .section {
     padding: 28px 0;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   /* -----------------------------------------
@@ -877,14 +918,24 @@ textarea {
 
 @media (max-width: 360px) {
 
+  body {
+    width: 100%;
+    overflow-x: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .container {
     padding-left: 10px;
     padding-right: 10px;
+    overflow-x: hidden;
   }
 
   .section {
     padding-top: 24px;
     padding-bottom: 24px;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   .products-grid,

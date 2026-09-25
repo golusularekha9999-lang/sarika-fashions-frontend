@@ -2046,4 +2046,35 @@
     font-size: 8px !important;
   }
 
+}/* Fix white line on all mobiles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Prevent elements from exceeding viewport */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Fix containers */
+.container, section, div {
+  max-width: 100%;
+  overflow-x: hidden;
 }
