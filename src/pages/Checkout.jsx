@@ -12,8 +12,9 @@ import './Checkout.css'
 // ============================================================
 // API BASE
 // ============================================================
-
-const API_BASE = `${import.meta.env.VITE_API_URL}`
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://sarika-fashions-backend-rfwh.onrender.com/api'
 
 // ============================================================
 // EMPTY ADDRESS
@@ -199,21 +200,22 @@ export default function Checkout() {
           paymentResponse?.razorpay_payment_id ||
           null,
 
-        payment_status: 'Paid',
-
-        order_status: 'Placed',
+        razorpay_signature:
+          paymentResponse?.razorpay_signature ||
+          null,
       }
 
       console.log(
-        '🛒 SAVING CUSTOMER ORDER:',
+        '🛒 COMPLETING RAZORPAY PAYMENT:',
         orderData
       )
 
       const response = await axios.post(
-        `${API_BASE}/orders`,
+        `${API_BASE}/payment/complete`,
         orderData,
         {
           withCredentials: true,
+          timeout: 30000,
         }
       )
 
@@ -371,7 +373,7 @@ export default function Checkout() {
 
           try {
             // ================================================
-            // SAVE ORDER TO DATABASE
+            // VERIFY PAYMENT + CREATE ORDER ON BACKEND
             // ================================================
 
             const savedOrder =

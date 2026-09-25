@@ -1,6 +1,14 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Heart, ShoppingBag, Menu, X } from 'lucide-react'
+import {
+  Search,
+  Heart,
+  ShoppingBag,
+  Menu,
+  X,
+  Package
+} from 'lucide-react'
+
 import { useCart } from '../context/CartContext.jsx'
 import { useWishlist } from '../context/WishlistContext.jsx'
 import TopBar from './TopBar.jsx'
@@ -12,7 +20,8 @@ const NAV_LINKS = [
   { label: 'Bestsellers', to: '/shop' },
   { label: 'About', to: '/about' },
   { label: 'Contact', to: '/contact' },
-  {label:'Admin',to:'/admin/products'}
+  { label: 'My Orders', to: '/my-orders' },
+  { label: 'Admin', to: '/admin/products' }
 ]
 
 export default function Navbar() {
@@ -61,7 +70,7 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Navigation */}
+          {/* Desktop Navigation */}
           <nav className="navbar-links desktop-only">
             {NAV_LINKS.map((link) => (
               <Link
@@ -101,11 +110,22 @@ export default function Navbar() {
               )}
             </Link>
 
+            {/* My Orders */}
+            <Link
+              to="/my-orders"
+              className="btn-icon"
+              aria-label="My Orders"
+              title="My Orders"
+            >
+              <Package size={18} />
+            </Link>
+
             {/* Cart */}
             <Link
               to="/cart"
               className="btn-icon"
               aria-label="Cart"
+              title="Cart"
             >
               <ShoppingBag size={18} />
 
@@ -173,6 +193,7 @@ export default function Navbar() {
 
         </div>
 
+        {/* Mobile Navigation */}
         <nav className="mobile-drawer-links">
           {NAV_LINKS.map((link) => (
             <Link
@@ -184,6 +205,7 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
+
       </div>
 
       {/* Mobile Overlay */}

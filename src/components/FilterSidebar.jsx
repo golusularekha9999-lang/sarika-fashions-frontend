@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { X } from 'lucide-react'
 import { categories, colors } from '../data/products.js'
@@ -13,6 +12,16 @@ export default function FilterSidebar({
   mobileOpen,
   onCloseMobile,
 }) {
+  // Price range for Sarika Fashions products
+  const MIN_PRICE = 300
+  const MAX_PRICE = 1000
+  const PRICE_STEP = 50
+
+  const currentMaxPrice = Math.min(
+    Math.max(Number(filters.maxPrice) || MIN_PRICE, MIN_PRICE),
+    MAX_PRICE
+  )
+
   return (
     <>
       <aside
@@ -24,9 +33,7 @@ export default function FilterSidebar({
         {/* =========================================
             MOBILE HEADER
             ========================================= */}
-
         <div className="filter-sidebar-mobile-header mobile-only">
-
           <h3>Filters</h3>
 
           <button
@@ -36,17 +43,13 @@ export default function FilterSidebar({
           >
             <X size={20} />
           </button>
-
         </div>
 
         {/* =========================================
             CATEGORY
             ========================================= */}
-
         <div className="filter-group">
-
           <div className="filter-group-header">
-
             <h4>Category</h4>
 
             <button
@@ -56,98 +59,73 @@ export default function FilterSidebar({
             >
               Clear all
             </button>
-
           </div>
 
           {categories.map((cat) => (
-
             <label
               key={cat.id}
               className="filter-checkbox"
             >
-
               <input
                 type="checkbox"
-                checked={filters.categories.includes(
-                  cat.id
-                )}
+                checked={filters.categories.includes(cat.id)}
                 onChange={() =>
                   onCategoryToggle(cat.id)
                 }
               />
 
               <span>{cat.name}</span>
-
             </label>
-
           ))}
-
         </div>
 
         {/* =========================================
             PRICE
             ========================================= */}
-
         <div className="filter-group">
-
           <h4>Price</h4>
 
           <input
             type="range"
-            min="300"
-            max="1000"
-            step="50"
-            value={Math.min(
-              Math.max(filters.maxPrice, 300),
-              1000
-            )}
+            min={MIN_PRICE}
+            max={MAX_PRICE}
+            step={PRICE_STEP}
+            value={currentMaxPrice}
             onChange={(e) =>
-              onPriceChange(
-                Number(e.target.value)
-              )
+              onPriceChange(Number(e.target.value))
             }
             className="filter-price-slider"
+            aria-label="Maximum price"
           />
 
           <div className="filter-price-labels">
-
-            <span>₹300</span>
-
             <span>
-              ₹
-              {Number(
-                filters.maxPrice
-              ).toLocaleString('en-IN')}
+              ₹{MIN_PRICE.toLocaleString('en-IN')}
             </span>
 
+            <span>
+              ₹{currentMaxPrice.toLocaleString('en-IN')}
+            </span>
           </div>
-
         </div>
 
         {/* =========================================
             COLOR
             ========================================= */}
-
         <div className="filter-group">
-
           <h4>Color</h4>
 
           <div className="filter-colors">
-
             {colors.map((c) => {
-
               const isSelected =
                 filters.colors.includes(c.id)
 
               return (
-
                 <button
                   key={c.id}
                   type="button"
                   className={`filter-color-swatch ${
-                    isSelected
-                      ? 'is-active'
-                      : ''
+                    isSelected ? 'is-active' : ''
                   }`}
                   style={{
                     backgroundColor: c.hex,
@@ -158,25 +136,19 @@ export default function FilterSidebar({
                   aria-label={`Filter by ${c.name}`}
                   title={c.name}
                 />
-
               )
             })}
-
           </div>
 
-          {/* SELECTED COLORS */}
-
+          {/* =========================================
+              SELECTED COLORS
+              ========================================= */}
           {filters.colors.length > 0 && (
-
             <div className="selected-color-names">
-
               {filters.colors.map((colorId) => {
-
-                const selectedColor =
-                  colors.find(
-                    (color) =>
-                      color.id === colorId
-                  )
+                const selectedColor = colors.find(
+                  (color) => color.id === colorId
+                )
 
                 return selectedColor ? (
                   <span
@@ -186,19 +158,14 @@ export default function FilterSidebar({
                     {selectedColor.name}
                   </span>
                 ) : null
-
               })}
-
             </div>
-
           )}
-
         </div>
 
         {/* =========================================
             MOBILE APPLY
             ========================================= */}
-
         <button
           type="button"
           className="btn btn-primary btn-block mobile-only"
@@ -206,22 +173,17 @@ export default function FilterSidebar({
         >
           Apply Filters
         </button>
-
       </aside>
 
       {/* =========================================
           MOBILE OVERLAY
           ========================================= */}
-
       {mobileOpen && (
         <div
           className="filter-sidebar-overlay mobile-only"
           onClick={onCloseMobile}
         />
       )}
-
     </>
   )
 }
-
-
