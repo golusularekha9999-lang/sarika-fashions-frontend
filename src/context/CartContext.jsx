@@ -21,6 +21,13 @@ export function CartProvider({ children }) {
   })
 
   // ============================================================
+  // POP-UP STATE
+  // ============================================================
+
+  const [addedItem, setAddedItem] = useState(null)
+  const [showPopup, setShowPopup] = useState(false)
+
+  // ============================================================
   // SAVE CART TO LOCAL STORAGE
   // ============================================================
 
@@ -32,13 +39,14 @@ export function CartProvider({ children }) {
   }, [items])
 
   // ============================================================
-  // ADD TO CART
+  // ADD TO CART (Triggers Pop-up)
   // ============================================================
 
   const addToCart = (
     product,
     quantity = 1,
-    color = null
+    color = null,
+    skipPopup = false
   ) => {
     setItems((prev) => {
       const key = `${product.id}-${color || 'default'}`
@@ -83,6 +91,24 @@ export function CartProvider({ children }) {
         },
       ]
     })
+
+    // Open the pop-up modal with the added product
+    if (!skipPopup) {
+      setAddedItem({
+        ...product,
+        quantity,
+        color,
+      })
+      setShowPopup(true)
+    }
+  }
+
+  // ============================================================
+  // CLOSE POP-UP
+  // ============================================================
+
+  const closePopup = () => {
+    setShowPopup(false)
   }
 
   // ============================================================
@@ -142,12 +168,11 @@ export function CartProvider({ children }) {
   )
 
   // ============================================================
-  // SHIPPING
-  // ₹1 SHIPPING CHARGE
+  // SHIPPING (₹75 FLAT RATE)
   // ============================================================
 
   const shipping =
-    subtotal > 0 ? 1 : 0
+    subtotal > 0 ? 75 : 0
 
   // ============================================================
   // TOTAL
@@ -189,6 +214,12 @@ export function CartProvider({ children }) {
     total,
 
     itemCount,
+
+    showPopup,
+
+    addedItem,
+
+    closePopup,
   }
 
   return (

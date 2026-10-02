@@ -4,6 +4,9 @@ import { Routes, Route } from 'react-router-dom'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import SarikaLoader from './components/Loader.jsx'
+import AddToCartPopup from './components/AddToCartPopup.jsx'
+
+import { useCart } from './context/CartContext.jsx'
 
 import MainLayout from './layouts/MainLayout.jsx'
 import AdminLayout from './layouts/AdminLayout.jsx'
@@ -32,7 +35,6 @@ import Terms from './pages/Terms.jsx'
 import RefundPolicy from './pages/RefundPolicy.jsx'
 import ShippingPolicy from './pages/ShippingPolicy.jsx'
 
-
 /* ============================================================
    ADMIN PAGES
 ============================================================ */
@@ -48,6 +50,8 @@ import AdminReturns from './pages/admin/AdminReturns.jsx'
 
 
 function App() {
+  const { showPopup, addedItem, closePopup, itemCount, subtotal } = useCart()
+
   return (
     <>
       {/* ======================================================
@@ -57,10 +61,20 @@ function App() {
       <ScrollToTop />
 
       {/* ======================================================
-          GLOBAL LOADING FALLBACK
+          ITEM ADDED TO CART POP-UP MODAL
+      ====================================================== */}
 
-          If any lazy-loaded page/component is loading,
-          SarikaLoader will be displayed.
+      {showPopup && addedItem && (
+        <AddToCartPopup
+          item={addedItem}
+          cartCount={itemCount}
+          cartSubtotal={subtotal}
+          onClose={closePopup}
+        />
+      )}
+
+      {/* ======================================================
+          GLOBAL LOADING FALLBACK
       ====================================================== */}
 
       <Suspense fallback={<SarikaLoader />}>
@@ -79,14 +93,12 @@ function App() {
               element={<Home />}
             />
 
-
             {/* ================= SHOP ================= */}
 
             <Route
               path="/shop"
               element={<Shop />}
             />
-
 
             {/* ================= PRODUCT DETAILS ================= */}
 
@@ -95,14 +107,12 @@ function App() {
               element={<ProductDetails />}
             />
 
-
             {/* ================= CART ================= */}
 
             <Route
               path="/cart"
               element={<Cart />}
             />
-
 
             {/* ================= WISHLIST ================= */}
 
@@ -111,7 +121,6 @@ function App() {
               element={<Wishlist />}
             />
 
-
             {/* ================= CHECKOUT ================= */}
 
             <Route
@@ -119,16 +128,12 @@ function App() {
               element={<Checkout />}
             />
 
-
-            {/* ==================================================
-                MY ORDERS
-            ================================================== */}
+            {/* ================= MY ORDERS ================= */}
 
             <Route
               path="/my-orders"
               element={<MyOrders />}
             />
-
 
             {/* ================= REGISTER ================= */}
 
@@ -137,14 +142,12 @@ function App() {
               element={<Register />}
             />
 
-
             {/* ================= ABOUT ================= */}
 
             <Route
               path="/about"
               element={<About />}
             />
-
 
             {/* ================= CONTACT ================= */}
 
@@ -153,14 +156,12 @@ function App() {
               element={<Contact />}
             />
 
-
             {/* ================= TRACK ORDER ================= */}
 
             <Route
               path="/track-order"
               element={<TrackOrder />}
             />
-
 
             {/* ================= SHIPPING & RETURNS ================= */}
 
@@ -169,14 +170,12 @@ function App() {
               element={<ShippingReturns />}
             />
 
-
             {/* ================= FAQ ================= */}
 
             <Route
               path="/faqs"
               element={<FAQs />}
             />
-
 
             {/* ================= PRIVACY ================= */}
 
@@ -185,14 +184,12 @@ function App() {
               element={<PrivacyPolicy />}
             />
 
-
             {/* ================= TERMS ================= */}
 
             <Route
               path="/terms"
               element={<Terms />}
             />
-
 
             {/* ================= REFUND POLICY ================= */}
 
@@ -201,7 +198,6 @@ function App() {
               element={<RefundPolicy />}
             />
 
-
             {/* ================= SHIPPING POLICY ================= */}
 
             <Route
@@ -209,10 +205,7 @@ function App() {
               element={<ShippingPolicy />}
             />
 
-
-            {/* ==================================================
-                PUBLIC 404
-            ================================================== */}
+            {/* ================= PUBLIC 404 ================= */}
 
             <Route
               path="*"
@@ -221,17 +214,14 @@ function App() {
 
           </Route>
 
-
           {/* ====================================================
-              ADMIN LOGIN
-              PUBLIC
+              ADMIN LOGIN (PUBLIC)
           ==================================================== */}
 
           <Route
             path="/admin/login"
             element={<AdminLogin />}
           />
-
 
           {/* ====================================================
               PROTECTED ADMIN AREA
@@ -244,79 +234,56 @@ function App() {
               element={<AdminLayout />}
             >
 
-              {/* =================================================
-                  ADMIN DASHBOARD
-              ================================================= */}
+              {/* ================= ADMIN DASHBOARD ================= */}
 
               <Route
                 index
                 element={<AdminDashboard />}
               />
 
-
-              {/* =================================================
-                  ADMIN PRODUCTS
-              ================================================= */}
+              {/* ================= ADMIN PRODUCTS ================= */}
 
               <Route
                 path="products"
                 element={<AdminProducts />}
               />
 
-
-              {/* =================================================
-                  ADD PRODUCT
-              ================================================= */}
+              {/* ================= ADD PRODUCT ================= */}
 
               <Route
                 path="products/add"
                 element={<AdminAddProduct />}
               />
 
-
-              {/* =================================================
-                  EDIT PRODUCT
-              ================================================= */}
+              {/* ================= EDIT PRODUCT ================= */}
 
               <Route
                 path="products/:id/edit"
                 element={<AdminEditProduct />}
               />
 
-
-              {/* =================================================
-                  ADMIN ORDERS
-              ================================================= */}
+              {/* ================= ADMIN ORDERS ================= */}
 
               <Route
                 path="orders"
                 element={<AdminOrders />}
               />
 
-
-              {/* =================================================
-                  ADMIN RETURN REQUESTS
-              ================================================= */}
+              {/* ================= ADMIN RETURN REQUESTS ================= */}
 
               <Route
                 path="returns"
                 element={<AdminReturns />}
               />
 
-
-              {/* =================================================
-                  CUSTOMERS
-              ================================================= */}
+              {/* ================= CUSTOMERS ================= */}
 
               <Route
                 path="customers"
                 element={<AdminInfo />}
               />
 
-
-              {/* =================================================
-                  CATEGORIES
-              ================================================= */}
+              {/* ================= CATEGORIES ================= */}
 
               <Route
                 path="categories"
