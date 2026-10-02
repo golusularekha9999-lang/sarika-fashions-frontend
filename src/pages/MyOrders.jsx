@@ -25,23 +25,6 @@ import './MyOrders.css'
 // ============================================================
 // API CONFIG
 // ============================================================
-//
-// Production:
-// https://sarika-fashions-backend-rfwh.onrender.com/api
-//
-// Local development:
-// http://localhost:5000/api
-//
-// You can also set VITE_API_BASE_URL in Vercel/local .env
-// ============================================================
-
-// ============================================================
-// API CONFIG
-// ============================================================
-
-// ============================================================
-// API CONFIG
-// ============================================================
 
 const isLocalhost =
   window.location.hostname === 'localhost' ||
@@ -52,6 +35,53 @@ const API_BASE =
   (isLocalhost
     ? 'http://localhost:5000/api'
     : 'https://sarika-fashions-backend-rfwh.onrender.com/api')
+
+// ============================================================
+// CUSTOMER ORDER TOKEN
+// ============================================================
+
+const CUSTOMER_TOKEN_KEY =
+  'sarika_customer_order_token'
+
+function getCustomerOrderToken() {
+  try {
+    return localStorage.getItem(
+      CUSTOMER_TOKEN_KEY
+    )
+  } catch (error) {
+    console.warn(
+      'Unable to read customer order token:',
+      error
+    )
+
+    return null
+  }
+}
+
+// ============================================================
+// CUSTOMER HEADERS
+// ============================================================
+//
+// The backend can identify the customer using this token even
+// when the Flask session cookie is not available between the
+// Vercel frontend and Render backend.
+// ============================================================
+
+function getCustomerOrderHeaders() {
+  const token =
+    getCustomerOrderToken()
+
+  return {
+    Accept: 'application/json',
+    ...(token
+      ? {
+          'X-Customer-Order-Token':
+            token,
+        }
+      : {}),
+  }
+}
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -61,13 +91,18 @@ function formatDate(value) {
 
   const date = new Date(value)
 
-  if (Number.isNaN(date.getTime())) return value
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
 
-  return date.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+  return date.toLocaleDateString(
+    'en-IN',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }
+  )
 }
 
 function formatTime(value) {
@@ -75,28 +110,43 @@ function formatTime(value) {
 
   const date = new Date(value)
 
-  if (Number.isNaN(date.getTime())) return ''
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
 
-  return date.toLocaleTimeString('en-IN', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return date.toLocaleTimeString(
+    'en-IN',
+    {
+      hour: '2-digit',
+      minute: '2-digit',
+    }
+  )
 }
 
 function money(value) {
   const number = Number(value || 0)
 
-  return `₹${number.toLocaleString('en-IN', {
-    maximumFractionDigits: 2,
-  })}`
+  return `₹${number.toLocaleString(
+    'en-IN',
+    {
+      maximumFractionDigits: 2,
+    }
+  )}`
 }
 
 function getOrderStatus(order) {
-  return order?.order_status || order?.status || 'Placed'
+  return (
+    order?.order_status ||
+    order?.status ||
+    'Placed'
+  )
 }
 
 function getPaymentStatus(order) {
-  return order?.payment_status || 'Pending'
+  return (
+    order?.payment_status ||
+    'Pending'
+  )
 }
 
 function getItemName(item) {
@@ -144,7 +194,8 @@ function isReceived(order) {
 }
 
 function getStatusClass(status) {
-  const value = String(status || '').toLowerCase()
+  const value =
+    String(status || '').toLowerCase()
 
   if (
     value.includes('cancel') ||
@@ -178,13 +229,28 @@ function getStatusClass(status) {
 }
 
 function getTrackingStep(status) {
-  const value = String(status || '').toLowerCase()
+  const value =
+    String(status || '').toLowerCase()
 
-  if (value.includes('cancel')) return -1
-  if (value.includes('closed')) return 4
-  if (value.includes('deliver')) return 4
-  if (value.includes('out')) return 3
-  if (value.includes('ship')) return 2
+  if (value.includes('cancel')) {
+    return -1
+  }
+
+  if (value.includes('closed')) {
+    return 4
+  }
+
+  if (value.includes('deliver')) {
+    return 4
+  }
+
+  if (value.includes('out')) {
+    return 3
+  }
+
+  if (value.includes('ship')) {
+    return 2
+  }
 
   if (
     value.includes('process') ||
@@ -197,7 +263,8 @@ function getTrackingStep(status) {
 }
 
 function getReturnStatusClass(status) {
-  const value = String(status || '').toLowerCase()
+  const value =
+    String(status || '').toLowerCase()
 
   if (
     value.includes('refund') ||
@@ -231,13 +298,18 @@ function getOrderTotals(order) {
       0
   )
 
-  const shipping = Number(order?.shipping ?? 0)
+  const shipping = Number(
+    order?.shipping ?? 0
+  )
 
   const subtotal =
     order?.subtotal !== null &&
     order?.subtotal !== undefined
       ? Number(order.subtotal)
-      : Math.max(total - shipping, 0)
+      : Math.max(
+          total - shipping,
+          0
+        )
 
   return {
     subtotal,
@@ -251,8 +323,11 @@ function getOrderTotals(order) {
 // ============================================================
 
 function TrackingTimeline({ order }) {
-  const status = getOrderStatus(order)
-  const currentStep = getTrackingStep(status)
+  const status =
+    getOrderStatus(order)
+
+  const currentStep =
+    getTrackingStep(status)
 
   if (currentStep === -1) {
     return (
@@ -260,10 +335,13 @@ function TrackingTimeline({ order }) {
         <XCircle size={22} />
 
         <div>
-          <strong>Order Cancelled</strong>
+          <strong>
+            Order Cancelled
+          </strong>
 
           <span>
-            This order is no longer being processed.
+            This order is no longer
+            being processed.
           </span>
         </div>
       </div>
@@ -273,70 +351,103 @@ function TrackingTimeline({ order }) {
   const steps = [
     {
       title: 'Order Placed',
-      description: order?.created_at
-        ? formatDate(order.created_at)
-        : 'Order received',
+      description:
+        order?.created_at
+          ? formatDate(
+              order.created_at
+            )
+          : 'Order received',
       icon: Package,
     },
     {
       title: 'Order Confirmed',
-      description: order?.confirmed_at
-        ? formatDate(order.confirmed_at)
-        : 'Being prepared',
+      description:
+        order?.confirmed_at
+          ? formatDate(
+              order.confirmed_at
+            )
+          : 'Being prepared',
       icon: Clock3,
     },
     {
       title: 'Shipped',
-      description: order?.shipped_at
-        ? formatDate(order.shipped_at)
-        : 'Package on the way',
+      description:
+        order?.shipped_at
+          ? formatDate(
+              order.shipped_at
+            )
+          : 'Package on the way',
       icon: Truck,
     },
     {
       title: 'Out for Delivery',
-      description: order?.out_for_delivery_at
-        ? formatDate(order.out_for_delivery_at)
-        : 'Arriving soon',
+      description:
+        order?.out_for_delivery_at
+          ? formatDate(
+              order.out_for_delivery_at
+            )
+          : 'Arriving soon',
       icon: MapPin,
     },
     {
       title: 'Delivered',
-      description: order?.delivered_at
-        ? formatDate(order.delivered_at)
-        : 'Order delivered',
+      description:
+        order?.delivered_at
+          ? formatDate(
+              order.delivered_at
+            )
+          : 'Order delivered',
       icon: CheckCircle2,
     },
   ]
 
   return (
     <div className="tracking-timeline">
-      {steps.map((step, index) => {
-        const Icon = step.icon
-        const completed = index <= currentStep
-        const active = index === currentStep
+      {steps.map(
+        (step, index) => {
+          const Icon = step.icon
 
-        return (
-          <div
-            className={`tracking-step ${
-              completed ? 'completed' : ''
-            } ${active ? 'active' : ''}`}
-            key={step.title}
-          >
-            <div className="tracking-icon">
-              <Icon size={18} />
+          const completed =
+            index <= currentStep
+
+          const active =
+            index === currentStep
+
+          return (
+            <div
+              className={`tracking-step ${
+                completed
+                  ? 'completed'
+                  : ''
+              } ${
+                active
+                  ? 'active'
+                  : ''
+              }`}
+              key={step.title}
+            >
+              <div className="tracking-icon">
+                <Icon size={18} />
+              </div>
+
+              <div className="tracking-content">
+                <strong>
+                  {step.title}
+                </strong>
+
+                <span>
+                  {step.description}
+                </span>
+              </div>
+
+              {index <
+                steps.length - 1 && (
+                <div className="tracking-line" />
+              )}
             </div>
-
-            <div className="tracking-content">
-              <strong>{step.title}</strong>
-              <span>{step.description}</span>
-            </div>
-
-            {index < steps.length - 1 && (
-              <div className="tracking-line" />
-            )}
-          </div>
-        )
-      })}
+          )
+        }
+      )}
     </div>
   )
 }
@@ -350,17 +461,36 @@ function ReturnModal({
   onClose,
   onSuccess,
 }) {
-  const items = Array.isArray(order?.items)
+  const items = Array.isArray(
+    order?.items
+  )
     ? order.items
     : []
 
-  const [selectedItem, setSelectedItem] =
-    useState(items.length === 1 ? 0 : null)
+  const [
+    selectedItem,
+    setSelectedItem,
+  ] = useState(
+    items.length === 1
+      ? 0
+      : null
+  )
 
-  const [reason, setReason] = useState('')
-  const [description, setDescription] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const [reason, setReason] =
+    useState('')
+
+  const [
+    description,
+    setDescription,
+  ] = useState('')
+
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false)
+
+  const [error, setError] =
+    useState('')
 
   const reasons = [
     'Damaged / Defective',
@@ -373,6 +503,7 @@ function ReturnModal({
 
   const handleSubmit = async event => {
     event.preventDefault()
+
     setError('')
 
     if (
@@ -382,6 +513,7 @@ function ReturnModal({
       setError(
         'Please select the product you want to return.'
       )
+
       return
     }
 
@@ -389,40 +521,59 @@ function ReturnModal({
       setError(
         'Please select a reason for the return.'
       )
+
       return
     }
 
     try {
       setSubmitting(true)
 
-      const item = items[selectedItem]
+      const item =
+        items[selectedItem]
 
-      const response = await fetch(
-        `${API_BASE}/returns`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify({
-            order_id: order.id || null,
-            order_number:
-              order.order_number || null,
-            product_id:
-              item.product_id ||
-              item.id ||
-              null,
-            product_name: getItemName(item),
-            quantity: getItemQuantity(item),
-            reason,
-            description: description.trim(),
-          }),
-        }
-      )
+      const customerHeaders =
+        getCustomerOrderHeaders()
 
-      const data = await response.json()
+      const response =
+        await fetch(
+          `${API_BASE}/returns`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              ...customerHeaders,
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify({
+              order_id:
+                order.id || null,
+
+              order_number:
+                order.order_number ||
+                null,
+
+              product_id:
+                item.product_id ||
+                item.id ||
+                null,
+
+              product_name:
+                getItemName(item),
+
+              quantity:
+                getItemQuantity(item),
+
+              reason,
+
+              description:
+                description.trim(),
+            }),
+          }
+        )
+
+      const data =
+        await response.json()
 
       if (!response.ok) {
         throw new Error(
@@ -462,7 +613,9 @@ function ReturnModal({
               SARIKA FASHIONS
             </span>
 
-            <h2>Request a Return</h2>
+            <h2>
+              Request a Return
+            </h2>
 
             <p>
               Order{' '}
@@ -488,68 +641,100 @@ function ReturnModal({
           onSubmit={handleSubmit}
         >
           <div className="return-form-section">
-            <label>Select Product</label>
+            <label>
+              Select Product
+            </label>
 
             <div className="return-product-list">
               {items.length > 0 ? (
-                items.map((item, index) => {
-                  const selected =
-                    selectedItem === index
+                items.map(
+                  (
+                    item,
+                    index
+                  ) => {
+                    const selected =
+                      selectedItem ===
+                      index
 
-                  return (
-                    <button
-                      type="button"
-                      key={
-                        item.id ||
-                        item.product_id ||
-                        index
-                      }
-                      className={`return-product-option ${
-                        selected ? 'selected' : ''
-                      }`}
-                      onClick={() =>
-                        setSelectedItem(index)
-                      }
-                    >
-                      <div className="return-product-image">
-                        {getItemImage(item) ? (
-                          <img
-                            src={getItemImage(item)}
-                            alt={getItemName(item)}
-                          />
-                        ) : (
-                          <Package size={25} />
-                        )}
-                      </div>
+                    return (
+                      <button
+                        type="button"
+                        key={
+                          item.id ||
+                          item.product_id ||
+                          index
+                        }
+                        className={`return-product-option ${
+                          selected
+                            ? 'selected'
+                            : ''
+                        }`}
+                        onClick={() =>
+                          setSelectedItem(
+                            index
+                          )
+                        }
+                      >
+                        <div className="return-product-image">
+                          {getItemImage(
+                            item
+                          ) ? (
+                            <img
+                              src={getItemImage(
+                                item
+                              )}
+                              alt={getItemName(
+                                item
+                              )}
+                            />
+                          ) : (
+                            <Package
+                              size={25}
+                            />
+                          )}
+                        </div>
 
-                      <div className="return-product-info">
-                        <strong>
-                          {getItemName(item)}
-                        </strong>
+                        <div className="return-product-info">
+                          <strong>
+                            {getItemName(
+                              item
+                            )}
+                          </strong>
 
-                        <span>
-                          Qty: {getItemQuantity(item)}
-                        </span>
+                          <span>
+                            Qty:{' '}
+                            {getItemQuantity(
+                              item
+                            )}
+                          </span>
 
-                        <small>
-                          {money(getItemPrice(item))}
-                        </small>
-                      </div>
+                          <small>
+                            {money(
+                              getItemPrice(
+                                item
+                              )
+                            )}
+                          </small>
+                        </div>
 
-                      <div className="return-radio">
-                        {selected && (
-                          <CheckCircle2 size={20} />
-                        )}
-                      </div>
-                    </button>
-                  )
-                })
+                        <div className="return-radio">
+                          {selected && (
+                            <CheckCircle2
+                              size={20}
+                            />
+                          )}
+                        </div>
+                      </button>
+                    )
+                  }
+                )
               ) : (
                 <div className="return-no-products">
                   <Package size={22} />
 
                   <span>
-                    Product information is unavailable.
+                    Product information is
+                    unavailable.
                   </span>
                 </div>
               )}
@@ -557,33 +742,46 @@ function ReturnModal({
           </div>
 
           <div className="return-form-section">
-            <label>Reason for Return</label>
+            <label>
+              Reason for Return
+            </label>
 
             <div className="return-reasons">
-              {reasons.map(returnReason => (
-                <label
-                  className={`return-reason ${
-                    reason === returnReason
-                      ? 'selected'
-                      : ''
-                  }`}
-                  key={returnReason}
-                >
-                  <input
-                    type="radio"
-                    name="returnReason"
-                    value={returnReason}
-                    checked={
-                      reason === returnReason
-                    }
-                    onChange={event =>
-                      setReason(event.target.value)
-                    }
-                  />
+              {reasons.map(
+                returnReason => (
+                  <label
+                    className={`return-reason ${
+                      reason ===
+                      returnReason
+                        ? 'selected'
+                        : ''
+                    }`}
+                    key={returnReason}
+                  >
+                    <input
+                      type="radio"
+                      name="returnReason"
+                      value={
+                        returnReason
+                      }
+                      checked={
+                        reason ===
+                        returnReason
+                      }
+                      onChange={event =>
+                        setReason(
+                          event.target
+                            .value
+                        )
+                      }
+                    />
 
-                  <span>{returnReason}</span>
-                </label>
-              ))}
+                    <span>
+                      {returnReason}
+                    </span>
+                  </label>
+                )
+              )}
             </div>
           </div>
 
@@ -596,9 +794,11 @@ function ReturnModal({
               id="returnDescription"
               value={description}
               onChange={event =>
-                setDescription(event.target.value)
+                setDescription(
+                  event.target.value
+                )
               }
-              placeholder="Tell us more about the reason for your return..."
+              placeholder="Tell us more about the reason for the return..."
               rows={4}
               maxLength={500}
             />
@@ -612,7 +812,9 @@ function ReturnModal({
             <div className="return-form-error">
               <AlertCircle size={19} />
 
-              <span>{error}</span>
+              <span>
+                {error}
+              </span>
             </div>
           )}
 
@@ -620,10 +822,10 @@ function ReturnModal({
             <AlertCircle size={18} />
 
             <p>
-              Return requests are subject to
-              Sarika Fashions' return policy.
-              Our team will review your request
-              before approval.
+              Return requests are subject
+              to Sarika Fashions' return
+              policy. Our team will review
+              your request before approval.
             </p>
           </div>
 
@@ -678,11 +880,13 @@ function ReceiveOrderModal({
           SARIKA FASHIONS
         </span>
 
-        <h2>Did you receive your order?</h2>
+        <h2>
+          Did you receive your order?
+        </h2>
 
         <p>
-          Please confirm that you have received
-          order{' '}
+          Please confirm that you have
+          received order{' '}
           <strong>
             {order.order_number ||
               `#${order.id}`}
@@ -694,8 +898,9 @@ function ReceiveOrderModal({
           <CheckCircle2 size={18} />
 
           <span>
-            Once confirmed, this order will be
-            marked as received and closed.
+            Once confirmed, this order
+            will be marked as received
+            and closed.
           </span>
         </div>
 
@@ -738,27 +943,47 @@ function ReceiveOrderModal({
 // ============================================================
 
 export default function MyOrders() {
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState('')
-  const [expandedOrder, setExpandedOrder] =
-    useState(null)
+  const [orders, setOrders] =
+    useState([])
 
-  const [returnOrder, setReturnOrder] =
-    useState(null)
+  const [loading, setLoading] =
+    useState(true)
 
-  const [receiveOrder, setReceiveOrder] =
-    useState(null)
-
-  const [receiveLoading, setReceiveLoading] =
+  const [refreshing, setRefreshing] =
     useState(false)
 
-  const [receiveError, setReceiveError] =
+  const [error, setError] =
     useState('')
 
-  const [returnMessage, setReturnMessage] =
-    useState('')
+  const [
+    expandedOrder,
+    setExpandedOrder,
+  ] = useState(null)
+
+  const [
+    returnOrder,
+    setReturnOrder,
+  ] = useState(null)
+
+  const [
+    receiveOrder,
+    setReceiveOrder,
+  ] = useState(null)
+
+  const [
+    receiveLoading,
+    setReceiveLoading,
+  ] = useState(false)
+
+  const [
+    receiveError,
+    setReceiveError,
+  ] = useState('')
+
+  const [
+    returnMessage,
+    setReturnMessage,
+  ] = useState('')
 
   // ==========================================================
   // FETCH ORDERS
@@ -776,23 +1001,32 @@ export default function MyOrders() {
 
       setError('')
 
+      const customerToken =
+        getCustomerOrderToken()
+
       console.log(
         '📦 Fetching orders from:',
         `${API_BASE}/my-orders`
       )
 
-      const response = await fetch(
-        `${API_BASE}/my-orders`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            Accept: 'application/json',
-          },
-        }
+      console.log(
+        '🔐 Customer token available:',
+        Boolean(customerToken)
       )
 
-      const data = await response.json()
+      const response =
+        await fetch(
+          `${API_BASE}/my-orders`,
+          {
+            method: 'GET',
+            credentials: 'include',
+            headers:
+              getCustomerOrderHeaders(),
+          }
+        )
+
+      const data =
+        await response.json()
 
       console.log(
         '📦 My Orders API response:',
@@ -809,7 +1043,9 @@ export default function MyOrders() {
       }
 
       setOrders(
-        Array.isArray(data.orders)
+        Array.isArray(
+          data.orders
+        )
           ? data.orders
           : []
       )
@@ -838,10 +1074,11 @@ export default function MyOrders() {
   // ==========================================================
 
   const toggleOrder = orderId => {
-    setExpandedOrder(current =>
-      current === orderId
-        ? null
-        : orderId
+    setExpandedOrder(
+      current =>
+        current === orderId
+          ? null
+          : orderId
     )
   }
 
@@ -851,7 +1088,8 @@ export default function MyOrders() {
 
   const canReturnOrder = status => {
     const value =
-      String(status || '').toLowerCase()
+      String(status || '')
+        .toLowerCase()
 
     return (
       value.includes('deliver') &&
@@ -864,119 +1102,130 @@ export default function MyOrders() {
   // RECEIVE
   // ==========================================================
 
-  const canConfirmReceived = order => {
-    if (!order) return false
+  const canConfirmReceived =
+    order => {
+      if (!order) return false
 
-    const status =
-      String(
-        order.order_status ||
-          order.status ||
-          ''
-      ).toLowerCase()
+      const status =
+        String(
+          order.order_status ||
+            order.status ||
+            ''
+        ).toLowerCase()
 
-    return (
-      status.includes('deliver') &&
-      !isReceived(order) &&
-      !status.includes('closed')
-    )
-  }
-
-  const openReceiveModal = order => {
-    setReceiveError('')
-    setReceiveOrder(order)
-  }
-
-  const handleReceiveConfirm = async () => {
-    if (!receiveOrder?.id) return
-
-    try {
-      setReceiveLoading(true)
-      setReceiveError('')
-
-      const response = await fetch(
-        `${API_BASE}/my-orders/${receiveOrder.id}/received`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
+      return (
+        status.includes('deliver') &&
+        !isReceived(order) &&
+        !status.includes('closed')
       )
+    }
 
-      const data = await response
-        .json()
-        .catch(() => ({}))
+  const openReceiveModal =
+    order => {
+      setReceiveError('')
+      setReceiveOrder(order)
+    }
 
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-            data.error ||
-            'Unable to confirm receipt.'
-        )
+  const handleReceiveConfirm =
+    async () => {
+      if (!receiveOrder?.id) {
+        return
       }
 
-      console.log(
-        '✅ ORDER RECEIVED:',
-        data
-      )
+      try {
+        setReceiveLoading(true)
+        setReceiveError('')
 
-      setReceiveOrder(null)
-      setReceiveError('')
+        const response =
+          await fetch(
+            `${API_BASE}/my-orders/${receiveOrder.id}/received`,
+            {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                ...getCustomerOrderHeaders(),
+                'Content-Type':
+                  'application/json',
+              },
+            }
+          )
 
-      await fetchOrders(true)
-    } catch (err) {
-      console.error(
-        '❌ RECEIVE CONFIRMATION ERROR:',
-        err
-      )
+        const data =
+          await response
+            .json()
+            .catch(() => ({}))
 
-      setReceiveError(
-        err.message ||
-          'Unable to confirm receipt.'
-      )
-    } finally {
-      setReceiveLoading(false)
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              data.error ||
+              'Unable to confirm receipt.'
+          )
+        }
+
+        console.log(
+          '✅ ORDER RECEIVED:',
+          data
+        )
+
+        setReceiveOrder(null)
+        setReceiveError('')
+
+        await fetchOrders(true)
+      } catch (err) {
+        console.error(
+          '❌ RECEIVE CONFIRMATION ERROR:',
+          err
+        )
+
+        setReceiveError(
+          err.message ||
+            'Unable to confirm receipt.'
+        )
+      } finally {
+        setReceiveLoading(false)
+      }
     }
-  }
 
   // ==========================================================
   // RETURN
   // ==========================================================
 
-  const openReturnModal = order => {
-    setReturnMessage('')
-    setReturnOrder(order)
-  }
-
-  const closeReturnModal = () => {
-    setReturnOrder(null)
-  }
-
-  const handleReturnSuccess = returnData => {
-    console.log(
-      '✅ RETURN REQUEST CREATED:',
-      returnData
-    )
-
-    setReturnOrder(null)
-
-    setReturnMessage(
-      'Your return request has been submitted successfully.'
-    )
-
-    fetchOrders()
-
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    })
-
-    setTimeout(() => {
+  const openReturnModal =
+    order => {
       setReturnMessage('')
-    }, 5000)
-  }
+      setReturnOrder(order)
+    }
+
+  const closeReturnModal =
+    () => {
+      setReturnOrder(null)
+    }
+
+  const handleReturnSuccess =
+    returnData => {
+      console.log(
+        '✅ RETURN REQUEST CREATED:',
+        returnData
+      )
+
+      setReturnOrder(null)
+
+      setReturnMessage(
+        'Your return request has been submitted successfully.'
+      )
+
+      fetchOrders()
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+
+      setTimeout(() => {
+        setReturnMessage('')
+      }, 5000)
+    }
 
   // ==========================================================
   // LOADING
@@ -986,7 +1235,9 @@ export default function MyOrders() {
     return (
       <div className="my-orders-page">
         <div className="my-orders-container">
+
           <div className="orders-loading">
+
             <div className="loading-spinner" />
 
             <h2>
@@ -994,10 +1245,12 @@ export default function MyOrders() {
             </h2>
 
             <p>
-              Please wait while we fetch your
-              order history.
+              Please wait while we fetch
+              your order history.
             </p>
+
           </div>
+
         </div>
       </div>
     )
@@ -1014,12 +1267,15 @@ export default function MyOrders() {
         {/* HEADER */}
 
         <div className="my-orders-header">
+
           <div>
             <span className="orders-eyebrow">
               SARIKA FASHIONS
             </span>
 
-            <h1>My Orders</h1>
+            <h1>
+              My Orders
+            </h1>
 
             <p>
               View your purchases, delivery
@@ -1031,7 +1287,9 @@ export default function MyOrders() {
           <button
             type="button"
             className="refresh-orders-btn"
-            onClick={() => fetchOrders(true)}
+            onClick={() =>
+              fetchOrders(true)
+            }
             disabled={refreshing}
           >
             <RefreshCw
@@ -1047,15 +1305,18 @@ export default function MyOrders() {
               ? 'Refreshing...'
               : 'Refresh'}
           </button>
+
         </div>
 
         {/* RETURN MESSAGE */}
 
         {returnMessage && (
           <div className="return-success-message">
+
             <CheckCircle2 size={21} />
 
             <div>
+
               <strong>
                 Return Request Submitted
               </strong>
@@ -1063,7 +1324,9 @@ export default function MyOrders() {
               <span>
                 {returnMessage}
               </span>
+
             </div>
+
           </div>
         )}
 
@@ -1071,698 +1334,938 @@ export default function MyOrders() {
 
         {error && (
           <div className="orders-error">
+
             <XCircle size={22} />
 
             <div>
+
               <strong>
                 Unable to load orders
               </strong>
 
-              <p>{error}</p>
+              <p>
+                {error}
+              </p>
 
               <button
                 type="button"
-                onClick={() => fetchOrders()}
+                onClick={() =>
+                  fetchOrders()
+                }
               >
                 Try Again
               </button>
+
             </div>
+
           </div>
         )}
 
         {/* EMPTY */}
 
-        {!error && orders.length === 0 && (
-          <div className="orders-empty">
-            <div className="empty-order-icon">
-              <ShoppingBag size={42} />
+        {!error &&
+          orders.length === 0 && (
+            <div className="orders-empty">
+
+              <div className="empty-order-icon">
+                <ShoppingBag
+                  size={42}
+                />
+              </div>
+
+              <h2>
+                No orders yet
+              </h2>
+
+              <p>
+                You haven't placed any
+                orders with Sarika Fashions
+                yet.
+              </p>
+
+              <Link
+                to="/shop"
+                className="shop-now-btn"
+              >
+                Start Shopping
+              </Link>
+
             </div>
-
-            <h2>No orders yet</h2>
-
-            <p>
-              You haven't placed any orders
-              with Sarika Fashions yet.
-            </p>
-
-            <Link
-              to="/shop"
-              className="shop-now-btn"
-            >
-              Start Shopping
-            </Link>
-          </div>
-        )}
+          )}
 
         {/* ORDERS */}
 
-        {!error && orders.length > 0 && (
-          <div className="orders-list">
+        {!error &&
+          orders.length > 0 && (
+            <div className="orders-list">
 
-            {orders.map(order => {
-              const orderId =
-                order.id ||
-                order.order_number
+              {orders.map(order => {
 
-              const status =
-                getOrderStatus(order)
+                const orderId =
+                  order.id ||
+                  order.order_number
 
-              const paymentStatus =
-                getPaymentStatus(order)
+                const status =
+                  getOrderStatus(order)
 
-              const {
-                subtotal,
-                shipping,
-                total,
-              } = getOrderTotals(order)
+                const paymentStatus =
+                  getPaymentStatus(order)
 
-              const isExpanded =
-                expandedOrder === orderId
+                const {
+                  subtotal,
+                  shipping,
+                  total,
+                } =
+                  getOrderTotals(order)
 
-              const returnRequests =
-                Array.isArray(
-                  order.return_requests
-                )
-                  ? order.return_requests
-                  : []
+                const isExpanded =
+                  expandedOrder ===
+                  orderId
 
-              const hasReturn =
-                returnRequests.length > 0
+                const returnRequests =
+                  Array.isArray(
+                    order.return_requests
+                  )
+                    ? order.return_requests
+                    : []
 
-              const latestReturn =
-                hasReturn
-                  ? returnRequests[
-                      returnRequests.length - 1
-                    ]
-                  : null
+                const hasReturn =
+                  returnRequests.length >
+                  0
 
-              const customerReceived =
-                isReceived(order)
+                const latestReturn =
+                  hasReturn
+                    ? returnRequests[
+                        returnRequests.length -
+                          1
+                      ]
+                    : null
 
-              const orderClosed =
-                customerReceived ||
-                String(status).toLowerCase() ===
-                  'closed'
+                const customerReceived =
+                  isReceived(order)
 
-              const receiveAllowed =
-                canConfirmReceived(order)
+                const orderClosed =
+                  customerReceived ||
+                  String(
+                    status
+                  ).toLowerCase() ===
+                    'closed'
 
-              const returnAllowed =
-                canReturnOrder(status)
+                const receiveAllowed =
+                  canConfirmReceived(
+                    order
+                  )
 
-              const paymentLower =
-                String(paymentStatus).toLowerCase()
+                const returnAllowed =
+                  canReturnOrder(
+                    status
+                  )
 
-              const paymentSuccessful =
-                paymentLower.includes('captured') ||
-                paymentLower.includes('paid') ||
-                paymentLower.includes('success')
+                const paymentLower =
+                  String(
+                    paymentStatus
+                  ).toLowerCase()
 
-              return (
-                <article
-                  className={`order-card ${
-                    orderClosed
-                      ? 'order-card-closed'
-                      : ''
-                  }`}
-                  key={orderId}
-                >
+                const paymentSuccessful =
+                  paymentLower.includes(
+                    'captured'
+                  ) ||
+                  paymentLower.includes(
+                    'paid'
+                  ) ||
+                  paymentLower.includes(
+                    'success'
+                  )
 
-                  {/* HEADER */}
+                return (
+                  <article
+                    className={`order-card ${
+                      orderClosed
+                        ? 'order-card-closed'
+                        : ''
+                    }`}
+                    key={orderId}
+                  >
 
-                  <div className="order-card-header">
-                    <div className="order-main-info">
+                    {/* HEADER */}
 
-                      <div className="order-icon">
-                        {orderClosed ? (
-                          <CheckCircle2 size={21} />
-                        ) : (
-                          <Package size={21} />
-                        )}
+                    <div className="order-card-header">
+
+                      <div className="order-main-info">
+
+                        <div className="order-icon">
+                          {orderClosed ? (
+                            <CheckCircle2
+                              size={21}
+                            />
+                          ) : (
+                            <Package
+                              size={21}
+                            />
+                          )}
+                        </div>
+
+                        <div>
+
+                          <span className="order-label">
+                            Order Number
+                          </span>
+
+                          <h2>
+                            {order.order_number ||
+                              `#${order.id}`}
+                          </h2>
+
+                        </div>
+
                       </div>
 
-                      <div>
-                        <span className="order-label">
-                          Order Number
+                      <div className="order-date">
+
+                        <span>
+                          Ordered on
                         </span>
 
-                        <h2>
-                          {order.order_number ||
-                            `#${order.id}`}
-                        </h2>
-                      </div>
-                    </div>
-
-                    <div className="order-date">
-                      <span>Ordered on</span>
-
-                      <strong>
-                        {formatDate(
-                          order.created_at
-                        )}
-                      </strong>
-
-                      {formatTime(
-                        order.created_at
-                      ) && (
-                        <small>
-                          {formatTime(
+                        <strong>
+                          {formatDate(
                             order.created_at
                           )}
-                        </small>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* SUMMARY */}
-
-                  <div className="order-summary-grid">
-
-                    <div className="order-summary-item">
-                      <span>Order Status</span>
-
-                      <strong
-                        className={`status-badge ${
-                          orderClosed
-                            ? 'status-delivered'
-                            : getStatusClass(status)
-                        }`}
-                      >
-                        {orderClosed
-                          ? 'Closed'
-                          : status}
-                      </strong>
-                    </div>
-
-                    <div className="order-summary-item">
-                      <span>Payment</span>
-
-                      <strong
-                        className={`payment-badge ${
-                          paymentSuccessful
-                            ? 'payment-paid'
-                            : ''
-                        }`}
-                      >
-                        {paymentStatus}
-                      </strong>
-                    </div>
-
-                    <div className="order-summary-item">
-                      <span>Total Amount</span>
-
-                      <strong>
-                        {money(total)}
-                      </strong>
-                    </div>
-                  </div>
-
-                  {/* ADDRESS */}
-
-                  <div className="order-address-section">
-                    <div className="address-heading">
-                      <MapPin size={18} />
-
-                      <strong>
-                        Delivery Address
-                      </strong>
-                    </div>
-
-                    <div className="address-content">
-                      <strong>
-                        {order.customer_name ||
-                          order.full_name ||
-                          'Customer'}
-                      </strong>
-
-                      {order.customer_phone && (
-                        <span>
-                          {order.customer_phone}
-                        </span>
-                      )}
-
-                      <p>
-                        {order.address ||
-                          order.address_line ||
-                          ''}
-
-                        {order.city &&
-                          `, ${order.city}`}
-
-                        {order.state &&
-                          `, ${order.state}`}
-
-                        {order.pincode &&
-                          ` - ${order.pincode}`}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* CLOSED */}
-
-                  {orderClosed && (
-                    <div className="order-received-banner">
-                      <div className="order-received-icon">
-                        <CheckCircle2 size={22} />
-                      </div>
-
-                      <div>
-                        <strong>
-                          Order Received
                         </strong>
 
-                        <span>
-                          You confirmed that you
-                          received this order.
-                        </span>
+                        {formatTime(
+                          order.created_at
+                        ) && (
+                          <small>
+                            {formatTime(
+                              order.created_at
+                            )}
+                          </small>
+                        )}
+
                       </div>
 
-                      <div className="order-closed-badge">
-                        <LockKeyhole size={15} />
-                        Order Closed
-                      </div>
                     </div>
-                  )}
 
-                  {/* RETURN */}
+                    {/* SUMMARY */}
 
-                  {latestReturn && (
-                    <div className="return-status-card">
-                      <div className="return-status-icon">
-                        <RotateCcw size={20} />
-                      </div>
+                    <div className="order-summary-grid">
 
-                      <div className="return-status-content">
+                      <div className="order-summary-item">
+
                         <span>
-                          Return Request
+                          Order Status
                         </span>
 
                         <strong
-                          className={getReturnStatusClass(
-                            latestReturn.return_status ||
-                              latestReturn.status
-                          )}
+                          className={`status-badge ${
+                            orderClosed
+                              ? 'status-delivered'
+                              : getStatusClass(
+                                  status
+                                )
+                          }`}
                         >
-                          {latestReturn.return_status ||
-                            latestReturn.status ||
-                            'Requested'}
+                          {orderClosed
+                            ? 'Closed'
+                            : status}
                         </strong>
 
-                        {latestReturn.product_name && (
-                          <small>
-                            {latestReturn.product_name}
-                          </small>
-                        )}
                       </div>
+
+                      <div className="order-summary-item">
+
+                        <span>
+                          Payment
+                        </span>
+
+                        <strong
+                          className={`payment-badge ${
+                            paymentSuccessful
+                              ? 'payment-paid'
+                              : ''
+                          }`}
+                        >
+                          {paymentStatus}
+                        </strong>
+
+                      </div>
+
+                      <div className="order-summary-item">
+
+                        <span>
+                          Total Amount
+                        </span>
+
+                        <strong>
+                          {money(total)}
+                        </strong>
+
+                      </div>
+
                     </div>
-                  )}
 
-                  {/* ACTIONS */}
+                    {/* ADDRESS */}
 
-                  <div className="order-actions">
+                    <div className="order-address-section">
 
-                    <button
-                      type="button"
-                      className="track-order-btn"
-                      onClick={() =>
-                        toggleOrder(orderId)
-                      }
-                    >
-                      <Truck size={17} />
+                      <div className="address-heading">
 
-                      {isExpanded
-                        ? 'Hide Tracking'
-                        : 'Track Order'}
+                        <MapPin size={18} />
 
-                      {isExpanded ? (
-                        <ChevronUp size={17} />
-                      ) : (
-                        <ChevronDown size={17} />
-                      )}
-                    </button>
+                        <strong>
+                          Delivery Address
+                        </strong>
 
-                    {receiveAllowed && (
-                      <button
-                        type="button"
-                        className="receive-order-btn"
-                        onClick={() =>
-                          openReceiveModal(order)
-                        }
-                      >
-                        <CheckCircle2 size={17} />
-                        I Received My Order
-                      </button>
-                    )}
-
-                    {returnAllowed && !hasReturn && (
-                      <button
-                        type="button"
-                        className="return-order-btn"
-                        onClick={() =>
-                          openReturnModal(order)
-                        }
-                      >
-                        <RotateCcw size={17} />
-                        Return Item
-                      </button>
-                    )}
-
-                    {hasReturn && (
-                      <span className="return-already-requested">
-                        <CheckCircle2 size={16} />
-                        Return Requested
-                      </span>
-                    )}
-                  </div>
-
-                  {/* EXPANDED */}
-
-                  {isExpanded && (
-                    <div className="order-expanded">
-
-                      {/* TRACKING */}
-
-                      <div className="expanded-section">
-                        <h3>
-                          <Truck size={19} />
-                          Order Tracking
-                        </h3>
-
-                        <TrackingTimeline
-                          order={order}
-                        />
                       </div>
 
-                      {/* PAYMENT */}
+                      <div className="address-content">
 
-                      <div className="expanded-section">
-                        <h3>
-                          <CreditCard size={19} />
-                          Payment Details
-                        </h3>
+                        <strong>
+                          {order.customer_name ||
+                            order.full_name ||
+                            'Customer'}
+                        </strong>
 
-                        <div className="details-grid">
+                        {order.customer_phone && (
+                          <span>
+                            {order.customer_phone}
+                          </span>
+                        )}
 
-                          <div>
-                            <span>
-                              Payment Status
-                            </span>
+                        <p>
 
-                            <strong>
-                              {paymentStatus}
-                            </strong>
-                          </div>
+                          {order.address ||
+                            order.address_line ||
+                            ''}
 
-                          {(
-                            order.razorpay_payment_id ||
-                            order.payment_id
-                          ) && (
-                            <div>
-                              <span>
-                                Payment ID
-                              </span>
+                          {order.city &&
+                            `, ${order.city}`}
 
-                              <strong>
-                                {order.razorpay_payment_id ||
-                                  order.payment_id}
-                              </strong>
-                            </div>
-                          )}
+                          {order.state &&
+                            `, ${order.state}`}
 
-                          {order.razorpay_order_id && (
-                            <div>
-                              <span>
-                                Razorpay Order
-                              </span>
+                          {order.pincode &&
+                            ` - ${order.pincode}`}
 
-                              <strong>
-                                {order.razorpay_order_id}
-                              </strong>
-                            </div>
-                          )}
+                        </p>
 
-                          <div>
-                            <span>
-                              Subtotal
-                            </span>
+                      </div>
 
-                            <strong>
-                              {money(subtotal)}
-                            </strong>
-                          </div>
+                    </div>
 
-                          <div>
-                            <span>
-                              Shipping
-                            </span>
+                    {/* CLOSED */}
 
-                            <strong>
-                              {shipping === 0
-                                ? 'FREE'
-                                : money(shipping)}
-                            </strong>
-                          </div>
+                    {orderClosed && (
+                      <div className="order-received-banner">
 
-                          <div>
-                            <span>
-                              Amount Paid
-                            </span>
-
-                            <strong>
-                              {money(total)}
-                            </strong>
-                          </div>
+                        <div className="order-received-icon">
+                          <CheckCircle2
+                            size={22}
+                          />
                         </div>
+
+                        <div>
+
+                          <strong>
+                            Order Received
+                          </strong>
+
+                          <span>
+                            You confirmed that
+                            you received this
+                            order.
+                          </span>
+
+                        </div>
+
+                        <div className="order-closed-badge">
+                          <LockKeyhole
+                            size={15}
+                          />
+
+                          Order Closed
+                        </div>
+
                       </div>
+                    )}
 
-                      {/* ITEMS */}
+                    {/* RETURN */}
 
-                      <div className="expanded-section">
-                        <h3>
-                          <Package size={19} />
-                          Order Details
-                        </h3>
+                    {latestReturn && (
+                      <div className="return-status-card">
 
-                        {Array.isArray(order.items) &&
-                        order.items.length > 0 ? (
-                          <div className="order-items">
+                        <div className="return-status-icon">
+                          <RotateCcw
+                            size={20}
+                          />
+                        </div>
 
-                            {order.items.map(
-                              (item, index) => {
-                                const itemPrice =
-                                  getItemPrice(item)
+                        <div className="return-status-content">
 
-                                const quantity =
-                                  getItemQuantity(item)
+                          <span>
+                            Return Request
+                          </span>
 
-                                const image =
-                                  getItemImage(item)
+                          <strong
+                            className={getReturnStatusClass(
+                              latestReturn.return_status ||
+                                latestReturn.status
+                            )}
+                          >
+                            {latestReturn.return_status ||
+                              latestReturn.status ||
+                              'Requested'}
+                          </strong>
 
-                                return (
-                                  <div
-                                    className="order-item"
-                                    key={
-                                      item.id ||
-                                      item.product_id ||
-                                      index
-                                    }
-                                  >
-                                    <div className="order-item-image">
-                                      {image ? (
-                                        <img
-                                          src={image}
-                                          alt={getItemName(
+                          {latestReturn.product_name && (
+                            <small>
+                              {
+                                latestReturn.product_name
+                              }
+                            </small>
+                          )}
+
+                        </div>
+
+                      </div>
+                    )}
+
+                    {/* ACTIONS */}
+
+                    <div className="order-actions">
+
+                      <button
+                        type="button"
+                        className="track-order-btn"
+                        onClick={() =>
+                          toggleOrder(
+                            orderId
+                          )
+                        }
+                      >
+                        <Truck size={17} />
+
+                        {isExpanded
+                          ? 'Hide Tracking'
+                          : 'Track Order'}
+
+                        {isExpanded ? (
+                          <ChevronUp
+                            size={17}
+                          />
+                        ) : (
+                          <ChevronDown
+                            size={17}
+                          />
+                        )}
+
+                      </button>
+
+                      {receiveAllowed && (
+                        <button
+                          type="button"
+                          className="receive-order-btn"
+                          onClick={() =>
+                            openReceiveModal(
+                              order
+                            )
+                          }
+                        >
+                          <CheckCircle2
+                            size={17}
+                          />
+
+                          I Received My Order
+                        </button>
+                      )}
+
+                      {returnAllowed &&
+                        !hasReturn && (
+                          <button
+                            type="button"
+                            className="return-order-btn"
+                            onClick={() =>
+                              openReturnModal(
+                                order
+                              )
+                            }
+                          >
+                            <RotateCcw
+                              size={17}
+                            />
+
+                            Return Item
+                          </button>
+                        )}
+
+                      {hasReturn && (
+                        <span className="return-already-requested">
+
+                          <CheckCircle2
+                            size={16}
+                          />
+
+                          Return Requested
+
+                        </span>
+                      )}
+
+                    </div>
+
+                    {/* EXPANDED */}
+
+                    {isExpanded && (
+                      <div className="order-expanded">
+
+                        {/* TRACKING */}
+
+                        <div className="expanded-section">
+
+                          <h3>
+                            <Truck
+                              size={19}
+                            />
+
+                            Order Tracking
+                          </h3>
+
+                          <TrackingTimeline
+                            order={order}
+                          />
+
+                        </div>
+
+                        {/* PAYMENT */}
+
+                        <div className="expanded-section">
+
+                          <h3>
+                            <CreditCard
+                              size={19}
+                            />
+
+                            Payment Details
+                          </h3>
+
+                          <div className="details-grid">
+
+                            <div>
+
+                              <span>
+                                Payment Status
+                              </span>
+
+                              <strong>
+                                {paymentStatus}
+                              </strong>
+
+                            </div>
+
+                            {(
+                              order.razorpay_payment_id ||
+                              order.payment_id
+                            ) && (
+                              <div>
+
+                                <span>
+                                  Payment ID
+                                </span>
+
+                                <strong>
+                                  {order.razorpay_payment_id ||
+                                    order.payment_id}
+                                </strong>
+
+                              </div>
+                            )}
+
+                            {order.razorpay_order_id && (
+                              <div>
+
+                                <span>
+                                  Razorpay Order
+                                </span>
+
+                                <strong>
+                                  {
+                                    order.razorpay_order_id
+                                  }
+                                </strong>
+
+                              </div>
+                            )}
+
+                            <div>
+
+                              <span>
+                                Subtotal
+                              </span>
+
+                              <strong>
+                                {money(
+                                  subtotal
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div>
+
+                              <span>
+                                Shipping
+                              </span>
+
+                              <strong>
+                                {shipping ===
+                                0
+                                  ? 'FREE'
+                                  : money(
+                                      shipping
+                                    )}
+                              </strong>
+
+                            </div>
+
+                            <div>
+
+                              <span>
+                                Amount Paid
+                              </span>
+
+                              <strong>
+                                {money(
+                                  total
+                                )}
+                              </strong>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                        {/* ITEMS */}
+
+                        <div className="expanded-section">
+
+                          <h3>
+                            <Package
+                              size={19}
+                            />
+
+                            Order Details
+                          </h3>
+
+                          {Array.isArray(
+                            order.items
+                          ) &&
+                          order.items.length >
+                            0 ? (
+                            <div className="order-items">
+
+                              {order.items.map(
+                                (
+                                  item,
+                                  index
+                                ) => {
+
+                                  const itemPrice =
+                                    getItemPrice(
+                                      item
+                                    )
+
+                                  const quantity =
+                                    getItemQuantity(
+                                      item
+                                    )
+
+                                  const image =
+                                    getItemImage(
+                                      item
+                                    )
+
+                                  return (
+                                    <div
+                                      className="order-item"
+                                      key={
+                                        item.id ||
+                                        item.product_id ||
+                                        index
+                                      }
+                                    >
+
+                                      <div className="order-item-image">
+
+                                        {image ? (
+                                          <img
+                                            src={
+                                              image
+                                            }
+                                            alt={getItemName(
+                                              item
+                                            )}
+                                          />
+                                        ) : (
+                                          <Package
+                                            size={
+                                              25
+                                            }
+                                          />
+                                        )}
+
+                                      </div>
+
+                                      <div className="order-item-info">
+
+                                        <strong>
+                                          {getItemName(
                                             item
                                           )}
-                                        />
-                                      ) : (
-                                        <Package
-                                          size={25}
-                                        />
-                                      )}
-                                    </div>
+                                        </strong>
 
-                                    <div className="order-item-info">
+                                        <span>
+                                          Qty:{' '}
+                                          {
+                                            quantity
+                                          }
+                                        </span>
+
+                                        <small>
+                                          {money(
+                                            itemPrice
+                                          )}{' '}
+                                          each
+                                        </small>
+
+                                      </div>
+
                                       <strong>
-                                        {getItemName(
-                                          item
+                                        {money(
+                                          itemPrice *
+                                            quantity
                                         )}
                                       </strong>
 
-                                      <span>
-                                        Qty: {quantity}
-                                      </span>
-
-                                      <small>
-                                        {money(itemPrice)}
-                                        {' '}each
-                                      </small>
                                     </div>
-
-                                    <strong>
-                                      {money(
-                                        itemPrice *
-                                          quantity
-                                      )}
-                                    </strong>
-                                  </div>
-                                )
-                              }
-                            )}
-                          </div>
-                        ) : (
-                          <p className="no-item-data">
-                            Product details are
-                            available in your order
-                            record.
-                          </p>
-                        )}
-                      </div>
-
-                      {/* PRICE BREAKDOWN */}
-
-                      <div className="expanded-section">
-                        <h3>
-                          <ShoppingBag size={19} />
-                          Price Summary
-                        </h3>
-
-                        <div className="price-summary">
-                          <div>
-                            <span>Subtotal</span>
-
-                            <strong>
-                              {money(subtotal)}
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>Shipping</span>
-
-                            <strong>
-                              {shipping === 0
-                                ? 'FREE'
-                                : money(shipping)}
-                            </strong>
-                          </div>
-
-                          <div className="price-summary-total">
-                            <span>Total Paid</span>
-
-                            <strong>
-                              {money(total)}
-                            </strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* RETURN DETAILS */}
-
-                      {latestReturn && (
-                        <div className="expanded-section">
-                          <h3>
-                            <RotateCcw size={19} />
-                            Return Details
-                          </h3>
-
-                          <div className="return-details-grid">
-
-                            <div>
-                              <span>Product</span>
-
-                              <strong>
-                                {latestReturn.product_name ||
-                                  'Product'}
-                              </strong>
-                            </div>
-
-                            <div>
-                              <span>Reason</span>
-
-                              <strong>
-                                {latestReturn.reason ||
-                                  'Not specified'}
-                              </strong>
-                            </div>
-
-                            <div>
-                              <span>
-                                Return Status
-                              </span>
-
-                              <strong
-                                className={getReturnStatusClass(
-                                  latestReturn.return_status ||
-                                    latestReturn.status
-                                )}
-                              >
-                                {latestReturn.return_status ||
-                                  latestReturn.status ||
-                                  'Requested'}
-                              </strong>
-                            </div>
-
-                            <div>
-                              <span>
-                                Refund Status
-                              </span>
-
-                              <strong>
-                                {latestReturn.refund_status ||
-                                  'Pending'}
-                              </strong>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* CLOSED */}
-
-                      {orderClosed && (
-                        <div className="expanded-section order-closed-section">
-                          <h3>
-                            <LockKeyhole size={19} />
-                            Order Closed
-                          </h3>
-
-                          <div className="closed-order-message">
-                            <CheckCircle2 size={24} />
-
-                            <div>
-                              <strong>
-                                Order successfully
-                                received
-                              </strong>
-
-                              <span>
-                                You confirmed that
-                                this order has been
-                                received. The order
-                                is now closed.
-                              </span>
-
-                              {order.received_at && (
-                                <small>
-                                  Received on:{' '}
-                                  {formatDate(
-                                    order.received_at
-                                  )}{' '}
-                                  {formatTime(
-                                    order.received_at
-                                  )}
-                                </small>
+                                  )
+                                }
                               )}
+
                             </div>
-                          </div>
+                          ) : (
+                            <p className="no-item-data">
+                              Product details are
+                              available in your order
+                              record.
+                            </p>
+                          )}
+
                         </div>
-                      )}
-                    </div>
-                  )}
-                </article>
-              )
-            })}
-          </div>
-        )}
+
+                        {/* PRICE BREAKDOWN */}
+
+                        <div className="expanded-section">
+
+                          <h3>
+                            <ShoppingBag
+                              size={19}
+                            />
+
+                            Price Summary
+                          </h3>
+
+                          <div className="price-summary">
+
+                            <div>
+
+                              <span>
+                                Subtotal
+                              </span>
+
+                              <strong>
+                                {money(
+                                  subtotal
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div>
+
+                              <span>
+                                Shipping
+                              </span>
+
+                              <strong>
+                                {shipping ===
+                                0
+                                  ? 'FREE'
+                                  : money(
+                                      shipping
+                                    )}
+                              </strong>
+
+                            </div>
+
+                            <div className="price-summary-total">
+
+                              <span>
+                                Total Paid
+                              </span>
+
+                              <strong>
+                                {money(
+                                  total
+                                )}
+                              </strong>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                        {/* RETURN DETAILS */}
+
+                        {latestReturn && (
+                          <div className="expanded-section">
+
+                            <h3>
+                              <RotateCcw
+                                size={19}
+                              />
+
+                              Return Details
+                            </h3>
+
+                            <div className="return-details-grid">
+
+                              <div>
+
+                                <span>
+                                  Product
+                                </span>
+
+                                <strong>
+                                  {latestReturn.product_name ||
+                                    'Product'}
+                                </strong>
+
+                              </div>
+
+                              <div>
+
+                                <span>
+                                  Reason
+                                </span>
+
+                                <strong>
+                                  {latestReturn.reason ||
+                                    'Not specified'}
+                                </strong>
+
+                              </div>
+
+                              <div>
+
+                                <span>
+                                  Return Status
+                                </span>
+
+                                <strong
+                                  className={getReturnStatusClass(
+                                    latestReturn.return_status ||
+                                      latestReturn.status
+                                  )}
+                                >
+                                  {latestReturn.return_status ||
+                                    latestReturn.status ||
+                                    'Requested'}
+                                </strong>
+
+                              </div>
+
+                              <div>
+
+                                <span>
+                                  Refund Status
+                                </span>
+
+                                <strong>
+                                  {latestReturn.refund_status ||
+                                    'Pending'}
+                                </strong>
+
+                              </div>
+
+                            </div>
+
+                          </div>
+                        )}
+
+                        {/* CLOSED */}
+
+                        {orderClosed && (
+                          <div className="expanded-section order-closed-section">
+
+                            <h3>
+                              <LockKeyhole
+                                size={19}
+                              />
+
+                              Order Closed
+                            </h3>
+
+                            <div className="closed-order-message">
+
+                              <CheckCircle2
+                                size={24}
+                              />
+
+                              <div>
+
+                                <strong>
+                                  Order successfully
+                                  received
+                                </strong>
+
+                                <span>
+                                  You confirmed
+                                  that this order
+                                  has been received.
+                                  The order is now
+                                  closed.
+                                </span>
+
+                                {order.received_at && (
+                                  <small>
+                                    Received on:{' '}
+                                    {formatDate(
+                                      order.received_at
+                                    )}{' '}
+                                    {formatTime(
+                                      order.received_at
+                                    )}
+                                  </small>
+                                )}
+
+                              </div>
+
+                            </div>
+
+                          </div>
+                        )}
+
+                      </div>
+                    )}
+
+                  </article>
+                )
+              })}
+
+            </div>
+          )}
+
       </div>
 
       {/* RETURN MODAL */}
@@ -1770,8 +2273,12 @@ export default function MyOrders() {
       {returnOrder && (
         <ReturnModal
           order={returnOrder}
-          onClose={closeReturnModal}
-          onSuccess={handleReturnSuccess}
+          onClose={
+            closeReturnModal
+          }
+          onSuccess={
+            handleReturnSuccess
+          }
         />
       )}
 
@@ -1783,13 +2290,18 @@ export default function MyOrders() {
           onClose={() =>
             setReceiveOrder(null)
           }
-          onConfirm={handleReceiveConfirm}
-          confirming={receiveLoading}
-          error={receiveError}
+          onConfirm={
+            handleReceiveConfirm
+          }
+          confirming={
+            receiveLoading
+          }
+          error={
+            receiveError
+          }
         />
       )}
+
     </div>
   )
 }
-
-
