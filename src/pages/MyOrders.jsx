@@ -32,6 +32,7 @@ const isLocalhost =
 
 const API_BASE =
   import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL || 
   (isLocalhost
     ? 'http://localhost:5000/api'
     : 'https://sarika-fashions-backend-rfwh.onrender.com/api')

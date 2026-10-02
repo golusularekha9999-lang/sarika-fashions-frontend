@@ -13,9 +13,16 @@ import './Checkout.css'
 // API BASE
 // ============================================================
 
+const isLocalhost =
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+
 const API_BASE =
+  import.meta.env.VITE_API_URL ||
   import.meta.env.VITE_API_BASE_URL ||
-  'https://sarika-fashions-backend-rfwh.onrender.com/api'
+  (isLocalhost
+    ? 'http://localhost:5000/api'
+    : 'https://sarika-fashions-backend-rfwh.onrender.com/api')
 
 // ============================================================
 // CUSTOMER ORDER TOKEN
@@ -195,6 +202,9 @@ export default function Checkout() {
           '',
       }))
 
+      const existingToken =
+        localStorage.getItem(CUSTOMER_TOKEN_KEY)
+
       const orderData = {
         customer_name: address.fullName,
         customer_phone: address.phone,
@@ -211,6 +221,9 @@ export default function Checkout() {
         subtotal: Number(subtotal),
         shipping: Number(shipping),
         total_amount: Number(total),
+
+        customer_order_token:
+          existingToken || undefined,
 
         razorpay_order_id:
           paymentResponse?.razorpay_order_id ||
@@ -235,6 +248,9 @@ export default function Checkout() {
         `${API_BASE}/payment/complete`,
         orderData,
         {
+          headers: existingToken
+            ? { 'X-Customer-Order-Token': existingToken }
+            : {},
           withCredentials: true,
           timeout: 30000,
         }
