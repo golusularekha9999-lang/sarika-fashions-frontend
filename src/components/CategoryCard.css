@@ -75,4 +75,12 @@
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--color-dark);
+}/* Look for something like this in your CSS: */
+.section-title::after,
+.shop-by-category h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  margin: 10px auto;
 }

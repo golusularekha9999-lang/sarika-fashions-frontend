@@ -21,10 +21,36 @@ import {
 import { Link } from 'react-router-dom'
 import './MyOrders.css'
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ||
-  'https://sarika-fashions-backend-rfwh.onrender.com/api'
+// ============================================================
+// API CONFIG
+// ============================================================
+//
+// Production:
+// https://sarika-fashions-backend-rfwh.onrender.com/api
+//
+// Local development:
+// http://localhost:5000/api
+//
+// You can also set VITE_API_BASE_URL in Vercel/local .env
+// ============================================================
 
+// ============================================================
+// API CONFIG
+// ============================================================
+
+// ============================================================
+// API CONFIG
+// ============================================================
+
+const isLocalhost =
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (isLocalhost
+    ? 'http://localhost:5000/api'
+    : 'https://sarika-fashions-backend-rfwh.onrender.com/api')
 // ============================================================
 // HELPERS
 // ============================================================
@@ -84,17 +110,17 @@ function getItemName(item) {
 function getItemPrice(item) {
   return Number(
     item?.price ??
-    item?.unit_price ??
-    item?.product_price ??
-    0
+      item?.unit_price ??
+      item?.product_price ??
+      0
   )
 }
 
 function getItemQuantity(item) {
   return Number(
     item?.quantity ??
-    item?.qty ??
-    1
+      item?.qty ??
+      1
   )
 }
 
@@ -119,7 +145,10 @@ function isReceived(order) {
 function getStatusClass(status) {
   const value = String(status || '').toLowerCase()
 
-  if (value.includes('cancel') || value.includes('fail')) {
+  if (
+    value.includes('cancel') ||
+    value.includes('fail')
+  ) {
     return 'status-cancelled'
   }
 
@@ -155,6 +184,7 @@ function getTrackingStep(status) {
   if (value.includes('deliver')) return 4
   if (value.includes('out')) return 3
   if (value.includes('ship')) return 2
+
   if (
     value.includes('process') ||
     value.includes('confirm')
@@ -195,9 +225,9 @@ function getReturnStatusClass(status) {
 function getOrderTotals(order) {
   const total = Number(
     order?.total_amount ??
-    order?.total ??
-    order?.amount ??
-    0
+      order?.total ??
+      order?.amount ??
+      0
   )
 
   const shipping = Number(order?.shipping ?? 0)
@@ -230,6 +260,7 @@ function TrackingTimeline({ order }) {
 
         <div>
           <strong>Order Cancelled</strong>
+
           <span>
             This order is no longer being processed.
           </span>
@@ -322,9 +353,8 @@ function ReturnModal({
     ? order.items
     : []
 
-  const [selectedItem, setSelectedItem] = useState(
-    items.length === 1 ? 0 : null
-  )
+  const [selectedItem, setSelectedItem] =
+    useState(items.length === 1 ? 0 : null)
 
   const [reason, setReason] = useState('')
   const [description, setDescription] = useState('')
@@ -396,15 +426,15 @@ function ReturnModal({
       if (!response.ok) {
         throw new Error(
           data.message ||
-          data.error ||
-          'Unable to submit return request.'
+            data.error ||
+            'Unable to submit return request.'
         )
       }
 
       onSuccess(
         data.return_request ||
-        data.return ||
-        data
+          data.return ||
+          data
       )
     } catch (err) {
       console.error(
@@ -414,7 +444,7 @@ function ReturnModal({
 
       setError(
         err.message ||
-        'Unable to submit return request.'
+          'Unable to submit return request.'
       )
     } finally {
       setSubmitting(false)
@@ -516,6 +546,7 @@ function ReturnModal({
               ) : (
                 <div className="return-no-products">
                   <Package size={22} />
+
                   <span>
                     Product information is unavailable.
                   </span>
@@ -579,6 +610,7 @@ function ReturnModal({
           {error && (
             <div className="return-form-error">
               <AlertCircle size={19} />
+
               <span>{error}</span>
             </div>
           )}
@@ -711,18 +743,24 @@ export default function MyOrders() {
   const [error, setError] = useState('')
   const [expandedOrder, setExpandedOrder] =
     useState(null)
-  const [returnOrder, setReturnOrder] = useState(null)
+
+  const [returnOrder, setReturnOrder] =
+    useState(null)
+
   const [receiveOrder, setReceiveOrder] =
     useState(null)
+
   const [receiveLoading, setReceiveLoading] =
     useState(false)
+
   const [receiveError, setReceiveError] =
     useState('')
+
   const [returnMessage, setReturnMessage] =
     useState('')
 
   // ==========================================================
-  // FETCH
+  // FETCH ORDERS
   // ==========================================================
 
   const fetchOrders = async (
@@ -737,6 +775,11 @@ export default function MyOrders() {
 
       setError('')
 
+      console.log(
+        '📦 Fetching orders from:',
+        `${API_BASE}/my-orders`
+      )
+
       const response = await fetch(
         `${API_BASE}/my-orders`,
         {
@@ -750,11 +793,17 @@ export default function MyOrders() {
 
       const data = await response.json()
 
+      console.log(
+        '📦 My Orders API response:',
+        response.status,
+        data
+      )
+
       if (!response.ok) {
         throw new Error(
           data.message ||
-          data.error ||
-          'Unable to load your orders.'
+            data.error ||
+            'Unable to load your orders.'
         )
       }
 
@@ -771,7 +820,7 @@ export default function MyOrders() {
 
       setError(
         err.message ||
-        'Unable to load your orders.'
+          'Unable to load your orders.'
       )
     } finally {
       setLoading(false)
@@ -820,8 +869,8 @@ export default function MyOrders() {
     const status =
       String(
         order.order_status ||
-        order.status ||
-        ''
+          order.status ||
+          ''
       ).toLowerCase()
 
     return (
@@ -862,8 +911,8 @@ export default function MyOrders() {
       if (!response.ok) {
         throw new Error(
           data.message ||
-          data.error ||
-          'Unable to confirm receipt.'
+            data.error ||
+            'Unable to confirm receipt.'
         )
       }
 
@@ -884,7 +933,7 @@ export default function MyOrders() {
 
       setReceiveError(
         err.message ||
-        'Unable to confirm receipt.'
+          'Unable to confirm receipt.'
       )
     } finally {
       setReceiveLoading(false)
@@ -1580,6 +1629,7 @@ export default function MyOrders() {
                         <div className="price-summary">
                           <div>
                             <span>Subtotal</span>
+
                             <strong>
                               {money(subtotal)}
                             </strong>
@@ -1587,6 +1637,7 @@ export default function MyOrders() {
 
                           <div>
                             <span>Shipping</span>
+
                             <strong>
                               {shipping === 0
                                 ? 'FREE'
@@ -1596,6 +1647,7 @@ export default function MyOrders() {
 
                           <div className="price-summary-total">
                             <span>Total Paid</span>
+
                             <strong>
                               {money(total)}
                             </strong>

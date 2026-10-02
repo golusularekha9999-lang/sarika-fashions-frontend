@@ -809,3 +809,4 @@ export default function AdminEditProduct() {
     </div>
   );
 }
+
