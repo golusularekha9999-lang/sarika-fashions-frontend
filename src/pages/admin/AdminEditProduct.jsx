@@ -16,10 +16,20 @@ import {
   AlertCircle,
 } from "lucide-react";
 import "./AdminEditProduct.css";
+
+/* =========================================================
+   API
+========================================================= */
+
 const API_BASE =
   import.meta.env.VITE_API_URL ||
-  'https://sarika-fashions-backend-rfwh.onrender.com/api'
+  "https://sarika-fashions-backend-rfwh.onrender.com/api";
+
 const IMAGE_FIELDS = ["image", "image2", "image3", "image4"];
+
+/* =========================================================
+   CATEGORIES
+========================================================= */
 
 const categories = [
   "Kadhi Cotton",
@@ -32,6 +42,10 @@ const categories = [
   "Black Apple",
 ];
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function AdminEditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -42,6 +56,10 @@ export default function AdminEditProduct() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  /* =======================================================
+     FORM DATA
+  ======================================================= */
+
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -50,6 +68,10 @@ export default function AdminEditProduct() {
     description: "",
     stock: "",
   });
+
+  /* =======================================================
+     IMAGES
+  ======================================================= */
 
   const [images, setImages] = useState({
     image: "",
@@ -72,9 +94,9 @@ export default function AdminEditProduct() {
     image4: "",
   });
 
-  // --------------------------------------------------
-  // LOAD PRODUCT
-  // --------------------------------------------------
+  /* =======================================================
+     LOAD PRODUCT
+  ======================================================= */
 
   useEffect(() => {
     fetchProduct();
@@ -85,12 +107,15 @@ export default function AdminEditProduct() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`${API_BASE_URL}/products/${id}`);
+      /* FIXED: API_BASE_URL → API_BASE */
+      const response = await fetch(`${API_BASE}/products/${id}`);
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to load product");
+        throw new Error(
+          data.message || data.error || "Unable to load product"
+        );
       }
 
       const product = data.product || data;
@@ -114,16 +139,16 @@ export default function AdminEditProduct() {
       setImages(loadedImages);
       setPreviewImages(loadedImages);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch product error:", err);
       setError(err.message || "Failed to load product.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --------------------------------------------------
-  // FORM HANDLING
-  // --------------------------------------------------
+  /* =======================================================
+     FORM HANDLING
+  ======================================================= */
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -134,9 +159,9 @@ export default function AdminEditProduct() {
     }));
   };
 
-  // --------------------------------------------------
-  // IMAGE HANDLING
-  // --------------------------------------------------
+  /* =======================================================
+     IMAGE HANDLING
+  ======================================================= */
 
   const handleImageChange = (field, file) => {
     if (!file) return;
@@ -183,9 +208,9 @@ export default function AdminEditProduct() {
     }));
   };
 
-  // --------------------------------------------------
-  // SAVE PRODUCT
-  // --------------------------------------------------
+  /* =======================================================
+     SAVE PRODUCT
+  ======================================================= */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -195,6 +220,10 @@ export default function AdminEditProduct() {
     setSuccess("");
 
     try {
+      /* -----------------------------------------------
+         VALIDATION
+      ----------------------------------------------- */
+
       if (!formData.name.trim()) {
         throw new Error("Product name is required.");
       }
@@ -207,34 +236,65 @@ export default function AdminEditProduct() {
         throw new Error("Please enter a valid price.");
       }
 
-      if (formData.stock === "" || Number(formData.stock) < 0) {
+      if (
+        formData.stock === "" ||
+        Number(formData.stock) < 0
+      ) {
         throw new Error("Please enter a valid stock quantity.");
       }
+
+      /* -----------------------------------------------
+         FORM DATA
+      ----------------------------------------------- */
 
       const data = new FormData();
 
       data.append("name", formData.name.trim());
       data.append("category", formData.category);
       data.append("price", formData.price);
-      data.append("old_price", formData.old_price || "");
-      data.append("description", formData.description);
+      data.append(
+        "old_price",
+        formData.old_price || ""
+      );
+      data.append(
+        "description",
+        formData.description
+      );
       data.append("stock", formData.stock);
+
+      /* -----------------------------------------------
+         IMAGES
+      ----------------------------------------------- */
 
       IMAGE_FIELDS.forEach((field) => {
         if (imageFiles[field]) {
           data.append(field, imageFiles[field]);
         } else if (images[field]) {
-          data.append(`${field}_url`, images[field]);
+          data.append(
+            `${field}_url`,
+            images[field]
+          );
         } else {
-          data.append(`${field}_url`, "");
+          data.append(
+            `${field}_url`,
+            ""
+          );
         }
       });
 
-      const response = await fetch(`${API_BASE_URL}/products/${id}`, {
-        method: "PUT",
-        credentials: "include",
-        body: data,
-      });
+      /* -----------------------------------------------
+         UPDATE PRODUCT
+      ----------------------------------------------- */
+
+      /* FIXED: API_BASE_URL → API_BASE */
+      const response = await fetch(
+        `${API_BASE}/products/${id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          body: data,
+        }
+      );
 
       const result = await response.json();
 
@@ -246,26 +306,38 @@ export default function AdminEditProduct() {
         }
 
         throw new Error(
-          result.message || result.error || "Failed to update product."
+          result.message ||
+            result.error ||
+            "Failed to update product."
         );
       }
 
-      setSuccess("Saree details updated successfully.");
+      /* -----------------------------------------------
+         SUCCESS
+      ----------------------------------------------- */
+
+      setSuccess(
+        "Saree details updated successfully."
+      );
 
       setTimeout(() => {
         navigate("/admin/products");
       }, 1200);
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Something went wrong.");
+      console.error("Update product error:", err);
+
+      setError(
+        err.message ||
+          "Something went wrong."
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  // --------------------------------------------------
-  // LOADING
-  // --------------------------------------------------
+  /* =======================================================
+     LOADING
+  ======================================================= */
 
   if (loading) {
     return (
@@ -276,27 +348,34 @@ export default function AdminEditProduct() {
     );
   }
 
-  // --------------------------------------------------
-  // PAGE
-  // --------------------------------------------------
+  /* =======================================================
+     PAGE
+  ======================================================= */
 
   return (
     <div className="edit-product-page">
 
-      {/* HEADER */}
+      {/* =================================================
+          HEADER
+      ================================================= */}
+
       <div className="edit-page-header">
 
         <button
           type="button"
           className="back-button"
-          onClick={() => navigate("/admin/products")}
+          onClick={() =>
+            navigate("/admin/products")
+          }
         >
           <ArrowLeft size={18} />
           Back to Products
         </button>
 
         <div className="header-content">
+
           <div>
+
             <span className="header-eyebrow">
               PRODUCT MANAGEMENT
             </span>
@@ -304,60 +383,94 @@ export default function AdminEditProduct() {
             <h1>Edit Saree</h1>
 
             <p>
-              Update product information, pricing, stock and images.
+              Update product information, pricing,
+              stock and images.
             </p>
+
           </div>
 
           <div className="product-id-badge">
+
             <Package size={16} />
+
             Product #{id}
+
           </div>
+
         </div>
+
       </div>
 
-      {/* ALERTS */}
+      {/* =================================================
+          ALERTS
+      ================================================= */}
 
       {error && (
         <div className="edit-alert error-alert">
+
           <AlertCircle size={19} />
+
           <span>{error}</span>
 
-          <button onClick={() => setError("")}>
+          <button
+            type="button"
+            onClick={() => setError("")}
+          >
             <X size={17} />
           </button>
+
         </div>
       )}
 
       {success && (
         <div className="edit-alert success-alert">
+
           <CheckCircle2 size={19} />
+
           <span>{success}</span>
+
         </div>
       )}
+
+      {/* =================================================
+          FORM
+      ================================================= */}
 
       <form onSubmit={handleSubmit}>
 
         <div className="edit-layout">
 
-          {/* LEFT SIDE */}
+          {/* =================================================
+              LEFT SIDE
+          ================================================= */}
 
           <div className="edit-main-column">
 
-            {/* PRODUCT DETAILS */}
+            {/* =================================================
+                PRODUCT DETAILS
+            ================================================= */}
 
             <section className="edit-card">
 
               <div className="card-heading">
+
                 <div className="heading-icon">
                   <Tag size={20} />
                 </div>
 
                 <div>
-                  <h2>Edit Saree Details</h2>
+
+                  <h2>
+                    Edit Saree Details
+                  </h2>
+
                   <p>
-                    Update the information displayed to customers.
+                    Update the information displayed
+                    to customers.
                   </p>
+
                 </div>
+
               </div>
 
               <div className="form-grid">
@@ -365,6 +478,7 @@ export default function AdminEditProduct() {
                 {/* NAME */}
 
                 <div className="form-group full-width">
+
                   <label>
                     Saree Name <span>*</span>
                   </label>
@@ -376,11 +490,13 @@ export default function AdminEditProduct() {
                     onChange={handleChange}
                     placeholder="Enter saree name"
                   />
+
                 </div>
 
                 {/* CATEGORY */}
 
                 <div className="form-group">
+
                   <label>
                     Category <span>*</span>
                   </label>
@@ -390,29 +506,36 @@ export default function AdminEditProduct() {
                     value={formData.category}
                     onChange={handleChange}
                   >
+
                     <option value="">
                       Select category
                     </option>
 
-                    {categories.map((category) => (
-                      <option
-                        key={category}
-                        value={category}
-                      >
-                        {category}
-                      </option>
-                    ))}
+                    {categories.map(
+                      (category) => (
+                        <option
+                          key={category}
+                          value={category}
+                        >
+                          {category}
+                        </option>
+                      )
+                    )}
+
                   </select>
+
                 </div>
 
                 {/* STOCK */}
 
                 <div className="form-group">
+
                   <label>
                     Stock Quantity <span>*</span>
                   </label>
 
                   <div className="input-with-icon">
+
                     <Boxes size={18} />
 
                     <input
@@ -423,17 +546,21 @@ export default function AdminEditProduct() {
                       onChange={handleChange}
                       placeholder="0"
                     />
+
                   </div>
+
                 </div>
 
                 {/* PRICE */}
 
                 <div className="form-group">
+
                   <label>
                     Selling Price <span>*</span>
                   </label>
 
                   <div className="input-with-icon">
+
                     <IndianRupee size={18} />
 
                     <input
@@ -444,17 +571,21 @@ export default function AdminEditProduct() {
                       onChange={handleChange}
                       placeholder="800"
                     />
+
                   </div>
+
                 </div>
 
                 {/* OLD PRICE */}
 
                 <div className="form-group">
+
                   <label>
                     Original / Old Price
                   </label>
 
                   <div className="input-with-icon">
+
                     <IndianRupee size={18} />
 
                     <input
@@ -465,7 +596,9 @@ export default function AdminEditProduct() {
                       onChange={handleChange}
                       placeholder="1000"
                     />
+
                   </div>
+
                 </div>
 
                 {/* DESCRIPTION */}
@@ -473,8 +606,11 @@ export default function AdminEditProduct() {
                 <div className="form-group full-width">
 
                   <label>
+
                     <FileText size={15} />
+
                     Product Description
+
                   </label>
 
                   <textarea
@@ -486,7 +622,11 @@ export default function AdminEditProduct() {
                   />
 
                   <div className="character-count">
-                    {formData.description.length} characters
+
+                    {formData.description.length}
+                    {" "}
+                    characters
+
                   </div>
 
                 </div>
@@ -495,8 +635,9 @@ export default function AdminEditProduct() {
 
             </section>
 
-
-            {/* IMAGE SECTION */}
+            {/* =================================================
+                IMAGE SECTION
+            ================================================= */}
 
             <section className="edit-card image-card">
 
@@ -507,129 +648,158 @@ export default function AdminEditProduct() {
                 </div>
 
                 <div>
-                  <h2>Saree Images</h2>
+
+                  <h2>
+                    Saree Images
+                  </h2>
 
                   <p>
-                    Manage your product gallery. You can replace
-                    individual images without changing the others.
+                    Manage your product gallery.
+                    You can replace individual images
+                    without changing the others.
                   </p>
+
                 </div>
 
               </div>
 
-
               <div className="image-info-box">
+
                 <ImageIcon size={17} />
 
                 <div>
-                  <strong>Premium product photography</strong>
+
+                  <strong>
+                    Premium product photography
+                  </strong>
 
                   <p>
-                    Use clear, high-quality images. JPG, JPEG, PNG
-                    and WEBP are supported.
+                    Use clear, high-quality images.
+                    JPG, JPEG, PNG and WEBP are supported.
                   </p>
-                </div>
-              </div>
 
+                </div>
+
+              </div>
 
               <div className="image-grid">
 
-                {IMAGE_FIELDS.map((field, index) => {
+                {IMAGE_FIELDS.map(
+                  (field, index) => {
 
-                  const file = imageFiles[field];
-                  const preview = previewImages[field];
+                    const file =
+                      imageFiles[field];
 
-                  return (
-                    <div
-                      className={`image-editor ${
-                        index === 0 ? "primary-image" : ""
-                      }`}
-                      key={field}
-                    >
+                    const preview =
+                      previewImages[field];
 
-                      <div className="image-editor-header">
+                    return (
+                      <div
+                        className={`image-editor ${
+                          index === 0
+                            ? "primary-image"
+                            : ""
+                        }`}
+                        key={field}
+                      >
 
-                        <div>
-                          <span className="image-number">
-                            IMAGE {index + 1}
-                          </span>
+                        <div className="image-editor-header">
 
-                          {index === 0 && (
-                            <span className="primary-badge">
-                              Main Image
+                          <div>
+
+                            <span className="image-number">
+                              IMAGE {index + 1}
                             </span>
+
+                            {index === 0 && (
+                              <span className="primary-badge">
+                                Main Image
+                              </span>
+                            )}
+
+                          </div>
+
+                          {preview && (
+                            <button
+                              type="button"
+                              className="remove-image"
+                              onClick={() =>
+                                removeImage(field)
+                              }
+                              title="Remove image"
+                            >
+                              <X size={15} />
+                            </button>
                           )}
+
                         </div>
 
-                        {preview && (
-                          <button
-                            type="button"
-                            className="remove-image"
-                            onClick={() => removeImage(field)}
-                            title="Remove image"
-                          >
-                            <X size={15} />
-                          </button>
+                        <label className="image-dropzone">
+
+                          {preview ? (
+                            <img
+                              src={preview}
+                              alt={`Saree ${
+                                index + 1
+                              }`}
+                            />
+                          ) : (
+                            <div className="empty-image">
+
+                              <div className="upload-icon">
+
+                                <Upload size={25} />
+
+                              </div>
+
+                              <strong>
+                                Upload Image
+                              </strong>
+
+                              <span>
+                                Click to choose a photo
+                              </span>
+
+                            </div>
+                          )}
+
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            onChange={(e) =>
+                              handleImageChange(
+                                field,
+                                e.target.files?.[0]
+                              )
+                            }
+                          />
+
+                          {preview && (
+                            <div className="change-image-overlay">
+
+                              <Upload size={18} />
+
+                              Change Image
+
+                            </div>
+                          )}
+
+                        </label>
+
+                        {file && (
+                          <div className="selected-file">
+
+                            <CheckCircle2 size={14} />
+
+                            New image selected
+
+                          </div>
                         )}
 
                       </div>
-
-
-                      <label className="image-dropzone">
-
-                        {preview ? (
-                          <img
-                            src={preview}
-                            alt={`Saree ${index + 1}`}
-                          />
-                        ) : (
-                          <div className="empty-image">
-
-                            <div className="upload-icon">
-                              <Upload size={25} />
-                            </div>
-
-                            <strong>
-                              Upload Image
-                            </strong>
-
-                            <span>
-                              Click to choose a photo
-                            </span>
-
-                          </div>
-                        )}
-
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/jpg,image/webp"
-                          onChange={(e) =>
-                            handleImageChange(
-                              field,
-                              e.target.files?.[0]
-                            )
-                          }
-                        />
-
-                        {preview && (
-                          <div className="change-image-overlay">
-                            <Upload size={18} />
-                            Change Image
-                          </div>
-                        )}
-
-                      </label>
-
-                      {file && (
-                        <div className="selected-file">
-                          <CheckCircle2 size={14} />
-                          New image selected
-                        </div>
-                      )}
-
-                    </div>
-                  );
-                })}
+                    );
+                  }
+                )}
 
               </div>
 
@@ -637,24 +807,35 @@ export default function AdminEditProduct() {
 
           </div>
 
-
-          {/* RIGHT SIDE */}
+          {/* =================================================
+              RIGHT SIDEBAR
+          ================================================= */}
 
           <aside className="edit-sidebar">
 
-            {/* PREVIEW */}
+            {/* =================================================
+                PREVIEW
+            ================================================= */}
 
             <section className="preview-card">
 
               <div className="preview-header">
+
                 <div>
-                  <span>LIVE PREVIEW</span>
-                  <h3>Product Gallery</h3>
+
+                  <span>
+                    LIVE PREVIEW
+                  </span>
+
+                  <h3>
+                    Product Gallery
+                  </h3>
+
                 </div>
 
                 <ImageIcon size={19} />
-              </div>
 
+              </div>
 
               <div className="preview-main">
 
@@ -665,47 +846,58 @@ export default function AdminEditProduct() {
                   />
                 ) : (
                   <div className="preview-empty">
+
                     <ImageIcon size={35} />
-                    <span>No main image</span>
+
+                    <span>
+                      No main image
+                    </span>
+
                   </div>
                 )}
 
               </div>
 
-
               <div className="preview-thumbnails">
 
-                {IMAGE_FIELDS.slice(1).map((field) => (
+                {IMAGE_FIELDS.slice(1).map(
+                  (field) => (
 
-                  <div
-                    className="preview-thumbnail"
-                    key={field}
-                  >
+                    <div
+                      className="preview-thumbnail"
+                      key={field}
+                    >
 
-                    {previewImages[field] ? (
-                      <img
-                        src={previewImages[field]}
-                        alt=""
-                      />
-                    ) : (
-                      <ImageIcon size={17} />
-                    )}
+                      {previewImages[field] ? (
+                        <img
+                          src={previewImages[field]}
+                          alt=""
+                        />
+                      ) : (
+                        <ImageIcon size={17} />
+                      )}
 
-                  </div>
+                    </div>
 
-                ))}
+                  )
+                )}
 
               </div>
-
 
               <div className="preview-product-info">
 
                 <span className="preview-category">
-                  {formData.category || "Category"}
+
+                  {formData.category ||
+                    "Category"}
+
                 </span>
 
                 <h4>
-                  {formData.name || "Saree Name"}
+
+                  {formData.name ||
+                    "Saree Name"}
+
                 </h4>
 
                 <div className="preview-price">
@@ -726,44 +918,60 @@ export default function AdminEditProduct() {
 
             </section>
 
-
-            {/* PRODUCT STATUS */}
+            {/* =================================================
+                PRODUCT STATUS
+            ================================================= */}
 
             <section className="status-card">
 
               <div className="status-title">
+
                 <Package size={18} />
+
                 Product Status
+
               </div>
 
               <div className="status-row">
 
-                <span>Stock</span>
+                <span>
+                  Stock
+                </span>
 
                 <strong>
-                  {formData.stock || 0} units
+                  {formData.stock || 0}
+                  {" "}
+                  units
                 </strong>
 
               </div>
 
               <div className="status-row">
 
-                <span>Gallery</span>
+                <span>
+                  Gallery
+                </span>
 
                 <strong>
+
                   {
                     IMAGE_FIELDS.filter(
-                      (field) => previewImages[field]
+                      (field) =>
+                        previewImages[field]
                     ).length
-                  } / 4 images
+                  }
+                  {" "}
+                  / 4 images
+
                 </strong>
 
               </div>
 
             </section>
 
-
-            {/* ACTIONS */}
+            {/* =================================================
+                ACTIONS
+            ================================================= */}
 
             <section className="action-card">
 
@@ -776,17 +984,18 @@ export default function AdminEditProduct() {
                 {saving ? (
                   <>
                     <span className="button-spinner"></span>
+
                     Saving Changes...
                   </>
                 ) : (
                   <>
                     <Save size={18} />
+
                     Save Changes
                   </>
                 )}
 
               </button>
-
 
               <button
                 type="button"
@@ -810,7 +1019,3 @@ export default function AdminEditProduct() {
     </div>
   );
 }
-
-
-
-
