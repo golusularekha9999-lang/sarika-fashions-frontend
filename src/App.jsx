@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import ScrollToTop from './components/ScrollToTop.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import SarikaLoader from './components/Loader.jsx'
 
 import MainLayout from './layouts/MainLayout.jsx'
 import AdminLayout from './layouts/AdminLayout.jsx'
@@ -55,270 +56,279 @@ function App() {
 
       <ScrollToTop />
 
-      <Routes>
+      {/* ======================================================
+          GLOBAL LOADING FALLBACK
 
-        {/* ====================================================
-            PUBLIC WEBSITE
-        ==================================================== */}
+          If any lazy-loaded page/component is loading,
+          SarikaLoader will be displayed.
+      ====================================================== */}
 
-        <Route element={<MainLayout />}>
+      <Suspense fallback={<SarikaLoader />}>
+        <Routes>
 
-          {/* ================= HOME ================= */}
+          {/* ====================================================
+              PUBLIC WEBSITE
+          ==================================================== */}
 
-          <Route
-            path="/"
-            element={<Home />}
-          />
+          <Route element={<MainLayout />}>
 
-
-          {/* ================= SHOP ================= */}
-
-          <Route
-            path="/shop"
-            element={<Shop />}
-          />
-
-
-          {/* ================= PRODUCT DETAILS ================= */}
-
-          <Route
-            path="/product/:id"
-            element={<ProductDetails />}
-          />
-
-
-          {/* ================= CART ================= */}
-
-          <Route
-            path="/cart"
-            element={<Cart />}
-          />
-
-
-          {/* ================= WISHLIST ================= */}
-
-          <Route
-            path="/wishlist"
-            element={<Wishlist />}
-          />
-
-
-          {/* ================= CHECKOUT ================= */}
-
-          <Route
-            path="/checkout"
-            element={<Checkout />}
-          />
-
-
-          {/* ==================================================
-              MY ORDERS
-          ================================================== */}
-
-          <Route
-            path="/my-orders"
-            element={<MyOrders />}
-          />
-
-
-          {/* ================= REGISTER ================= */}
-
-          <Route
-            path="/register"
-            element={<Register />}
-          />
-
-
-          {/* ================= ABOUT ================= */}
-
-          <Route
-            path="/about"
-            element={<About />}
-          />
-
-
-          {/* ================= CONTACT ================= */}
-
-          <Route
-            path="/contact"
-            element={<Contact />}
-          />
-
-
-          {/* ================= TRACK ORDER ================= */}
-
-          <Route
-            path="/track-order"
-            element={<TrackOrder />}
-          />
-
-
-          {/* ================= SHIPPING & RETURNS ================= */}
-
-          <Route
-            path="/shipping-returns"
-            element={<ShippingReturns />}
-          />
-
-
-          {/* ================= FAQ ================= */}
-
-          <Route
-            path="/faqs"
-            element={<FAQs />}
-          />
-
-
-          {/* ================= PRIVACY ================= */}
-
-          <Route
-            path="/privacy-policy"
-            element={<PrivacyPolicy />}
-          />
-
-
-          {/* ================= TERMS ================= */}
-
-          <Route
-            path="/terms"
-            element={<Terms />}
-          />
-
-
-          {/* ================= REFUND POLICY ================= */}
-
-          <Route
-            path="/refund-policy"
-            element={<RefundPolicy />}
-          />
-
-
-          {/* ================= SHIPPING POLICY ================= */}
-
-          <Route
-            path="/shipping-policy"
-            element={<ShippingPolicy />}
-          />
-
-
-          {/* ==================================================
-              PUBLIC 404
-          ================================================== */}
-
-          <Route
-            path="*"
-            element={<NotFound />}
-          />
-
-        </Route>
-
-
-        {/* ====================================================
-            ADMIN LOGIN
-            PUBLIC
-        ==================================================== */}
-
-        <Route
-          path="/admin/login"
-          element={<AdminLogin />}
-        />
-
-
-        {/* ====================================================
-            PROTECTED ADMIN AREA
-        ==================================================== */}
-
-        <Route element={<ProtectedRoute />}>
-
-          <Route
-            path="/admin"
-            element={<AdminLayout />}
-          >
-
-            {/* =================================================
-                ADMIN DASHBOARD
-            ================================================= */}
+            {/* ================= HOME ================= */}
 
             <Route
-              index
-              element={<AdminDashboard />}
+              path="/"
+              element={<Home />}
             />
 
 
-            {/* =================================================
-                ADMIN PRODUCTS
-            ================================================= */}
+            {/* ================= SHOP ================= */}
 
             <Route
-              path="products"
-              element={<AdminProducts />}
+              path="/shop"
+              element={<Shop />}
             />
 
 
-            {/* =================================================
-                ADD PRODUCT
-            ================================================= */}
+            {/* ================= PRODUCT DETAILS ================= */}
 
             <Route
-              path="products/add"
-              element={<AdminAddProduct />}
+              path="/product/:id"
+              element={<ProductDetails />}
             />
 
 
-            {/* =================================================
-                EDIT PRODUCT
-            ================================================= */}
+            {/* ================= CART ================= */}
 
             <Route
-              path="products/:id/edit"
-              element={<AdminEditProduct />}
+              path="/cart"
+              element={<Cart />}
             />
 
 
-            {/* =================================================
-                ADMIN ORDERS
-            ================================================= */}
+            {/* ================= WISHLIST ================= */}
 
             <Route
-              path="orders"
-              element={<AdminOrders />}
+              path="/wishlist"
+              element={<Wishlist />}
             />
 
 
-            {/* =================================================
-                ADMIN RETURN REQUESTS
-            ================================================= */}
+            {/* ================= CHECKOUT ================= */}
 
             <Route
-              path="returns"
-              element={<AdminReturns />}
+              path="/checkout"
+              element={<Checkout />}
             />
 
 
-            {/* =================================================
-                CUSTOMERS
-            ================================================= */}
+            {/* ==================================================
+                MY ORDERS
+            ================================================== */}
 
             <Route
-              path="customers"
-              element={<AdminInfo />}
+              path="/my-orders"
+              element={<MyOrders />}
             />
 
 
-            {/* =================================================
-                CATEGORIES
-            ================================================= */}
+            {/* ================= REGISTER ================= */}
 
             <Route
-              path="categories"
-              element={<AdminInfo />}
+              path="/register"
+              element={<Register />}
+            />
+
+
+            {/* ================= ABOUT ================= */}
+
+            <Route
+              path="/about"
+              element={<About />}
+            />
+
+
+            {/* ================= CONTACT ================= */}
+
+            <Route
+              path="/contact"
+              element={<Contact />}
+            />
+
+
+            {/* ================= TRACK ORDER ================= */}
+
+            <Route
+              path="/track-order"
+              element={<TrackOrder />}
+            />
+
+
+            {/* ================= SHIPPING & RETURNS ================= */}
+
+            <Route
+              path="/shipping-returns"
+              element={<ShippingReturns />}
+            />
+
+
+            {/* ================= FAQ ================= */}
+
+            <Route
+              path="/faqs"
+              element={<FAQs />}
+            />
+
+
+            {/* ================= PRIVACY ================= */}
+
+            <Route
+              path="/privacy-policy"
+              element={<PrivacyPolicy />}
+            />
+
+
+            {/* ================= TERMS ================= */}
+
+            <Route
+              path="/terms"
+              element={<Terms />}
+            />
+
+
+            {/* ================= REFUND POLICY ================= */}
+
+            <Route
+              path="/refund-policy"
+              element={<RefundPolicy />}
+            />
+
+
+            {/* ================= SHIPPING POLICY ================= */}
+
+            <Route
+              path="/shipping-policy"
+              element={<ShippingPolicy />}
+            />
+
+
+            {/* ==================================================
+                PUBLIC 404
+            ================================================== */}
+
+            <Route
+              path="*"
+              element={<NotFound />}
             />
 
           </Route>
 
-        </Route>
 
-      </Routes>
+          {/* ====================================================
+              ADMIN LOGIN
+              PUBLIC
+          ==================================================== */}
+
+          <Route
+            path="/admin/login"
+            element={<AdminLogin />}
+          />
+
+
+          {/* ====================================================
+              PROTECTED ADMIN AREA
+          ==================================================== */}
+
+          <Route element={<ProtectedRoute />}>
+
+            <Route
+              path="/admin"
+              element={<AdminLayout />}
+            >
+
+              {/* =================================================
+                  ADMIN DASHBOARD
+              ================================================= */}
+
+              <Route
+                index
+                element={<AdminDashboard />}
+              />
+
+
+              {/* =================================================
+                  ADMIN PRODUCTS
+              ================================================= */}
+
+              <Route
+                path="products"
+                element={<AdminProducts />}
+              />
+
+
+              {/* =================================================
+                  ADD PRODUCT
+              ================================================= */}
+
+              <Route
+                path="products/add"
+                element={<AdminAddProduct />}
+              />
+
+
+              {/* =================================================
+                  EDIT PRODUCT
+              ================================================= */}
+
+              <Route
+                path="products/:id/edit"
+                element={<AdminEditProduct />}
+              />
+
+
+              {/* =================================================
+                  ADMIN ORDERS
+              ================================================= */}
+
+              <Route
+                path="orders"
+                element={<AdminOrders />}
+              />
+
+
+              {/* =================================================
+                  ADMIN RETURN REQUESTS
+              ================================================= */}
+
+              <Route
+                path="returns"
+                element={<AdminReturns />}
+              />
+
+
+              {/* =================================================
+                  CUSTOMERS
+              ================================================= */}
+
+              <Route
+                path="customers"
+                element={<AdminInfo />}
+              />
+
+
+              {/* =================================================
+                  CATEGORIES
+              ================================================= */}
+
+              <Route
+                path="categories"
+                element={<AdminInfo />}
+              />
+
+            </Route>
+
+          </Route>
+
+        </Routes>
+      </Suspense>
     </>
   )
 }
