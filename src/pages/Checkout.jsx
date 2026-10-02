@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2, Package } from 'lucide-react'
 
 import CheckoutSteps from '../components/CheckoutSteps.jsx'
@@ -25,23 +25,33 @@ const API_BASE =
     : 'https://sarika-fashions-backend-rfwh.onrender.com/api')
 
 // ============================================================
-// CUSTOMER ORDER TOKEN
+// STORAGE KEYS
 // ============================================================
 
-const CUSTOMER_TOKEN_KEY =
-  'sarika_customer_order_token'
+const CUSTOMER_TOKEN_KEY = 'sarika_customer_order_token'
+const CUSTOMER_PHONE_KEY = 'sarika_customer_phone'
+const PENDING_ORDER_KEY = 'sarika_pending_order'
+const SAVED_ADDRESS_KEY = 'sarika_saved_address'
 
 // ============================================================
 // EMPTY ADDRESS
 // ============================================================
 
-const EMPTY_ADDRESS = {
-  fullName: '',
-  phone: '',
-  address: '',
-  city: '',
-  state: '',
-  pincode: '',
+const getInitialAddress = () => {
+  try {
+    const saved = localStorage.getItem(SAVED_ADDRESS_KEY)
+    if (saved) return JSON.parse(saved)
+  } catch (e) {
+    // ignore
+  }
+  return {
+    fullName: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+  }
 }
 
 // ============================================================
@@ -49,34 +59,65 @@ const EMPTY_ADDRESS = {
 // ============================================================
 
 export default function Checkout() {
-  const {
-    items,
-    subtotal,
-    shipping,
-    total,
-    clearCart,
-  } = useCart()
-
-  // ==========================================================
-  // STATE
-  // ==========================================================
+  const navigate = useNavigate()
+  const { items, subtotal, shipping, total, clearCart } = useCart()
 
   const [step, setStep] = useState(1)
+  const [address, setAddress] = useState(getInitialAddress)
+  const [errors, setErrors] = useState({})
+  const [placed, setPlaced] = useState(false)
+  const [paymentLoading, setPaymentLoading] = useState(false)
+  const [orderNumber, setOrderNumber] = useState('')
 
-  const [address, setAddress] =
-    useState(EMPTY_ADDRESS)
+  // ==========================================================
+  // MOBILE REDIRECT RECOVERY (IF PAGE RELOADED DURING UPI)
+  // ==========================================================
 
-  const [errors, setErrors] =
-    useState({})
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const razorpay_payment_id = params.get('razorpay_payment_id')
+    const razorpay_order_id = params.get('razorpay_order_id')
+    const razorpay_signature = params.get('razorpay_signature')
 
-  const [placed, setPlaced] =
-    useState(false)
+    if (razorpay_payment_id && razorpay_order_id) {
+      const pendingRaw = localStorage.getItem(PENDING_ORDER_KEY)
+      if (pendingRaw) {
+        try {
+          const pending = JSON.parse(pendingRaw)
+          setPaymentLoading(true)
 
-  const [paymentLoading, setPaymentLoading] =
-    useState(false)
-
-  const [orderNumber, setOrderNumber] =
-    useState('')
+          axios
+            .post(
+              `${API_BASE}/payment/complete`,
+              {
+                ...pending,
+                razorpay_order_id,
+                razorpay_payment_id,
+                razorpay_signature,
+              },
+              { withCredentials: true, timeout: 30000 }
+            )
+            .then(res => {
+              if (res.data?.customer_order_token) {
+                localStorage.setItem(CUSTOMER_TOKEN_KEY, res.data.customer_order_token)
+              }
+              if (pending.customer_phone) {
+                localStorage.setItem(CUSTOMER_PHONE_KEY, pending.customer_phone)
+              }
+              localStorage.removeItem(PENDING_ORDER_KEY)
+              clearCart()
+              navigate('/my-orders')
+            })
+            .catch(err => {
+              console.error('Pending recovery error:', err)
+              setPaymentLoading(false)
+            })
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    }
+  }, [navigate, clearCart])
 
   // ==========================================================
   // EMPTY CART
@@ -86,15 +127,8 @@ export default function Checkout() {
     return (
       <div className="container empty-state">
         <h2>Your cart is empty.</h2>
-
-        <p>
-          Add some sarees before checking out.
-        </p>
-
-        <Link
-          to="/shop"
-          className="btn btn-primary"
-        >
+        <p>Add some sarees before checking out.</p>
+        <Link to="/shop" className="btn btn-primary">
           Continue Shopping
         </Link>
       </div>
@@ -109,45 +143,30 @@ export default function Checkout() {
     const next = {}
 
     if (!address.fullName.trim()) {
-      next.fullName =
-        'Full name is required'
+      next.fullName = 'Full name is required'
     }
 
-    if (
-      !/^\d{10}$/.test(
-        address.phone.trim()
-      )
-    ) {
-      next.phone =
-        'Enter a valid 10-digit phone number'
+    if (!/^\d{10}$/.test(address.phone.trim())) {
+      next.phone = 'Enter a valid 10-digit phone number'
     }
 
     if (!address.address.trim()) {
-      next.address =
-        'Address is required'
+      next.address = 'Address is required'
     }
 
     if (!address.city.trim()) {
-      next.city =
-        'City is required'
+      next.city = 'City is required'
     }
 
     if (!address.state.trim()) {
-      next.state =
-        'State is required'
+      next.state = 'State is required'
     }
 
-    if (
-      !/^\d{6}$/.test(
-        address.pincode.trim()
-      )
-    ) {
-      next.pincode =
-        'Enter a valid 6-digit pincode'
+    if (!/^\d{6}$/.test(address.pincode.trim())) {
+      next.pincode = 'Enter a valid 6-digit pincode'
     }
 
     setErrors(next)
-
     return Object.keys(next).length === 0
   }
 
@@ -159,13 +178,13 @@ export default function Checkout() {
     event.preventDefault()
 
     if (validateAddress()) {
+      try {
+        localStorage.setItem(SAVED_ADDRESS_KEY, JSON.stringify(address))
+        localStorage.setItem(CUSTOMER_PHONE_KEY, address.phone.trim())
+      } catch (e) {}
       setStep(2)
     }
   }
-
-  // ==========================================================
-  // UPDATE ADDRESS
-  // ==========================================================
 
   const update = field => event => {
     setAddress(current => ({
@@ -183,135 +202,69 @@ export default function Checkout() {
   // SAVE ORDER AFTER PAYMENT
   // ==========================================================
 
-  const saveOrder = async (
-    paymentResponse,
-    razorpayOrderId
-  ) => {
-    try {
-      const orderItems = items.map(item => ({
-        id: item.id,
-        product_id:
-          item.product_id || item.id,
-        name: item.name,
-        price: Number(item.price),
-        quantity: Number(item.quantity),
-        image:
-          item.image ||
-          item.imageUrl ||
-          item.image2 ||
-          '',
-      }))
+  const saveOrder = async (paymentResponse, razorpayOrderId) => {
+    const orderItems = items.map(item => ({
+      id: item.id,
+      product_id: item.product_id || item.id,
+      name: item.name,
+      price: Number(item.price),
+      quantity: Number(item.quantity),
+      image: item.image || item.imageUrl || item.image2 || '',
+    }))
 
-      const existingToken =
-        localStorage.getItem(CUSTOMER_TOKEN_KEY)
+    const existingToken = localStorage.getItem(CUSTOMER_TOKEN_KEY)
 
-      const orderData = {
-        customer_name: address.fullName,
-        customer_phone: address.phone,
+    const orderData = {
+      customer_name: address.fullName.trim(),
+      customer_phone: address.phone.trim(),
+      address: address.address.trim(),
+      address_line: address.address.trim(),
+      city: address.city.trim(),
+      state: address.state.trim(),
+      pincode: address.pincode.trim(),
 
-        address: address.address,
-        address_line: address.address,
+      items: orderItems,
+      subtotal: Number(subtotal),
+      shipping: Number(shipping),
+      total_amount: Number(total),
 
-        city: address.city,
-        state: address.state,
-        pincode: address.pincode,
+      customer_order_token: existingToken || undefined,
 
-        items: orderItems,
-
-        subtotal: Number(subtotal),
-        shipping: Number(shipping),
-        total_amount: Number(total),
-
-        customer_order_token:
-          existingToken || undefined,
-
-        razorpay_order_id:
-          paymentResponse?.razorpay_order_id ||
-          razorpayOrderId ||
-          null,
-
-        razorpay_payment_id:
-          paymentResponse?.razorpay_payment_id ||
-          null,
-
-        razorpay_signature:
-          paymentResponse?.razorpay_signature ||
-          null,
-      }
-
-      console.log(
-        '🛒 COMPLETING RAZORPAY PAYMENT:',
-        orderData
-      )
-
-      const response = await axios.post(
-        `${API_BASE}/payment/complete`,
-        orderData,
-        {
-          headers: existingToken
-            ? { 'X-Customer-Order-Token': existingToken }
-            : {},
-          withCredentials: true,
-          timeout: 30000,
-        }
-      )
-
-      console.log(
-        '✅ ORDER SAVED:',
-        response.data
-      )
-
-      // ======================================================
-      // SAVE CUSTOMER ORDER TOKEN
-      // ======================================================
-
-      const customerToken =
-        response.data?.customer_order_token ||
-        response.data?.order_token ||
-        response.data?.token
-
-      if (customerToken) {
-        try {
-          localStorage.setItem(
-            CUSTOMER_TOKEN_KEY,
-            customerToken
-          )
-
-          console.log(
-            '🔐 Customer order token saved'
-          )
-        } catch (storageError) {
-          console.warn(
-            'Unable to save customer order token:',
-            storageError
-          )
-        }
-      }
-
-      // ======================================================
-      // SAVE ORDER NUMBER
-      // ======================================================
-
-      if (response.data?.order_number) {
-        setOrderNumber(
-          response.data.order_number
-        )
-      }
-
-      return response.data
-    } catch (error) {
-      console.error(
-        '❌ ORDER SAVE ERROR:',
-        error
-      )
-
-      console.error(
-        'Backend response:',
-        error.response?.data
-      )
-
-      throw error
+      razorpay_order_id:
+        paymentResponse?.razorpay_order_id || razorpayOrderId || null,
+      razorpay_payment_id:
+        paymentResponse?.razorpay_payment_id || null,
+      razorpay_signature:
+        paymentResponse?.razorpay_signature || null,
     }
+
+    console.log('🛒 COMPLETING PAYMENT:', orderData)
+
+    const response = await axios.post(`${API_BASE}/payment/complete`, orderData, {
+      headers: existingToken ? { 'X-Customer-Order-Token': existingToken } : {},
+      withCredentials: true,
+      timeout: 30000,
+    })
+
+    console.log('✅ ORDER SAVED RESPONSE:', response.data)
+
+    // Save token & phone number
+    const customerToken =
+      response.data?.customer_order_token || response.data?.token
+    if (customerToken) {
+      localStorage.setItem(CUSTOMER_TOKEN_KEY, customerToken)
+    }
+    if (address.phone) {
+      localStorage.setItem(CUSTOMER_PHONE_KEY, address.phone.trim())
+    }
+
+    localStorage.removeItem(PENDING_ORDER_KEY)
+
+    if (response.data?.order_number) {
+      setOrderNumber(response.data.order_number)
+    }
+
+    return response.data
   }
 
   // ==========================================================
@@ -324,198 +277,92 @@ export default function Checkout() {
     try {
       setPaymentLoading(true)
 
-      // ------------------------------------------------------
-      // CREATE RAZORPAY ORDER
-      // ------------------------------------------------------
-
       const response = await axios.post(
         `${API_BASE}/payment/create-order`,
-        {
-          amount: Number(total),
-        },
-        {
-          withCredentials: true,
-          timeout: 30000,
-        }
+        { amount: Number(total) },
+        { withCredentials: true, timeout: 30000 }
       )
 
-      const {
-        order_id,
-        amount,
-        currency,
-        key_id,
-      } = response.data || {}
+      const { order_id, amount, currency, key_id } = response.data || {}
 
-      if (!order_id) {
-        throw new Error(
-          'Razorpay order could not be created.'
-        )
+      if (!order_id || !amount || !currency || !key_id) {
+        throw new Error('Could not create Razorpay payment order.')
       }
-
-      if (!amount || !currency || !key_id) {
-        throw new Error(
-          'Invalid Razorpay response from server.'
-        )
-      }
-
-      // ------------------------------------------------------
-      // CHECK RAZORPAY
-      // ------------------------------------------------------
 
       if (!window.Razorpay) {
-        alert(
-          'Razorpay Checkout failed to load. Please refresh the page.'
-        )
-
+        alert('Razorpay failed to load. Please refresh and try again.')
         setPaymentLoading(false)
-
         return
       }
 
-      // ------------------------------------------------------
-      // RAZORPAY OPTIONS
-      // ------------------------------------------------------
+      // Save pending order in localStorage for mobile UPI recovery
+      const orderItems = items.map(item => ({
+        id: item.id,
+        product_id: item.product_id || item.id,
+        name: item.name,
+        price: Number(item.price),
+        quantity: Number(item.quantity),
+        image: item.image || item.imageUrl || '',
+      }))
+
+      try {
+        localStorage.setItem(
+          PENDING_ORDER_KEY,
+          JSON.stringify({
+            customer_name: address.fullName,
+            customer_phone: address.phone,
+            address: address.address,
+            address_line: address.address,
+            city: address.city,
+            state: address.state,
+            pincode: address.pincode,
+            items: orderItems,
+            subtotal: Number(subtotal),
+            shipping: Number(shipping),
+            total_amount: Number(total),
+            razorpay_order_id: order_id,
+          })
+        )
+      } catch (e) {}
 
       const options = {
         key: key_id,
-
         amount,
-
         currency,
-
         name: 'Sarika Fashions',
-
         description: 'Saree Purchase',
-
         order_id,
-
-        // ----------------------------------------------------
-        // PAYMENT METHODS
-        // ----------------------------------------------------
-
-        config: {
-          display: {
-            blocks: {
-              banks: {
-                name: 'Payment Methods',
-
-                instruments: [
-                  {
-                    method: 'upi',
-                  },
-                  {
-                    method: 'card',
-                  },
-                  {
-                    method: 'netbanking',
-                  },
-                  {
-                    method: 'wallet',
-                  },
-                ],
-              },
-            },
-
-            sequence: [
-              'block.banks',
-            ],
-
-            preferences: {
-              show_default_blocks: true,
-            },
-          },
-        },
-
-        // ----------------------------------------------------
-        // CUSTOMER DETAILS
-        // ----------------------------------------------------
-
         prefill: {
           name: address.fullName,
           contact: address.phone,
         },
-
-        // ----------------------------------------------------
-        // THEME
-        // ----------------------------------------------------
-
         theme: {
           color: '#8E1748',
         },
-
-        // ----------------------------------------------------
-        // PAYMENT SUCCESS
-        // ----------------------------------------------------
-
         handler: async paymentResponse => {
-          console.log(
-            '💳 Razorpay payment response:',
-            paymentResponse
-          )
-
+          console.log('💳 Razorpay Success:', paymentResponse)
           try {
-            // ==================================================
-            // SAVE ORDER
-            // ==================================================
-
-            const savedOrder =
-              await saveOrder(
-                paymentResponse,
-                order_id
-              )
-
-            console.log(
-              '🎉 ORDER CREATED:',
-              savedOrder
-            )
-
-            // ==================================================
-            // SAVE ORDER NUMBER
-            // ==================================================
-
-            if (
-              savedOrder?.order_number
-            ) {
-              setOrderNumber(
-                savedOrder.order_number
-              )
-            }
-
-            // ==================================================
-            // CLEAR CART
-            // ==================================================
-
+            await saveOrder(paymentResponse, order_id)
             clearCart()
-
-            // ==================================================
-            // SHOW SUCCESS PAGE
-            // ==================================================
-
             setPaymentLoading(false)
-
             setPlaced(true)
+
+            // Direct redirect to My Orders after 1.5 seconds or let them view page
+            setTimeout(() => {
+              navigate('/my-orders')
+            }, 1500)
           } catch (error) {
-            console.error(
-              '❌ PAYMENT SUCCESS BUT ORDER SAVE FAILED:',
-              error
-            )
-
+            console.error('❌ ORDER SAVE FAILED:', error)
             setPaymentLoading(false)
-
+            const errorMsg =
+              error.response?.data?.message ||
+              error.response?.data?.error ||
+              'Payment succeeded, but saving the order had an issue.'
             alert(
-              'Payment was successful, but we could not save your order. Please contact Sarika Fashions with your payment ID: ' +
-                (
-                  paymentResponse?.razorpay_payment_id ||
-                  'Unavailable'
-                )
+              `${errorMsg}\nPayment ID: ${paymentResponse?.razorpay_payment_id}`
             )
           }
         },
-
-        // ----------------------------------------------------
-        // PAYMENT MODAL CLOSED
-        // ----------------------------------------------------
-
         modal: {
           ondismiss: () => {
             setPaymentLoading(false)
@@ -523,52 +370,17 @@ export default function Checkout() {
         },
       }
 
-      // ------------------------------------------------------
-      // CREATE RAZORPAY INSTANCE
-      // ------------------------------------------------------
+      const razorpay = new window.Razorpay(options)
 
-      const razorpay =
-        new window.Razorpay(options)
-
-      // ------------------------------------------------------
-      // PAYMENT FAILED
-      // ------------------------------------------------------
-
-      razorpay.on(
-        'payment.failed',
-        response => {
-          console.error(
-            '❌ Payment failed:',
-            response?.error
-          )
-
-          alert(
-            response?.error?.description ||
-              'Payment failed. Please try again.'
-          )
-
-          setPaymentLoading(false)
-        }
-      )
-
-      // ------------------------------------------------------
-      // OPEN RAZORPAY
-      // ------------------------------------------------------
+      razorpay.on('payment.failed', resp => {
+        alert(resp?.error?.description || 'Payment failed. Please try again.')
+        setPaymentLoading(false)
+      })
 
       razorpay.open()
     } catch (error) {
-      console.error(
-        '❌ Payment error:',
-        error
-      )
-
-      alert(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          error.message ||
-          'Unable to start payment. Please try again.'
-      )
-
+      console.error('❌ Payment start error:', error)
+      alert(error.response?.data?.message || error.message || 'Unable to start payment.')
       setPaymentLoading(false)
     }
   }
@@ -580,21 +392,9 @@ export default function Checkout() {
   if (placed) {
     return (
       <div className="container empty-state">
-        <CheckCircle2
-          size={64}
-          color="var(--color-success)"
-          strokeWidth={1.4}
-        />
-
-        <h2>
-          Order Placed Successfully!
-        </h2>
-
-        <p>
-          Your payment was successful.
-          Thank you for shopping with
-          Sarika Fashions.
-        </p>
+        <CheckCircle2 size={64} color="var(--color-success)" strokeWidth={1.4} />
+        <h2>Order Placed Successfully!</h2>
+        <p>Your payment was successful. Redirecting to your orders...</p>
 
         {orderNumber && (
           <div
@@ -611,37 +411,15 @@ export default function Checkout() {
             }}
           >
             <Package size={20} />
-
             <span>
-              Order ID:{' '}
-              <strong>
-                {orderNumber}
-              </strong>
+              Order ID: <strong>{orderNumber}</strong>
             </span>
           </div>
         )}
 
-        <div
-          style={{
-            display: 'flex',
-            gap: '12px',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            marginTop: '24px',
-          }}
-        >
-          <Link
-            to="/my-orders"
-            className="btn btn-primary"
-          >
-            View My Orders
-          </Link>
-
-          <Link
-            to="/shop"
-            className="btn btn-outline"
-          >
-            Continue Shopping
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '24px' }}>
+          <Link to="/my-orders" className="btn btn-primary">
+            Go to My Orders
           </Link>
         </div>
       </div>
@@ -654,290 +432,130 @@ export default function Checkout() {
 
   return (
     <div className="container checkout-page">
-      <h1 className="section-title">
-        Checkout
-      </h1>
-
-      <CheckoutSteps
-        current={step}
-      />
+      <h1 className="section-title">Checkout</h1>
+      <CheckoutSteps current={step} />
 
       <div className="checkout-layout">
-        {/* ==================================================
-            MAIN CHECKOUT
-        ================================================== */}
-
         <div className="checkout-main">
-          {/* ==================================================
-              STEP 1 - SHIPPING
-          ================================================== */}
-
           {step === 1 && (
-            <form
-              className="checkout-card"
-              onSubmit={
-                handleShippingSubmit
-              }
-            >
-              <h3>
-                Shipping Address
-              </h3>
-
-              {/* FULL NAME */}
+            <form className="checkout-card" onSubmit={handleShippingSubmit}>
+              <h3>Shipping Address</h3>
 
               <div className="field">
-                <label htmlFor="fullName">
-                  Full Name
-                </label>
-
+                <label htmlFor="fullName">Full Name</label>
                 <input
                   id="fullName"
                   type="text"
-                  value={
-                    address.fullName
-                  }
-                  onChange={
-                    update('fullName')
-                  }
-                  className={
-                    errors.fullName
-                      ? 'has-error'
-                      : ''
-                  }
+                  value={address.fullName}
+                  onChange={update('fullName')}
+                  className={errors.fullName ? 'has-error' : ''}
                   autoComplete="name"
                 />
-
-                {errors.fullName && (
-                  <div className="field-error">
-                    {errors.fullName}
-                  </div>
-                )}
+                {errors.fullName && <div className="field-error">{errors.fullName}</div>}
               </div>
 
-              {/* PHONE */}
-
               <div className="field">
-                <label htmlFor="phone">
-                  Phone Number
-                </label>
-
+                <label htmlFor="phone">Phone Number</label>
                 <input
                   id="phone"
                   type="tel"
-                  value={
-                    address.phone
-                  }
-                  onChange={
-                    update('phone')
-                  }
-                  className={
-                    errors.phone
-                      ? 'has-error'
-                      : ''
-                  }
+                  value={address.phone}
+                  onChange={update('phone')}
+                  className={errors.phone ? 'has-error' : ''}
                   placeholder="10-digit mobile number"
                   maxLength={10}
                   inputMode="numeric"
                   autoComplete="tel"
                 />
-
-                {errors.phone && (
-                  <div className="field-error">
-                    {errors.phone}
-                  </div>
-                )}
+                {errors.phone && <div className="field-error">{errors.phone}</div>}
               </div>
 
-              {/* ADDRESS */}
-
               <div className="field">
-                <label htmlFor="address">
-                  Address
-                </label>
-
+                <label htmlFor="address">Address</label>
                 <input
                   id="address"
                   type="text"
-                  value={
-                    address.address
-                  }
-                  onChange={
-                    update('address')
-                  }
-                  className={
-                    errors.address
-                      ? 'has-error'
-                      : ''
-                  }
+                  value={address.address}
+                  onChange={update('address')}
+                  className={errors.address ? 'has-error' : ''}
                   autoComplete="street-address"
                 />
-
-                {errors.address && (
-                  <div className="field-error">
-                    {errors.address}
-                  </div>
-                )}
+                {errors.address && <div className="field-error">{errors.address}</div>}
               </div>
-
-              {/* CITY + STATE */}
 
               <div className="field-row">
                 <div className="field">
-                  <label htmlFor="city">
-                    City
-                  </label>
-
+                  <label htmlFor="city">City</label>
                   <input
                     id="city"
                     type="text"
-                    value={
-                      address.city
-                    }
-                    onChange={
-                      update('city')
-                    }
-                    className={
-                      errors.city
-                        ? 'has-error'
-                        : ''
-                    }
+                    value={address.city}
+                    onChange={update('city')}
+                    className={errors.city ? 'has-error' : ''}
                     autoComplete="address-level2"
                   />
-
-                  {errors.city && (
-                    <div className="field-error">
-                      {errors.city}
-                    </div>
-                  )}
+                  {errors.city && <div className="field-error">{errors.city}</div>}
                 </div>
 
                 <div className="field">
-                  <label htmlFor="state">
-                    State
-                  </label>
-
+                  <label htmlFor="state">State</label>
                   <input
                     id="state"
                     type="text"
-                    value={
-                      address.state
-                    }
-                    onChange={
-                      update('state')
-                    }
-                    className={
-                      errors.state
-                        ? 'has-error'
-                        : ''
-                    }
+                    value={address.state}
+                    onChange={update('state')}
+                    className={errors.state ? 'has-error' : ''}
                     autoComplete="address-level1"
                   />
-
-                  {errors.state && (
-                    <div className="field-error">
-                      {errors.state}
-                    </div>
-                  )}
+                  {errors.state && <div className="field-error">{errors.state}</div>}
                 </div>
               </div>
 
-              {/* PINCODE */}
-
               <div className="field">
-                <label htmlFor="pincode">
-                  Pincode
-                </label>
-
+                <label htmlFor="pincode">Pincode</label>
                 <input
                   id="pincode"
                   type="text"
-                  value={
-                    address.pincode
-                  }
-                  onChange={
-                    update('pincode')
-                  }
-                  className={
-                    errors.pincode
-                      ? 'has-error'
-                      : ''
-                  }
+                  value={address.pincode}
+                  onChange={update('pincode')}
+                  className={errors.pincode ? 'has-error' : ''}
                   placeholder="6-digit pincode"
                   maxLength={6}
                   inputMode="numeric"
                   autoComplete="postal-code"
                 />
-
-                {errors.pincode && (
-                  <div className="field-error">
-                    {errors.pincode}
-                  </div>
-                )}
+                {errors.pincode && <div className="field-error">{errors.pincode}</div>}
               </div>
 
-              {/* CONTINUE */}
-
-              <button
-                type="submit"
-                className="btn btn-primary btn-block"
-              >
+              <button type="submit" className="btn btn-primary btn-block">
                 Continue to Payment
               </button>
             </form>
           )}
 
-          {/* ==================================================
-              STEP 2 - PAYMENT
-          ================================================== */}
-
           {step === 2 && (
             <div className="checkout-card">
-              <h3>
-                Payment
-              </h3>
-
+              <h3>Payment</h3>
               <div className="razorpay-info">
-                <h4>
-                  Secure Payment
-                </h4>
-
-                <p>
-                  Click the button below to
-                  continue to Razorpay's
-                  secure payment checkout.
-                </p>
-
-                <p>
-                  You can pay securely using
-                  UPI, including PhonePe and
-                  Google Pay where supported
-                  by Razorpay.
-                </p>
+                <h4>Secure Payment</h4>
+                <p>Click the button below to continue to Razorpay secure checkout.</p>
+                <p>UPI supported (PhonePe, Google Pay, Paytm) & Cards.</p>
               </div>
 
               <div className="checkout-actions">
                 <button
                   type="button"
                   className="btn btn-outline"
-                  onClick={() =>
-                    setStep(1)
-                  }
-                  disabled={
-                    paymentLoading
-                  }
+                  onClick={() => setStep(1)}
+                  disabled={paymentLoading}
                 >
                   Back
                 </button>
-
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() =>
-                    setStep(3)
-                  }
-                  disabled={
-                    paymentLoading
-                  }
+                  onClick={() => setStep(3)}
+                  disabled={paymentLoading}
                 >
                   Review Order
                 </button>
@@ -945,101 +563,32 @@ export default function Checkout() {
             </div>
           )}
 
-          {/* ==================================================
-              STEP 3 - REVIEW
-          ================================================== */}
-
           {step === 3 && (
             <div className="checkout-card">
-              <h3>
-                Review Your Order
-              </h3>
-
-              {/* SHIPPING */}
+              <h3>Review Your Order</h3>
 
               <div className="review-block">
-                <h4>
-                  Shipping To
-                </h4>
-
-                <p>
-                  {address.fullName},{' '}
-                  {address.phone}
-                </p>
-
-                <p>
-                  {address.address},{' '}
-                  {address.city},{' '}
-                  {address.state} -{' '}
-                  {address.pincode}
-                </p>
+                <h4>Shipping To</h4>
+                <p>{address.fullName}, {address.phone}</p>
+                <p>{address.address}, {address.city}, {address.state} - {address.pincode}</p>
               </div>
 
-              {/* PAYMENT */}
-
               <div className="review-block">
-                <h4>
-                  Payment
-                </h4>
-
-                <p>
-                  Secure payment via
-                  Razorpay
-                </p>
-
-                <p>
-                  UPI supported, including
-                  PhonePe and Google Pay
-                  where available.
-                </p>
-              </div>
-
-              {/* ITEMS */}
-
-              <div className="review-block">
-                <h4>
-                  Items ({items.length})
-                </h4>
-
+                <h4>Items ({items.length})</h4>
                 {items.map(item => (
-                  <div
-                    className="review-item"
-                    key={
-                      item.key ||
-                      item.id ||
-                      item.product_id
-                    }
-                  >
-                    <span>
-                      {item.name} ×{' '}
-                      {item.quantity}
-                    </span>
-
-                    <span>
-                      ₹
-                      {(
-                        Number(item.price) *
-                        Number(item.quantity)
-                      ).toLocaleString(
-                        'en-IN'
-                      )}
-                    </span>
+                  <div className="review-item" key={item.key || item.id || item.product_id}>
+                    <span>{item.name} × {item.quantity}</span>
+                    <span>₹{(Number(item.price) * Number(item.quantity)).toLocaleString('en-IN')}</span>
                   </div>
                 ))}
               </div>
-
-              {/* ACTIONS */}
 
               <div className="checkout-actions">
                 <button
                   type="button"
                   className="btn btn-outline"
-                  onClick={() =>
-                    setStep(2)
-                  }
-                  disabled={
-                    paymentLoading
-                  }
+                  onClick={() => setStep(2)}
+                  disabled={paymentLoading}
                 >
                   Back
                 </button>
@@ -1047,35 +596,17 @@ export default function Checkout() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={
-                    handlePlaceOrder
-                  }
-                  disabled={
-                    paymentLoading
-                  }
+                  onClick={handlePlaceOrder}
+                  disabled={paymentLoading}
                 >
-                  {paymentLoading
-                    ? 'Processing Order...'
-                    : `Pay ₹${Number(
-                        total
-                      ).toLocaleString(
-                        'en-IN'
-                      )}`}
+                  {paymentLoading ? 'Processing Order...' : `Pay ₹${Number(total).toLocaleString('en-IN')}`}
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* ==================================================
-            ORDER SUMMARY
-        ================================================== */}
-
-        <OrderSummary
-          subtotal={subtotal}
-          shipping={shipping}
-          total={total}
-        />
+        <OrderSummary subtotal={subtotal} shipping={shipping} total={total} />
       </div>
     </div>
   )
