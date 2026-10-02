@@ -1,6 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, Star, ShoppingBag } from 'lucide-react'
+import {
+  Heart,
+  Star,
+  ShoppingBag,
+  Share2,
+} from 'lucide-react'
 import SareeArt from './SareeArt.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { useWishlist } from '../context/WishlistContext.jsx'
@@ -14,18 +19,50 @@ export default function ProductCard({ product }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     addToCart(product, 1)
   }
 
   const handleWishlist = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     toggleWishlist(product)
+  }
+
+  const handleShare = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const productUrl = `${window.location.origin}/product/${product.id}`
+
+    const shareData = {
+      title: product.name || 'Saree',
+      text: `Check out this beautiful saree from Sarika Fashions: ${product.name || 'Saree'}`,
+      url: productUrl,
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        await navigator.clipboard.writeText(productUrl)
+        alert('Product link copied!')
+      }
+    } catch (error) {
+      // User closed the share popup — no action needed.
+      if (error?.name !== 'AbortError') {
+        console.error('Share failed:', error)
+      }
+    }
   }
 
   const image = product.image || product.images?.[0]
 
   return (
-    <Link to={`/product/${product.id}`} className="product-card">
+    <Link
+      to={`/product/${product.id}`}
+      className="product-card"
+    >
 
       <div className="product-card-image">
 
@@ -62,6 +99,16 @@ export default function ProductCard({ product }) {
           />
         </button>
 
+        {/* SHARE BUTTON */}
+        <button
+          className="product-card-share"
+          onClick={handleShare}
+          aria-label={`Share ${product.name || 'saree'}`}
+          title="Share this saree"
+        >
+          <Share2 size={17} />
+        </button>
+
       </div>
 
       <div className="product-card-body">
@@ -94,7 +141,8 @@ export default function ProductCard({ product }) {
             ₹{Number(product.price).toLocaleString('en-IN')}
           </span>
 
-          {Number(product.originalPrice) > Number(product.price) && (
+          {Number(product.originalPrice) >
+            Number(product.price) && (
             <span className="product-card-original">
               ₹{Number(product.originalPrice).toLocaleString('en-IN')}
             </span>
