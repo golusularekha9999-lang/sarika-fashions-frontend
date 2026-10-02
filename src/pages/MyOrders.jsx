@@ -1,3 +1,4 @@
+import SarikaLoader from '../components/Loader.jsx'
 import React, { useEffect, useState } from 'react'
 import {
   Package,
@@ -989,7 +990,7 @@ export default function MyOrders() {
             <div className="loading-spinner" />
 
             <h2>
-              Loading your orders...
+              <SarikaLoader />
             </h2>
 
             <p>
@@ -1790,3 +1791,5 @@ export default function MyOrders() {
     </div>
   )
 }
+
+

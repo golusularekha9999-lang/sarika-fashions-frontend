@@ -1,3 +1,4 @@
+import SarikaLoader from '../../components/Loader.jsx'
 import React, {
   useEffect,
   useState,
@@ -236,7 +237,7 @@ export default function AdminProducts() {
           padding: 30,
         }}
       >
-        Loading products...
+        <SarikaLoader />
       </div>
 
     )
@@ -491,3 +492,5 @@ export default function AdminProducts() {
 
   )
 }
+
+

@@ -1,3 +1,4 @@
+import SarikaLoader from '../../components/Loader.jsx'
 import React, {
   useEffect,
   useMemo,
@@ -874,3 +875,4 @@ export default function AdminInfo() {
 
   )
 }
+

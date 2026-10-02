@@ -1,3 +1,4 @@
+import SarikaLoader from '../../components/Loader.jsx'
 
 import React, { useEffect, useMemo, useState } from 'react'
 import {
@@ -152,7 +153,7 @@ export default function AdminDashboard() {
             <RefreshCw size={24} />
           </div>
 
-          <h3>Loading dashboard...</h3>
+          <SarikaLoader />
 
           <p>
             Getting your store information ready.
@@ -638,5 +639,8 @@ export default function AdminDashboard() {
     </div>
   )
 }
+
+
+
 
 

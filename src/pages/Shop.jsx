@@ -1,3 +1,4 @@
+import SarikaLoader from '../components/Loader.jsx'
 import React, {
   useEffect,
   useState,
@@ -438,7 +439,7 @@ export default function Shop() {
           textAlign: 'center',
         }}
       >
-        <h2>Loading sarees...</h2>
+        <SarikaLoader />
       </div>
     )
   }
@@ -605,3 +606,5 @@ export default function Shop() {
     </div>
   )
 }
+
+

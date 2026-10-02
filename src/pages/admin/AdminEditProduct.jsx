@@ -1,3 +1,4 @@
+import SarikaLoader from '../../components/Loader.jsx'
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -270,7 +271,7 @@ export default function AdminEditProduct() {
     return (
       <div className="edit-page-loading">
         <div className="loading-spinner"></div>
-        <p>Loading saree details...</p>
+        <SarikaLoader />
       </div>
     );
   }
@@ -809,4 +810,7 @@ export default function AdminEditProduct() {
     </div>
   );
 }
+
+
+
 

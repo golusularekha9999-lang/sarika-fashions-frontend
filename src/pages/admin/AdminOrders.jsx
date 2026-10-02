@@ -1,3 +1,4 @@
+import SarikaLoader from '../../components/Loader.jsx'
 import React, {
   useEffect,
   useState,
@@ -1218,3 +1219,4 @@ export default function AdminOrders() {
     </div>
   )
 }
+

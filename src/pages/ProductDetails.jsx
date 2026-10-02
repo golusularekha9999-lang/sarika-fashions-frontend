@@ -1,3 +1,4 @@
+import SarikaLoader from '../components/Loader.jsx'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
@@ -450,7 +451,7 @@ export default function ProductDetails() {
     return (
       <div className="product-page-loading">
         <div className="product-loading-spinner" />
-        <p>Loading product...</p>
+        <SarikaLoader />
       </div>
     )
   }
@@ -1553,5 +1554,8 @@ export default function ProductDetails() {
     </div>
   )
 }
+
+
+
 
 
