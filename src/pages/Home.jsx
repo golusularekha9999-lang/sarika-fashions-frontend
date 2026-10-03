@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -20,14 +19,15 @@ import heroSaree from '../assets/hero-saree.jpg'
 import heroSaree2 from '../assets/hero-saree-2.jpg'
 import heroSaree3 from '../assets/hero-saree-3.jpg'
 import heroSaree4 from '../assets/hero-saree-4.jpg'
-import editorialImage from '../assets/editorial.jpg'
+
 import festiveImage from '../assets/silk-bg.jpeg'
 
 import './Home.css'
 
-/* =========================================
+
+/* =========================================================
    FEATURES
-   ========================================= */
+========================================================= */
 
 const FEATURES = [
   {
@@ -52,9 +52,10 @@ const FEATURES = [
   },
 ]
 
-/* =========================================
+
+/* =========================================================
    HERO SLIDES
-   ========================================= */
+========================================================= */
 
 const HERO_SLIDES = [
   heroSaree,
@@ -63,48 +64,59 @@ const HERO_SLIDES = [
   heroSaree4,
 ]
 
-/* =========================================
-   HOME COMPONENT
-   ========================================= */
+
+/* =========================================================
+   HOME PAGE
+========================================================= */
 
 export default function Home() {
+
   const categoryScroller = useRef(null)
+
   const [heroSlide, setHeroSlide] = useState(0)
 
-  /* =========================================
+
+  /* =======================================================
      AUTO HERO SLIDER
-     ========================================= */
+  ======================================================= */
 
   useEffect(() => {
+
     const timer = setInterval(() => {
-      setHeroSlide(
-        (current) =>
-          (current + 1) % HERO_SLIDES.length
-      )
+
+      setHeroSlide((current) => (
+        (current + 1) % HERO_SLIDES.length
+      ))
+
     }, 4000)
 
     return () => clearInterval(timer)
+
   }, [])
 
-  /* =========================================
-     CATEGORY SCROLLER
-     ========================================= */
+
+  /* =======================================================
+     CATEGORY SCROLL
+  ======================================================= */
 
   const scroll = (ref, direction) => {
-    if (ref.current) {
-      ref.current.scrollBy({
-        left: direction * 320,
-        behavior: 'smooth',
-      })
-    }
+
+    if (!ref.current) return
+
+    ref.current.scrollBy({
+      left: direction * 320,
+      behavior: 'smooth',
+    })
   }
+
 
   return (
     <div className="home-page">
 
-      {/* =========================================
+
+      {/* ===================================================
           HERO
-          ========================================= */}
+      =================================================== */}
 
       <section className="hero hero-fullscreen">
 
@@ -117,35 +129,49 @@ export default function Home() {
 
         <div className="hero-gradient" />
 
+
         <div className="container hero-inner hero-full-inner">
 
           <div className="hero-copy">
 
             <div className="hero-kicker">
+
               <Sparkles size={15} />
-              <span>NEW COLLECTION • 2026</span>
+
+              <span>
+                NEW COLLECTION • 2026
+              </span>
+
             </div>
+
 
             <p className="hero-overline">
               SARIKA FASHIONS
             </p>
 
+
             <h1 className="hero-title">
+
               Andham
               <em>.Aathmiyatha.</em>
+
               <br />
+
               Sarika Fashions.
+
             </h1>
 
+
             <p className="hero-text">
+
               Every Saree Has a Story,
               <br />
               Start Yours with Sarika Fashions.
+
             </p>
 
-            <div className="hero-actions">
 
-              {/* MAIN SHOP BUTTON */}
+            <div className="hero-actions">
 
               <Link
                 to="/shop"
@@ -155,7 +181,6 @@ export default function Home() {
                 <ArrowUpRight size={16} />
               </Link>
 
-              {/* EXPLORE SAREES → SHOP */}
 
               <Link
                 to="/shop"
@@ -166,6 +191,7 @@ export default function Home() {
               </Link>
 
             </div>
+
 
             <div className="hero-mini-stats">
 
@@ -190,9 +216,10 @@ export default function Home() {
 
         </div>
 
-        {/* =========================================
+
+        {/* =================================================
             HERO SLIDER CONTROLS
-            ========================================= */}
+        ================================================= */}
 
         <div className="hero-slider-controls">
 
@@ -202,7 +229,7 @@ export default function Home() {
             onClick={() =>
               setHeroSlide(
                 (heroSlide - 1 + HERO_SLIDES.length) %
-                  HERO_SLIDES.length
+                HERO_SLIDES.length
               )
             }
             aria-label="Previous slide"
@@ -210,21 +237,29 @@ export default function Home() {
             <ChevronLeft size={18} />
           </button>
 
+
           <div className="hero-slider-dots">
 
             {HERO_SLIDES.map((_, index) => (
+
               <button
                 key={index}
                 type="button"
-                className={`hero-slider-dot ${
-                  heroSlide === index ? 'active' : ''
-                }`}
+                className={
+                  `hero-slider-dot ${
+                    heroSlide === index
+                      ? 'active'
+                      : ''
+                  }`
+                }
                 onClick={() => setHeroSlide(index)}
                 aria-label={`Go to slide ${index + 1}`}
               />
+
             ))}
 
           </div>
+
 
           <button
             type="button"
@@ -232,7 +267,7 @@ export default function Home() {
             onClick={() =>
               setHeroSlide(
                 (heroSlide + 1) %
-                  HERO_SLIDES.length
+                HERO_SLIDES.length
               )
             }
             aria-label="Next slide"
@@ -244,9 +279,11 @@ export default function Home() {
 
       </section>
 
-      {/* =========================================
-          CATEGORY SECTION
-          ========================================= */}
+
+
+      {/* ===================================================
+          SHOP BY CATEGORY
+      =================================================== */}
 
       <section className="section home-section-soft">
 
@@ -266,6 +303,7 @@ export default function Home() {
 
             </div>
 
+
             <Link
               to="/shop"
               className="section-link"
@@ -276,22 +314,18 @@ export default function Home() {
 
           </div>
 
-          <div className="scroller-wrap">
 
-            {/* LEFT ARROW */}
+          <div className="scroller-wrap">
 
             <button
               type="button"
               className="scroller-arrow scroller-arrow-left desktop-only"
-              onClick={() =>
-                scroll(categoryScroller, -1)
-              }
+              onClick={() => scroll(categoryScroller, -1)}
               aria-label="Scroll categories left"
             >
               <ChevronLeft size={18} />
             </button>
 
-            {/* CATEGORY LIST */}
 
             <div
               className="category-scroller"
@@ -299,22 +333,21 @@ export default function Home() {
             >
 
               {categories.map((category) => (
+
                 <CategoryCard
                   key={category.id}
                   category={category}
                 />
+
               ))}
 
             </div>
 
-            {/* RIGHT ARROW */}
 
             <button
               type="button"
               className="scroller-arrow scroller-arrow-right desktop-only"
-              onClick={() =>
-                scroll(categoryScroller, 1)
-              }
+              onClick={() => scroll(categoryScroller, 1)}
               aria-label="Scroll categories right"
             >
               <ChevronRight size={18} />
@@ -326,30 +359,35 @@ export default function Home() {
 
       </section>
 
-      {/* =========================================
-          EDITORIAL SECTION
-          ========================================= */}
+
+
+      {/* ===================================================
+          THE ART OF DRAPING
+      =================================================== */}
 
       <section
         className="editorial-home"
         style={{
-          backgroundImage: `url(${editorialImage})`,
+          backgroundImage: `url('/editorial.jpg')`,
         }}
       >
 
         <div className="editorial-image-overlay" />
 
-        <div className="container editorial-full-content">
+
+        <div className="editorial-full-content">
 
           <div className="editorial-copy">
 
             <span className="eyebrow">
-              The Art of Tradition
+              THE ART OF TRADITION
             </span>
+
 
             <h2>
               The Art <em>of Draping.</em>
             </h2>
+
 
             <p>
               Every saree carries a story of heritage,
@@ -357,11 +395,12 @@ export default function Home() {
               craftsmanship.
             </p>
 
+
             <Link
               to="/about"
-              className="btn btn-outline editorial-story-button"
+              className="btn editorial-story-button"
             >
-              Discover Our Story
+              DISCOVER OUR STORY
               <ArrowUpRight size={16} />
             </Link>
 
@@ -371,9 +410,11 @@ export default function Home() {
 
       </section>
 
-      {/* =========================================
-          FESTIVE SECTION
-          ========================================= */}
+
+
+      {/* ===================================================
+          FESTIVE COLLECTION
+      =================================================== */}
 
       <section className="section festive-section-bg">
 
@@ -388,17 +429,20 @@ export default function Home() {
 
             <div className="festive-image-overlay" />
 
+
             <div className="festive-horizontal-content">
 
               <span className="eyebrow">
                 FESTIVE COLLECTION
               </span>
 
+
               <h2>
                 Drape Your
                 <br />
                 <em>Celebration.</em>
               </h2>
+
 
               <p>
                 From cherished traditions to joyful
@@ -407,7 +451,6 @@ export default function Home() {
                 unforgettable.
               </p>
 
-              {/* EXPLORE FESTIVE EDIT → SHOP */}
 
               <Link
                 to="/shop"
@@ -424,9 +467,11 @@ export default function Home() {
 
       </section>
 
-      {/* =========================================
+
+
+      {/* ===================================================
           FEATURES
-          ========================================= */}
+      =================================================== */}
 
       <section className="section features-section">
 
@@ -454,8 +499,7 @@ export default function Home() {
 
       </section>
 
+
     </div>
   )
 }
-
-

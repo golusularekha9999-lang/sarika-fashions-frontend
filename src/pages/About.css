@@ -1,191 +1,510 @@
-/* ABOUT HERO - COMPLETE BACKGROUND */
-.about-hero-full{
+/* =========================================================
+   ABOUT HERO — FULL SCREEN IMAGE + TEXT OVER IMAGE
+========================================================= */
+
+.about-hero-full {
   position: relative;
-  min-height: 680px;
-  padding: 0;
+  width: 100%;
+  height: calc(100vh - 72px);
+  min-height: 650px;
+
   overflow: hidden;
+
+  display: flex;
+  align-items: center;
+
+  /* EDITORIAL IMAGE */
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
 }
 
-.about-hero-overlay{
+
+/* =========================================================
+   SOFT LIGHT OVER IMAGE
+   Keeps the left text readable while showing the image
+========================================================= */
+
+.about-hero-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(90deg, rgba(255,249,243,0.96) 0%, rgba(255,249,243,0.88) 30%, rgba(255,249,243,0.55) 55%, rgba(255,249,243,0.15) 75%, rgba(255,249,243,0.02) 100%);
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 249, 243, 0.92) 0%,
+      rgba(255, 249, 243, 0.78) 24%,
+      rgba(255, 249, 243, 0.48) 42%,
+      rgba(255, 249, 243, 0.18) 60%,
+      rgba(255, 249, 243, 0.02) 78%,
+      rgba(255, 249, 243, 0) 100%
+    );
 }
 
-.about-hero-full-content{
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.about-hero-full-content {
   position: relative;
   z-index: 2;
+
   width: 100%;
-  min-height: 680px;
+  height: 100%;
+
   display: flex;
   align-items: center;
   justify-content: flex-start;
+
+  box-sizing: border-box;
 }
 
-.about-hero-copy{
-  width: 50%;
-  max-width: 580px;
+
+/* =========================================================
+   TEXT AREA
+========================================================= */
+
+.about-hero-copy {
+  width: 43%;
+  max-width: 620px;
+
+  margin-left: 2%;
+
   text-align: left;
 }
 
-.about-hero-copy h1{
-  font-size: clamp(2.8rem,5vw,4.8rem);
-  line-height: 1.05;
-  margin: 12px 0 20px;
-  color: var(--color-dark);
-}
 
-.about-hero-copy h1 em{
-  color: var(--color-primary);
+/* =========================================================
+   OUR HERITAGE
+========================================================= */
+
+.about-hero-copy .eyebrow {
+  display: inline-block;
+
+  margin-bottom: 14px;
+
+  color: #7d4d2f;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 13px;
   font-weight: 500;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
-.about-hero-copy p{
-  color: #66575b;
-  max-width: 560px;
-  margin-bottom: 24px;
-  line-height: 1.7;
-  font-size: 0.95rem;
+
+/* =========================================================
+   MAIN HEADING
+========================================================= */
+
+.about-hero-copy h1 {
+  margin: 0 0 22px;
+
+  color: #21191b;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: clamp(3rem, 4.4vw, 5rem);
+  font-weight: 500;
+
+  line-height: 1.02;
+
+  letter-spacing: -0.025em;
 }
-/* ABOUT HERO - MOBILE RESPONSIVE */
+
+
+/* STORIES */
+.about-hero-copy h1 em {
+  color: #9d174d;
+
+  font-weight: 500;
+  font-style: italic;
+}
+
+
+/* =========================================================
+   PARAGRAPH
+========================================================= */
+
+.about-hero-copy p {
+  width: 100%;
+  max-width: 610px;
+
+  margin: 0 0 28px;
+
+  color: #51454a;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 16px;
+  line-height: 1.55;
+
+  letter-spacing: 0.01em;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.about-hero-copy .btn {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  min-height: 52px;
+
+  padding: 0 28px;
+
+  border: none;
+  border-radius: 4px;
+
+  background: #9d174d;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  text-decoration: none;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.about-hero-copy .btn:hover {
+  background: #7f123e;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(157, 23, 77, 0.25);
+}
+
+
+.about-hero-copy .btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media screen and (min-width: 1400px) {
+
+  .about-hero-full {
+    height: calc(100vh - 72px);
+    min-height: 700px;
+
+    /*
+      Keeps the woman nicely visible on the right
+      without moving the image too far.
+    */
+    background-position: 68% center;
+  }
+
+
+  .about-hero-copy {
+    width: 42%;
+    max-width: 650px;
+
+    margin-left: 2.5%;
+  }
+
+
+  .about-hero-copy h1 {
+    font-size: 5rem;
+  }
+
+
+  .about-hero-copy p {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+}
+
+
+/* =========================================================
+   LAPTOP
+========================================================= */
+
+@media screen and (min-width: 769px) and (max-width: 1399px) {
+
+  .about-hero-full {
+    height: calc(100vh - 70px);
+    min-height: 620px;
+
+    background-position: 65% center;
+  }
+
+
+  .about-hero-copy {
+    width: 45%;
+    max-width: 560px;
+
+    margin-left: 3%;
+  }
+
+
+  .about-hero-copy h1 {
+    font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+  }
+
+
+  .about-hero-copy p {
+    font-size: 15px;
+  }
+
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
 
 @media screen and (max-width: 768px) {
 
   .about-hero-full {
-    min-height: 520px !important;
-    height: 520px !important;
-    background-size: cover !important;
-    background-position: 68% center !important;
+    width: 100%;
+
+    height: calc(100vh - 64px);
+    min-height: 600px;
+
+    background-size: cover;
+
+    /*
+      On mobile we move slightly toward the right
+      so the woman remains visible.
+    */
+    background-position: 68% center;
   }
+
 
   .about-hero-overlay {
-    background: linear-gradient(
-      90deg,
-      rgba(255,249,243,0.94) 0%,
-      rgba(255,249,243,0.82) 38%,
-      rgba(255,249,243,0.48) 65%,
-      rgba(255,249,243,0.12) 100%
-    ) !important;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(255, 249, 243, 0.94) 0%,
+        rgba(255, 249, 243, 0.82) 30%,
+        rgba(255, 249, 243, 0.55) 52%,
+        rgba(255, 249, 243, 0.20) 75%,
+        rgba(255, 249, 243, 0.02) 100%
+      );
   }
+
 
   .about-hero-full-content {
-    min-height: 520px !important;
-    height: 520px !important;
-    padding: 20px 20px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
+    height: 100%;
+
+    padding: 25px 22px;
+
+    box-sizing: border-box;
+
+    align-items: center;
   }
+
 
   .about-hero-copy {
-    width: 58% !important;
-    max-width: 58% !important;
-    text-align: left !important;
+    width: 57%;
+    max-width: 57%;
+
+    margin-left: 0;
+
+    text-align: left;
   }
+
 
   .about-hero-copy .eyebrow {
-    display: block !important;
-    font-size: 8px !important;
-    line-height: 1.2 !important;
-    letter-spacing: 0.14em !important;
-    margin-bottom: 7px !important;
+    margin-bottom: 8px;
+
+    font-size: 8px;
+
+    letter-spacing: 0.16em;
   }
+
 
   .about-hero-copy h1 {
-    font-size: 25px !important;
-    line-height: 1.05 !important;
-    margin: 0 0 12px !important;
-    white-space: nowrap !important;
+    margin: 0 0 14px;
+
+    font-size: 27px;
+    line-height: 1.05;
+
+    letter-spacing: -0.02em;
   }
 
-  .about-hero-copy h1 em {
-    font-size: inherit !important;
-  }
 
   .about-hero-copy p {
-    max-width: 100% !important;
-    margin: 0 0 14px !important;
-    color: #66575b !important;
-    font-size: 10px !important;
-    line-height: 1.42 !important;
+    margin: 0 0 17px;
+
+    font-size: 10px;
+    line-height: 1.45;
   }
+
 
   .about-hero-copy p br {
-    display: none !important;
+    display: none;
   }
+
 
   .about-hero-copy .btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-height: 34px !important;
-    height: 34px !important;
-    padding: 7px 11px !important;
-    font-size: 8px !important;
-    line-height: 1 !important;
-    white-space: nowrap !important;
+    min-height: 35px;
+
+    padding: 0 13px;
+
+    gap: 6px;
+
+    border-radius: 3px;
+
+    font-size: 8px;
+    letter-spacing: 0.07em;
   }
 
+
   .about-hero-copy .btn svg {
-    width: 11px !important;
-    height: 11px !important;
+    width: 11px;
+    height: 11px;
   }
+
 }
 
 
-/* SMALL PHONES */
+/* =========================================================
+   SMALL PHONES
+========================================================= */
 
 @media screen and (max-width: 480px) {
 
   .about-hero-full {
-    min-height: 470px !important;
-    height: 470px !important;
-    background-position: 70% center !important;
+    height: calc(100vh - 60px);
+    min-height: 500px;
+
+    background-size: cover;
+
+    background-position: 67% center;
   }
+
+
+  .about-hero-overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(255, 249, 243, 0.95) 0%,
+        rgba(255, 249, 243, 0.84) 30%,
+        rgba(255, 249, 243, 0.52) 55%,
+        rgba(255, 249, 243, 0.15) 80%,
+        rgba(255, 249, 243, 0) 100%
+      );
+  }
+
 
   .about-hero-full-content {
-    min-height: 470px !important;
-    height: 470px !important;
-    padding: 18px 16px !important;
+    padding: 18px 16px;
   }
+
 
   .about-hero-copy {
-    width: 59% !important;
-    max-width: 59% !important;
+    width: 59%;
+    max-width: 59%;
   }
+
 
   .about-hero-copy .eyebrow {
-    font-size: 7px !important;
-    margin-bottom: 6px !important;
+    font-size: 7px;
+
+    margin-bottom: 6px;
   }
+
 
   .about-hero-copy h1 {
-    font-size: 22px !important;
-    margin-bottom: 9px !important;
+    font-size: 22px;
+
+    line-height: 1.04;
+
+    margin-bottom: 10px;
   }
+
 
   .about-hero-copy p {
-    font-size: 9px !important;
-    line-height: 1.4 !important;
-    margin-bottom: 11px !important;
+    font-size: 9px;
+
+    line-height: 1.4;
+
+    margin-bottom: 12px;
   }
+
 
   .about-hero-copy .btn {
-    min-height: 31px !important;
-    height: 31px !important;
-    padding: 6px 9px !important;
-    font-size: 7px !important;
+    min-height: 31px;
+
+    padding: 0 10px;
+
+    font-size: 7px;
   }
 
+
   .about-hero-copy .btn svg {
-    width: 2px !important;
-    height: 9px !important;
+    width: 9px;
+    height: 9px;
   }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media screen and (max-width: 360px) {
+
+  .about-hero-full {
+    min-height: 480px;
+
+    background-position: 65% center;
+  }
+
+
+  .about-hero-copy {
+    width: 61%;
+    max-width: 61%;
+  }
+
+
+  .about-hero-copy h1 {
+    font-size: 20px;
+  }
+
+
+  .about-hero-copy p {
+    font-size: 8.5px;
+    line-height: 1.38;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .about-hero-copy .btn {
+    transition: none;
+  }
+
 }

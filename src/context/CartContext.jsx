@@ -20,16 +20,8 @@ export function CartProvider({ children }) {
     }
   })
 
-  // ============================================================
-  // POP-UP STATE
-  // ============================================================
-
   const [addedItem, setAddedItem] = useState(null)
   const [showPopup, setShowPopup] = useState(false)
-
-  // ============================================================
-  // SAVE CART TO LOCAL STORAGE
-  // ============================================================
 
   useEffect(() => {
     localStorage.setItem(
@@ -37,10 +29,6 @@ export function CartProvider({ children }) {
       JSON.stringify(items)
     )
   }, [items])
-
-  // ============================================================
-  // ADD TO CART (Triggers Pop-up)
-  // ============================================================
 
   const addToCart = (
     product,
@@ -71,28 +59,18 @@ export function CartProvider({ children }) {
         ...prev,
         {
           key,
-
           id: product.id,
-
           name: product.name,
-
           price: product.price,
-
-          originalPrice:
-            product.originalPrice,
-
+          originalPrice: product.originalPrice,
           image: product.image,
-
           variant: product.variant,
-
           color,
-
           quantity,
         },
       ]
     })
 
-    // Open the pop-up modal with the added product
     if (!skipPopup) {
       setAddedItem({
         ...product,
@@ -103,17 +81,9 @@ export function CartProvider({ children }) {
     }
   }
 
-  // ============================================================
-  // CLOSE POP-UP
-  // ============================================================
-
   const closePopup = () => {
     setShowPopup(false)
   }
-
-  // ============================================================
-  // REMOVE FROM CART
-  // ============================================================
 
   const removeFromCart = (key) => {
     setItems((prev) =>
@@ -121,14 +91,7 @@ export function CartProvider({ children }) {
     )
   }
 
-  // ============================================================
-  // UPDATE QUANTITY
-  // ============================================================
-
-  const updateQuantity = (
-    key,
-    quantity
-  ) => {
+  const updateQuantity = (key, quantity) => {
     if (quantity < 1) return
 
     setItems((prev) =>
@@ -143,17 +106,9 @@ export function CartProvider({ children }) {
     )
   }
 
-  // ============================================================
-  // CLEAR CART
-  // ============================================================
-
   const clearCart = () => {
     setItems([])
   }
-
-  // ============================================================
-  // SUBTOTAL
-  // ============================================================
 
   const subtotal = useMemo(
     () =>
@@ -167,23 +122,15 @@ export function CartProvider({ children }) {
     [items]
   )
 
-  // ============================================================
-  // SHIPPING (₹75 FLAT RATE)
-  // ============================================================
-
+  // ₹75 shipping below ₹999
+  // FREE shipping at ₹999 and above
   const shipping =
-    subtotal > 0 ? 75 : 0
-
-  // ============================================================
-  // TOTAL
-  // ============================================================
+    subtotal > 0 && subtotal < 999
+      ? 75
+      : 0
 
   const total =
     subtotal + shipping
-
-  // ============================================================
-  // ITEM COUNT
-  // ============================================================
 
   const itemCount =
     items.reduce(
@@ -192,53 +139,30 @@ export function CartProvider({ children }) {
       0
     )
 
-  // ============================================================
-  // CONTEXT VALUE
-  // ============================================================
-
   const value = {
     items,
-
     addToCart,
-
     removeFromCart,
-
     updateQuantity,
-
     clearCart,
-
     subtotal,
-
     shipping,
-
     total,
-
     itemCount,
-
     showPopup,
-
     addedItem,
-
     closePopup,
   }
 
   return (
-    <CartContext.Provider
-      value={value}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   )
 }
 
-// ============================================================
-// USE CART HOOK
-// ============================================================
-
 export const useCart = () => {
-  const ctx = useContext(
-    CartContext
-  )
+  const ctx = useContext(CartContext)
 
   if (!ctx) {
     throw new Error(

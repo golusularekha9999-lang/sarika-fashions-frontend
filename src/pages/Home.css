@@ -1,6 +1,6 @@
 /* =========================================================
-   SARIKA FASHIONS - HOME PAGE
-   FINAL RESPONSIVE VERSION
+   SARIKA FASHIONS
+   HOME PAGE - FINAL CSS
 ========================================================= */
 
 .home-page {
@@ -16,8 +16,9 @@
   box-sizing: border-box;
 }
 
+
 /* =========================================================
-   COMMON
+   CONTAINER
 ========================================================= */
 
 .home-page .container {
@@ -26,63 +27,49 @@
   margin: 0 auto;
 }
 
+
 /* =========================================================
-   HERO - DESKTOP
+   HERO
 ========================================================= */
 
 .hero-fullscreen {
   position: relative;
+
   width: 100%;
   min-height: calc(100vh - 104px);
 
   display: flex;
   align-items: center;
 
-  isolation: isolate;
   overflow: hidden;
+  isolation: isolate;
 
   background: #211016;
   color: #fff;
 }
 
-/* Background photo (used by Home.jsx's .hero-background div) */
 
 .hero-background {
   position: absolute;
+
   inset: 0;
+
   width: 100%;
   height: 100%;
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
   z-index: -4;
+
   transition: opacity 0.6s ease;
 }
 
-/* Background artwork (legacy/unused fallback) */
-
-.hero-art-bg {
-  position: absolute;
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  opacity: 0.28;
-
-  z-index: -4;
-}
-
-.hero-art-bg svg {
-  width: 100%;
-  height: 100%;
-  transform: scale(1.25);
-}
-
-/* Gradient */
 
 .hero-gradient {
   position: absolute;
+
   inset: 0;
 
   z-index: -3;
@@ -97,33 +84,6 @@
     );
 }
 
-/* Decorative orbs */
-
-.hero-orb {
-  position: absolute;
-
-  width: 38vw;
-  height: 38vw;
-
-  border-radius: 50%;
-
-  filter: blur(20px);
-  opacity: 0.2;
-
-  z-index: -2;
-}
-
-.hero-orb-one {
-  background: var(--color-primary);
-  top: -15%;
-  right: -10%;
-}
-
-.hero-orb-two {
-  background: var(--color-gold);
-  bottom: -30%;
-  left: 25%;
-}
 
 /* =========================================================
    HERO CONTENT
@@ -149,6 +109,7 @@
   z-index: 2;
 }
 
+
 .hero-copy {
   width: 100%;
   max-width: 680px;
@@ -160,15 +121,16 @@
     both;
 }
 
-/* Kicker */
 
 .hero-kicker {
   display: inline-flex;
+
   align-items: center;
 
   gap: 8px;
 
   font-size: 0.72rem;
+
   letter-spacing: 0.17em;
 
   color: var(--color-gold-light);
@@ -176,7 +138,6 @@
   margin-bottom: 20px;
 }
 
-/* Brand */
 
 .hero-overline {
   font-family: var(--font-accent);
@@ -190,7 +151,6 @@
   margin-bottom: 14px;
 }
 
-/* Title */
 
 .hero-title {
   color: #fff;
@@ -204,12 +164,13 @@
   margin: 0 0 22px;
 }
 
+
 .hero-title em {
   color: var(--color-gold-light);
+
   font-weight: 500;
 }
 
-/* Text */
 
 .hero-text {
   color: #f5e7e8;
@@ -223,7 +184,10 @@
   margin-bottom: 28px;
 }
 
-/* Buttons */
+
+/* =========================================================
+   HERO ACTIONS
+========================================================= */
 
 .hero-actions {
   display: flex;
@@ -235,6 +199,7 @@
   flex-wrap: wrap;
 }
 
+
 .hero-primary {
   padding: 15px 23px;
 
@@ -242,6 +207,7 @@
     0 15px 35px
     rgba(0, 0, 0, 0.24);
 }
+
 
 .hero-text-button {
   display: flex;
@@ -261,9 +227,11 @@
   font-weight: 600;
 }
 
+
 .hero-text-button span {
   font-size: 1.2rem;
 }
+
 
 /* =========================================================
    HERO STATS
@@ -283,6 +251,7 @@
     rgba(255, 255, 255, 0.18);
 }
 
+
 .hero-mini-stats div {
   display: grid;
 
@@ -291,6 +260,7 @@
   min-width: 0;
 }
 
+
 .hero-mini-stats strong {
   font-family: var(--font-display);
 
@@ -298,6 +268,7 @@
 
   font-size: 1.4rem;
 }
+
 
 .hero-mini-stats span {
   color: #d7c5c7;
@@ -309,188 +280,9 @@
   letter-spacing: 0.07em;
 }
 
-/* =========================================================
-   HERO SHOWCASE
-========================================================= */
-
-.hero-showcase {
-  position: relative;
-
-  min-height: 570px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-}
-
-.hero-frame {
-  position: relative;
-
-  width: min(420px, 34vw);
-
-  min-width: 320px;
-
-  aspect-ratio: 4 / 5.2;
-
-  overflow: hidden;
-
-  border-radius:
-    180px
-    180px
-    26px
-    26px;
-
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.24);
-
-  background: #f7e8ea;
-
-  box-shadow:
-    0 30px 90px
-    rgba(0, 0, 0, 0.38);
-}
-
-.hero-frame svg {
-  width: 100%;
-  height: 100%;
-
-  transform: scale(1.06);
-}
-
-.hero-frame-glow {
-  position: absolute;
-
-  width: 85%;
-  height: 70%;
-
-  border-radius: 50%;
-
-  background:
-    rgba(199, 154, 91, 0.18);
-
-  filter: blur(45px);
-}
-
-/* Floating note */
-
-.hero-floating-note {
-  position: absolute;
-
-  right: -5px;
-  bottom: 55px;
-
-  min-width: 175px;
-
-  padding: 15px 18px;
-
-  background:
-    rgba(255, 249, 240, 0.95);
-
-  color: var(--color-dark);
-
-  border-left:
-    3px solid
-    var(--color-gold);
-
-  border-radius: 10px;
-
-  box-shadow: var(--shadow-lg);
-}
-
-.hero-floating-note span {
-  display: block;
-
-  font-size: 0.56rem;
-
-  letter-spacing: 0.14em;
-
-  color: var(--color-primary);
-
-  font-weight: 700;
-
-  margin-bottom: 4px;
-}
-
-.hero-floating-note strong {
-  font-family: var(--font-display);
-
-  font-size: 1.05rem;
-
-  line-height: 1.05;
-}
-
-/* Circular badge */
-
-.hero-scroll-badge {
-  position: absolute;
-
-  left: -20px;
-  top: 45px;
-
-  width: 110px;
-  height: 110px;
-
-  border-radius: 50%;
-
-  display: grid;
-
-  place-items: center;
-
-  border:
-    1px dashed
-    rgba(255, 255, 255, 0.4);
-
-  color: #f4dcb8;
-
-  font-size: 0.5rem;
-
-  letter-spacing: 0.07em;
-
-  text-align: center;
-
-  padding: 15px;
-}
 
 /* =========================================================
-   HERO BOTTOM
-========================================================= */
-
-.hero-bottom-hint {
-  position: absolute;
-
-  left: 50%;
-  bottom: 20px;
-
-  transform:
-    translateX(-50%);
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  color: #d7c5c7;
-
-  font-size: 0.6rem;
-
-  letter-spacing: 0.15em;
-
-  text-transform: uppercase;
-}
-
-.hero-bottom-hint span {
-  width: 36px;
-  height: 1px;
-
-  background: var(--color-gold);
-}
-
-/* =========================================================
-   HERO SLIDER
+   HERO SLIDER CONTROLS
 ========================================================= */
 
 .hero-slider-controls {
@@ -517,6 +309,7 @@
   backdrop-filter: blur(8px);
 }
 
+
 .hero-slider-arrow {
   width: 31px;
   height: 31px;
@@ -539,6 +332,7 @@
   cursor: pointer;
 }
 
+
 .hero-slider-dots {
   display: flex;
 
@@ -546,6 +340,7 @@
 
   gap: 6px;
 }
+
 
 .hero-slider-dot {
   width: 7px;
@@ -563,43 +358,24 @@
   cursor: pointer;
 }
 
+
 .hero-slider-dot.active {
   width: 21px;
 
   border-radius: 999px;
 
-  background:
-    var(--color-gold-light);
+  background: var(--color-gold-light);
 }
+
 
 /* =========================================================
-   FEATURES
-========================================================= */
-
-.features-section {
-  padding-top: 34px;
-  padding-bottom: 42px;
-
-  background:
-    var(--color-cream);
-}
-
-.features-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-
-  gap: 18px;
-}
-
-/* =========================================================
-   SECTION COMMON
+   COMMON SECTION
 ========================================================= */
 
 .section {
   width: 100%;
 }
+
 
 .section-header {
   display: flex;
@@ -613,18 +389,31 @@
   margin-bottom: 24px;
 }
 
+
 .section-title {
   margin: 0;
 
   line-height: 1.05;
 }
 
-.section-title em,
-.editorial-copy em {
+
+.section-title em {
   color: var(--color-primary);
 
   font-weight: 500;
 }
+
+
+.section-link {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
 
 .eyebrow {
   display: inline-block;
@@ -640,19 +429,21 @@
   font-weight: 700;
 }
 
-.section-link {
-  display: flex;
-
-  align-items: center;
-
-  gap: 6px;
-
-  flex-shrink: 0;
-}
 
 /* =========================================================
-   SCROLLERS
+   CATEGORY SECTION
 ========================================================= */
+
+.home-section-soft {
+  width: 100%;
+
+  padding: 55px 0;
+
+  overflow: hidden;
+
+  background: #fffdf9;
+}
+
 
 .scroller-wrap {
   position: relative;
@@ -660,8 +451,8 @@
   width: 100%;
 }
 
-.category-scroller,
-.product-scroller {
+
+.category-scroller {
   display: flex;
 
   gap: 20px;
@@ -669,7 +460,6 @@
   width: 100%;
 
   overflow-x: auto;
-
   overflow-y: hidden;
 
   padding:
@@ -677,26 +467,28 @@
     2px
     12px;
 
-  scroll-snap-type:
-    x proximity;
+  scroll-snap-type: x proximity;
 
   scrollbar-width: none;
 }
 
-.category-scroller::-webkit-scrollbar,
-.product-scroller::-webkit-scrollbar {
+
+.category-scroller::-webkit-scrollbar {
   display: none;
 }
 
-/* Products */
 
-.product-scroller-item {
-  min-width: 268px;
+.category-scroller > * {
+  flex:
+    0 0
+    calc((100% - 60px) / 4);
+
+  min-width:
+    calc((100% - 60px) / 4);
 
   scroll-snap-align: start;
 }
 
-/* Scroller buttons */
 
 .scroller-arrow {
   position: absolute;
@@ -715,8 +507,7 @@
 
   background: #fff;
 
-  box-shadow:
-    var(--shadow-md);
+  box-shadow: var(--shadow-md);
 
   display: grid;
 
@@ -727,186 +518,436 @@
   cursor: pointer;
 }
 
+
 .scroller-arrow-left {
   left: -22px;
 }
+
 
 .scroller-arrow-right {
   right: -22px;
 }
 
+
 /* =========================================================
-   EDITORIAL
+   ART OF DRAPING
+   DESKTOP
 ========================================================= */
 
 .editorial-home {
+
+  position: relative;
+
   width: 100%;
 
-  padding: 72px 0;
+  /*
+    Laptop/desktop height.
+    The image fills the complete section.
+  */
 
-  background:
-    linear-gradient(
-      115deg,
-      #f3e5e5,
-      #fffaf3
-    );
+  height: 560px;
+
+  min-height: 560px;
 
   overflow: hidden;
-}
 
-.editorial-home-grid {
-  display: grid;
-
-  grid-template-columns:
-    0.9fr
-    1.1fr;
+  display: flex;
 
   align-items: center;
 
-  gap: 7vw;
+  justify-content: flex-start;
+
+  /*
+    IMPORTANT:
+    The actual image comes from:
+
+    public/art-of-draping.png
+  */
+
+  background-size: cover !important;
+
+  background-position: center center !important;
+
+  background-repeat: no-repeat !important;
+
+  background-color: #f8f0e6;
+
+  isolation: isolate;
 }
 
-.editorial-art {
-  width: 100%;
 
-  aspect-ratio: 1 / 1.12;
+/*
+   Prevent any previous CSS from creating
+   another image/background.
+*/
 
-  overflow: hidden;
-
-  border-radius:
-    28px
-    120px
-    28px
-    120px;
-
-  background: #f7e8ea;
-
-  box-shadow:
-    var(--shadow-lg);
+.editorial-home::before,
+.editorial-home::after {
+  content: none !important;
 }
 
-.editorial-art svg {
+
+/* =========================================================
+   ART OF DRAPING OVERLAY
+========================================================= */
+
+.editorial-image-overlay {
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  pointer-events: none;
+
+  /*
+    The image itself already has a very light
+    left side.
+
+    This overlay keeps the text readable
+    without hiding the women on the right.
+  */
+
+  background:
+    linear-gradient(
+      90deg,
+
+      rgba(255, 249, 243, 0.72) 0%,
+
+      rgba(255, 249, 243, 0.48) 23%,
+
+      rgba(255, 249, 243, 0.18) 43%,
+
+      rgba(255, 249, 243, 0.04) 62%,
+
+      rgba(255, 249, 243, 0) 100%
+    );
+}
+
+
+/* =========================================================
+   ART OF DRAPING CONTENT
+========================================================= */
+
+.editorial-full-content {
+
+  position: relative;
+
+  z-index: 2;
+
   width: 100%;
+
   height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  padding:
+    0
+    clamp(35px, 7vw, 110px);
 }
+
 
 .editorial-copy {
-  width: 100%;
 
-  max-width: 520px;
+  width: 45%;
+
+  max-width: 570px;
+
+  text-align: left;
 }
+
+
+/* =========================================================
+   ART OF DRAPING TEXT
+========================================================= */
+
+.editorial-copy .eyebrow {
+
+  margin-bottom: 12px;
+
+  color: #8b5b36;
+
+  font-size: 0.72rem;
+
+  letter-spacing: 0.22em;
+}
+
 
 .editorial-copy h2 {
-  font-size:
-    clamp(
-      2.4rem,
-      5vw,
-      4.4rem
-    );
-
-  line-height: 1.05;
 
   margin:
-    12px
+    0
     0
     20px;
+
+  color: #251b1e;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      3rem,
+      5vw,
+      5rem
+    );
+
+  font-weight: 500;
+
+  line-height: 1.02;
+
+  letter-spacing: -0.025em;
 }
 
+
+.editorial-copy h2 em {
+
+  color: #9d174d;
+
+  font-weight: 500;
+
+  font-style: italic;
+}
+
+
 .editorial-copy p {
-  color: #5a4a4e;
 
   max-width: 500px;
 
-  line-height: 1.7;
+  margin:
+    0
+    0
+    28px;
 
-  margin-bottom: 28px;
+  color: #4f4548;
+
+  font-size: 16px;
+
+  line-height: 1.65;
 }
+
 
 /* =========================================================
-   PROMO / FESTIVE
+   ART OF DRAPING BUTTON
 ========================================================= */
 
-.promo-banner {
-  width: 100%;
+.editorial-story-button {
 
-  background:
-    linear-gradient(
-      115deg,
-      var(--color-primary-dark),
-      var(--color-primary)
-    );
-
-  color: #fff;
-
-  overflow: hidden;
-}
-
-.promo-banner-inner {
-  min-height: 420px;
-
-  display: grid;
-
-  grid-template-columns:
-    1fr
-    360px;
+  display: inline-flex;
 
   align-items: center;
 
-  gap: 30px;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 50px;
+
+  padding:
+    0
+    24px;
+
+  border:
+    1px solid
+    #34292d;
+
+  border-radius: 4px;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  color: #34292d;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+
+  text-decoration: none;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
 }
 
-.promo-banner-inner h2 {
+
+.editorial-story-button:hover {
+
+  background: #9d174d;
+
+  border-color: #9d174d;
+
   color: #fff;
 
-  font-size:
-    clamp(
-      2rem,
-      4vw,
-      3.5rem
-    );
+  transform:
+    translateY(-2px);
+}
 
-  line-height: 1.08;
+
+/* =========================================================
+   FESTIVE SECTION
+========================================================= */
+
+.festive-section-bg {
+
+  padding:
+    70px
+    0;
+
+  background:
+    var(--color-cream);
+}
+
+
+.festive-horizontal-card {
+
+  position: relative;
+
+  min-height: 430px;
+
+  overflow: hidden;
+
+  display: flex;
+
+  align-items: center;
+
+  border-radius: 24px;
+
+  background-size: cover;
+
+  background-position: center;
+
+  background-repeat: no-repeat;
+}
+
+
+.festive-image-overlay {
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(33, 16, 22, 0.94),
+      rgba(33, 16, 22, 0.55),
+      rgba(33, 16, 22, 0.12)
+    );
+}
+
+
+.festive-horizontal-content {
+
+  position: relative;
+
+  z-index: 2;
+
+  width: 50%;
+
+  padding: 60px;
+
+  color: #fff;
+}
+
+
+.festive-horizontal-content .eyebrow {
+
+  color: #e7c38e;
+}
+
+
+.festive-horizontal-content h2 {
 
   margin:
     10px
     0
-    12px;
+    18px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      2.5rem,
+      5vw,
+      4.5rem
+    );
+
+  line-height: 1.05;
 }
 
-.promo-banner-inner p {
-  color: #f0d9df;
+
+.festive-horizontal-content h2 em {
+
+  color: #e1a4bb;
+
+  font-weight: 500;
+}
+
+
+.festive-horizontal-content p {
 
   max-width: 520px;
+
+  color: #f0d9df;
 
   line-height: 1.6;
 
   margin-bottom: 24px;
 }
 
-.promo-art {
-  align-self: end;
-
-  height: 360px;
-
-  overflow: hidden;
-
-  border-radius:
-    120px
-    120px
-    0
-    0;
-}
-
-.promo-art svg {
-  width: 100%;
-  height: 100%;
-}
 
 /* =========================================================
-   ANIMATIONS
+   FEATURES
 ========================================================= */
 
-.reveal {
+.features-section {
+
+  width: 100%;
+
+  padding:
+    42px
+    0;
+
+  background:
+    var(--color-cream);
+}
+
+
+.features-grid {
+
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+
+.features-grid > .reveal {
+
+  width: 100%;
+
+  min-width: 0;
+
   animation:
     revealUp
     0.65s
@@ -914,8 +955,15 @@
     both;
 }
 
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
 @keyframes heroEnter {
+
   from {
+
     opacity: 0;
 
     transform:
@@ -923,14 +971,20 @@
   }
 
   to {
+
     opacity: 1;
 
-    transform: none;
+    transform:
+      translateY(0);
   }
+
 }
 
+
 @keyframes revealUp {
+
   from {
+
     opacity: 0;
 
     transform:
@@ -938,145 +992,179 @@
   }
 
   to {
+
     opacity: 1;
 
-    transform: none;
+    transform:
+      translateY(0);
   }
+
 }
 
+
 /* =========================================================
-   TABLET
+   LAPTOP
 ========================================================= */
 
-@media (max-width: 1100px) {
+@media (min-width: 761px) and (max-width: 1200px) {
+
+  .home-page .container {
+
+    padding-left: 28px;
+
+    padding-right: 28px;
+  }
+
 
   .hero-full-inner {
+
     grid-template-columns:
       minmax(0, 1fr)
-      minmax(300px, 0.8fr);
+      minmax(280px, 0.75fr);
 
     gap: 30px;
   }
 
-  .hero-showcase {
-    min-height: 520px;
+
+  .hero-title {
+
+    font-size:
+      clamp(
+        3rem,
+        6vw,
+        5rem
+      );
   }
 
-  .hero-frame {
-    width: 32vw;
 
-    min-width: 280px;
+  /*
+    ART OF DRAPING - LAPTOP
+
+    Keep the women on the right.
+    Do not zoom so much that they are cut.
+  */
+
+  .editorial-home {
+
+    height: 500px;
+
+    min-height: 500px;
+
+    background-size: cover !important;
+
+    background-position:
+      65% center !important;
   }
+
+
+  .editorial-full-content {
+
+    padding:
+      0
+      5%;
+  }
+
+
+  .editorial-copy {
+
+    width: 47%;
+
+    max-width: 540px;
+  }
+
+
+  .editorial-copy h2 {
+
+    font-size:
+      clamp(
+        2.7rem,
+        5vw,
+        4.2rem
+      );
+  }
+
+
+  .editorial-copy p {
+
+    font-size: 15px;
+  }
+
 
   .features-grid {
+
     gap: 14px;
   }
 
-  .editorial-home-grid {
-    gap: 5vw;
-  }
-
-  .promo-banner-inner {
-    grid-template-columns:
-      1fr
-      300px;
-  }
 }
 
+
 /* =========================================================
-   MOBILE - MAIN
+   TABLET / MOBILE
 ========================================================= */
 
 @media (max-width: 760px) {
 
-  /* -------------------------------------------------------
-     GLOBAL
-  ------------------------------------------------------- */
-
   html,
   body,
   #root {
+
     width: 100%;
+
     max-width: 100%;
 
     overflow-x: hidden;
   }
+
 
   .home-page {
+
     width: 100%;
+
     max-width: 100%;
 
     overflow-x: hidden;
   }
 
+
   .home-page .container {
+
     width: 100%;
+
     max-width: 100%;
 
     margin: 0 auto;
 
-    padding-left: 14px;
-    padding-right: 14px;
+    padding:
+      0
+      14px;
   }
 
-  /* -------------------------------------------------------
-     HERO
-  ------------------------------------------------------- */
+
+  /* =====================================================
+     HERO MOBILE
+  ===================================================== */
 
   .hero-fullscreen {
-    width: 100%;
 
     min-height: auto;
+
     height: auto;
 
     display: block;
-
-    overflow: hidden;
   }
 
-  /* Keep background artwork */
-
-  .hero-art-bg {
-    display: block;
-
-    opacity: 0.18;
-  }
-
-  .hero-art-bg svg {
-    width: 100%;
-    height: 100%;
-
-    transform:
-      scale(1.15);
-  }
-
-  .hero-gradient {
-    background:
-      linear-gradient(
-        90deg,
-        rgba(30, 7, 15, 0.94) 0%,
-        rgba(45, 10, 25, 0.72) 45%,
-        rgba(45, 10, 25, 0.25) 100%
-      );
-  }
-
-  .hero-orb {
-    opacity: 0.1;
-  }
-
-  /* Main hero layout */
 
   .hero-full-inner {
+
     width: 100%;
 
     min-height: auto;
+
     height: auto;
 
     display: flex;
 
     flex-direction: column;
-
-    align-items: stretch;
 
     gap: 18px;
 
@@ -1086,89 +1174,17 @@
       42px;
   }
 
-  /* -------------------------------------------------------
-     MOBILE HERO IMAGE
-     
-     Horizontal banner.
-     Image itself is NOT changed.
-  ------------------------------------------------------- */
-
-  .hero-showcase {
-    order: -1;
-
-    width: 100%;
-
-    min-height: 0;
-
-    height: auto;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-  }
-
-  .hero-frame {
-    width: 100%;
-
-    min-width: 0;
-
-    max-width: 100%;
-
-    height: auto;
-
-    /*
-      Horizontal mobile banner
-    */
-
-    aspect-ratio: 16 / 8.5;
-
-    border-radius: 16px;
-
-    overflow: hidden;
-
-    box-shadow:
-      0 12px 35px
-      rgba(0, 0, 0, 0.3);
-  }
-
-  .hero-frame svg {
-    width: 100%;
-    height: 100%;
-
-    transform: none;
-  }
-
-  .hero-frame-glow {
-    display: none;
-  }
-
-  .hero-floating-note {
-    display: none;
-  }
-
-  .hero-scroll-badge {
-    display: none;
-  }
-
-  /* -------------------------------------------------------
-     HERO TEXT
-  ------------------------------------------------------- */
 
   .hero-copy {
+
     width: 100%;
 
     max-width: 100%;
-
-    animation:
-      heroEnter
-      0.7s
-      ease
-      both;
   }
 
+
   .hero-kicker {
+
     font-size: 0.58rem;
 
     letter-spacing: 0.10em;
@@ -1178,12 +1194,9 @@
     margin-bottom: 8px;
   }
 
-  .hero-kicker svg {
-    width: 11px;
-    height: 11px;
-  }
 
   .hero-overline {
+
     font-size: 0.52rem;
 
     letter-spacing: 0.20em;
@@ -1191,8 +1204,8 @@
     margin-bottom: 6px;
   }
 
+
   .hero-title {
-    width: 100%;
 
     font-size:
       clamp(
@@ -1203,18 +1216,11 @@
 
     line-height: 1.03;
 
-    letter-spacing: -0.025em;
-
-    margin:
-      0
-      0
-      11px;
+    margin-bottom: 11px;
   }
 
-  .hero-text {
-    width: 100%;
 
-    max-width: 100%;
+  .hero-text {
 
     font-size: 0.74rem;
 
@@ -1223,26 +1229,16 @@
     margin-bottom: 15px;
   }
 
-  /* Buttons */
 
   .hero-actions {
-    width: 100%;
-
-    display: flex;
-
-    align-items: center;
 
     gap: 9px;
 
     flex-wrap: nowrap;
   }
 
+
   .hero-primary {
-    flex: 0 1 auto;
-
-    width: auto;
-
-    min-width: 0;
 
     padding:
       10px
@@ -1253,35 +1249,16 @@
     white-space: nowrap;
   }
 
-  .hero-primary svg {
-    width: 13px;
-    height: 13px;
-  }
 
   .hero-text-button {
-    display: flex;
-
-    flex-shrink: 0;
 
     font-size: 0.58rem;
-
-    letter-spacing: 0.05em;
-
-    gap: 5px;
 
     white-space: nowrap;
   }
 
-  .hero-text-button span {
-    font-size: 1rem;
-  }
-
-  /* -------------------------------------------------------
-     HERO STATS
-  ------------------------------------------------------- */
 
   .hero-mini-stats {
-    width: 100%;
 
     display: grid;
 
@@ -1295,29 +1272,21 @@
     padding-top: 13px;
   }
 
-  .hero-mini-stats strong {
-    font-size: 0.92rem;
 
-    line-height: 1.1;
+  .hero-mini-stats strong {
+
+    font-size: 0.92rem;
   }
+
 
   .hero-mini-stats span {
+
     font-size: 0.42rem;
-
-    line-height: 1.2;
-
-    letter-spacing: 0.03em;
   }
 
-  .hero-bottom-hint {
-    display: none;
-  }
-
-  /* -------------------------------------------------------
-     HERO SLIDER
-  ------------------------------------------------------- */
 
   .hero-slider-controls {
+
     left: 50%;
 
     right: auto;
@@ -1334,572 +1303,308 @@
       8px;
   }
 
+
   .hero-slider-arrow {
+
     width: 25px;
+
     height: 25px;
   }
 
-  .hero-slider-arrow svg {
-    width: 13px;
-    height: 13px;
-  }
 
-  .hero-slider-dots {
-    gap: 5px;
-  }
+  /* =====================================================
+     CATEGORY MOBILE
+  ===================================================== */
 
-  .hero-slider-dot {
-    width: 5px;
-    height: 5px;
-  }
+  .home-section-soft {
 
-  .hero-slider-dot.active {
-    width: 15px;
-  }
-
-  /* =======================================================
-     FEATURES
-     
-     SMALL 4 CARDS IN ONE ROW
-  ======================================================= */
-
-  .features-section {
-    width: 100%;
-
-    padding:
-      12px
-      7px
-      20px;
-
-    overflow: hidden;
-  }
-
-  .features-section .container {
-    width: 100%;
-
-    padding: 0;
-
-    margin: 0;
-  }
-
-  .features-grid {
-    width: 100%;
-
-    display: grid;
-
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-
-    gap: 4px;
-
-    padding: 0;
-    margin: 0;
-  }
-
-  .features-grid > .reveal {
-    width: 100%;
-
-    min-width: 0;
-  }
-
-  /* Feature card */
-
-  .features-grid .feature-card {
-    width: 100%;
-
-    min-width: 0;
-
-    height: 96px;
-
-    min-height: 96px;
-
-    padding:
-      7px
-      2px;
-
-    margin: 0;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: flex-start;
-
-    gap: 4px;
-
-    text-align: center;
-
-    border-radius: 7px;
-
-    overflow: hidden;
-  }
-
-  /* Correct FeatureCard icon class */
-
-  .features-grid .feature-card .feature-card-icon {
-    width: 27px;
-
-    height: 27px;
-
-    min-width: 27px;
-    min-height: 27px;
-
-    flex-shrink: 0;
-
-    margin: 0;
-  }
-
-  .features-grid .feature-card .feature-card-icon svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  /* Correct FeatureCard title */
-
-  .features-grid .feature-card .feature-card-title {
-    width: 100%;
-
-    min-width: 0;
-
-    margin: 0;
-
-    padding: 0;
-
-    font-size: 0.49rem;
-
-    line-height: 1.1;
-
-    font-weight: 700;
-
-    text-align: center;
-
-    white-space: normal;
-
-    word-break: normal;
-
-    overflow-wrap: normal;
-  }
-
-  /* Correct FeatureCard description */
-
-  .features-grid .feature-card .feature-card-text {
-    width: 100%;
-
-    min-width: 0;
-
-    margin: 0;
-
-    padding: 0;
-
-    font-size: 0.39rem;
-
-    line-height: 1.15;
-
-    text-align: center;
-
-    white-space: normal;
-
-    word-break: normal;
-
-    overflow-wrap: normal;
-  }
-
-  /* =======================================================
-     COMMON SECTIONS
-  ======================================================= */
-
-  .section {
     padding:
       34px
       0;
   }
 
-  .section-header {
-    width: 100%;
-
-    margin-bottom: 15px;
-
-    gap: 10px;
-
-    align-items: flex-end;
-  }
-
-  .eyebrow {
-    font-size: 0.53rem;
-
-    letter-spacing: 0.11em;
-  }
-
-  .section-title {
-    font-size: 1.4rem;
-
-    line-height: 1.08;
-  }
-
-  .section-link {
-    font-size: 0.6rem;
-
-    gap: 3px;
-  }
-
-  .section-link svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  /* =======================================================
-     CATEGORY
-     
-     4 ITEMS VISIBLE, ROUNDED-SQUARE THUMBNAILS
-     HORIZONTAL SLIDING
-  ======================================================= */
-
-  .home-section-soft {
-    width: 100%;
-
-    overflow: hidden;
-
-    background: #fffdf9;
-  }
-
-  .home-section-soft .container {
-    width: 100%;
-
-    max-width: 100%;
-
-    padding-left: 12px;
-    padding-right: 12px;
-  }
 
   .category-scroller {
-    width: 100%;
-
-    display: flex;
 
     gap: 10px;
-
-    overflow-x: auto;
-
-    overflow-y: hidden;
 
     padding:
       4px
       0
       12px;
-
-    margin: 0;
-
-    scroll-snap-type:
-      x mandatory;
-
-    scrollbar-width: none;
-
-    -webkit-overflow-scrolling: touch;
   }
 
-  .category-scroller::-webkit-scrollbar {
+
+  .category-scroller > * {
+
+    flex:
+      0 0
+      calc((100% - 30px) / 4);
+
+    width:
+      calc((100% - 30px) / 4);
+
+    min-width:
+      calc((100% - 30px) / 4);
+  }
+
+
+  .home-section-soft
+  .scroller-arrow {
+
     display: none;
   }
 
-  /*
-    4 categories visible on screen.
 
-    12px left/right container
-    + three 10px gaps
-    = remaining width divided by 4.
-  */
+  /* =====================================================
+     ART OF DRAPING MOBILE
+  ===================================================== */
 
-  .category-scroller > * {
-    flex: 0 0 calc((100% - 30px) / 4);
-    width: calc((100% - 30px) / 4);
-    min-width: calc((100% - 30px) / 4);
-    max-width: calc((100% - 30px) / 4);
+  .editorial-home {
 
-    scroll-snap-align: start;
-
-    margin: 0;
-  }
-
-  /* Category card */
-
-  .category-scroller .category-card {
     width: 100%;
 
-    min-width: 0;
+    height: 430px;
 
-    max-width: 100%;
+    min-height: 430px;
 
-    display: flex;
+    /*
+      Important:
+      On mobile the image should fill the whole section.
+    */
 
-    flex-direction: column;
+    background-size: cover !important;
+
+    background-position:
+      65% center !important;
+
+    background-repeat: no-repeat !important;
+  }
+
+
+  .editorial-image-overlay {
+
+    background:
+      linear-gradient(
+        90deg,
+
+        rgba(255, 249, 243, 0.78) 0%,
+
+        rgba(255, 249, 243, 0.50) 35%,
+
+        rgba(255, 249, 243, 0.18) 65%,
+
+        rgba(255, 249, 243, 0) 100%
+      );
+  }
+
+
+  .editorial-full-content {
+
+    width: 100%;
+
+    height: 100%;
+
+    padding:
+      0
+      20px;
 
     align-items: center;
 
-    gap: 7px;
-
-    margin: 0;
+    justify-content: flex-start;
   }
 
-  /*
-    Rounded square thumbnail (matches reference design) —
-    NOT a circle.
-  */
-
-  .category-scroller .category-card-image {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 1 / 1 !important;
-    border-radius: 14px !important;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-
-  .category-scroller
-  .category-card-image img {
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-
-    display: block;
-  }
-
-  /* Category name */
-
-  .category-scroller .category-card-name {
-    width: 100%;
-
-    min-height: 25px;
-
-    margin: 0;
-
-    padding: 0;
-
-    font-size: 0.58rem;
-
-    line-height: 1.15;
-
-    text-align: center;
-
-    white-space: normal;
-
-    overflow-wrap: normal;
-
-    word-break: normal;
-  }
-
-  /* Hide desktop arrows */
-
-  .home-section-soft .scroller-arrow {
-    display: none !important;
-  }
-
-  /* =======================================================
-     FEATURED PRODUCTS
-     
-     HORIZONTAL SCROLL
-  ======================================================= */
-
-  .featured-section {
-    width: 100%;
-
-    overflow: hidden;
-  }
-
-  .product-scroller {
-    width: 100%;
-
-    display: flex;
-
-    gap: 10px;
-
-    overflow-x: auto;
-
-    overflow-y: hidden;
-
-    padding:
-      4px
-      0
-      12px;
-
-    scroll-snap-type:
-      x proximity;
-
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .product-scroller-item {
-    flex:
-      0 0
-      185px;
-
-    width: 185px;
-
-    min-width: 185px;
-
-    scroll-snap-align: start;
-  }
-
-  /* =======================================================
-     EDITORIAL
-  ======================================================= */
-
-  .editorial-home {
-    width: 100%;
-
-    padding:
-      40px
-      0;
-
-    overflow: hidden;
-  }
-
-  .editorial-home-grid {
-    width: 100%;
-
-    display: grid;
-
-    grid-template-columns: 1fr;
-
-    gap: 22px;
-  }
-
-  .editorial-art {
-    width: 100%;
-
-    aspect-ratio: 16 / 10;
-
-    border-radius:
-      18px
-      60px
-      18px
-      60px;
-  }
-
-  .editorial-art svg {
-    width: 100%;
-    height: 100%;
-
-    transform: none;
-  }
 
   .editorial-copy {
-    width: 100%;
 
-    max-width: 100%;
+    width: 55%;
+
+    max-width: 55%;
   }
 
+
+  .editorial-copy .eyebrow {
+
+    font-size: 8px;
+
+    margin-bottom: 8px;
+  }
+
+
   .editorial-copy h2 {
-    font-size: 2.1rem;
+
+    font-size: 28px;
 
     line-height: 1.05;
 
-    margin:
-      8px
-      0
-      12px;
+    margin-bottom: 12px;
   }
+
 
   .editorial-copy p {
-    width: 100%;
 
-    max-width: 100%;
+    font-size: 10px;
 
-    font-size: 0.78rem;
+    line-height: 1.45;
 
-    line-height: 1.5;
-
-    margin-bottom: 18px;
+    margin-bottom: 15px;
   }
 
-  .editorial-copy .btn {
-    padding:
-      10px
-      14px;
 
-    font-size: 0.61rem;
-  }
+  .editorial-story-button {
 
-  /* =======================================================
-     FESTIVE / PROMO
-  ======================================================= */
-
-  .promo-banner {
-    width: 100%;
-
-    overflow: hidden;
-  }
-
-  .promo-banner-inner {
-    width: 100%;
-
-    min-height: auto;
-
-    display: grid;
-
-    grid-template-columns: 1fr;
-
-    gap: 0;
+    min-height: 34px;
 
     padding:
-      38px
-      14px;
-  }
-
-  .promo-banner-inner h2 {
-    font-size: 1.9rem;
-
-    line-height: 1.08;
-
-    margin:
-      8px
       0
       12px;
+
+    font-size: 8px;
   }
 
-  .promo-banner-inner p {
-    max-width: 100%;
 
-    font-size: 0.78rem;
+  .editorial-story-button svg {
 
-    line-height: 1.5;
+    width: 11px;
 
-    margin-bottom: 18px;
+    height: 11px;
   }
 
-  .promo-banner-inner .btn {
+
+  /* =====================================================
+     FESTIVE MOBILE
+  ===================================================== */
+
+  .festive-section-bg {
+
     padding:
-      10px
-      14px;
-
-    font-size: 0.61rem;
+      34px
+      0;
   }
 
-  .promo-art {
-    display: none;
+
+  .festive-horizontal-card {
+
+    min-height: 400px;
+
+    border-radius: 18px;
   }
+
+
+  .festive-horizontal-content {
+
+    width: 70%;
+
+    padding:
+      30px
+      20px;
+  }
+
+
+  .festive-horizontal-content h2 {
+
+    font-size: 2rem;
+  }
+
+
+  .festive-horizontal-content p {
+
+    font-size: 0.75rem;
+  }
+
+
+  /* =====================================================
+     FEATURES MOBILE
+  ===================================================== */
+
+  .features-section {
+
+    padding:
+      20px
+      6px
+      25px;
+  }
+
+
+  .features-grid {
+
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap: 4px;
+  }
+
+
+  .features-grid .feature-card {
+
+    height: 88px;
+
+    min-height: 88px;
+
+    padding:
+      6px
+      3px;
+
+    gap: 4px;
+
+    border-radius: 8px;
+  }
+
+
+  .features-grid
+  .feature-card-icon {
+
+    width: 26px;
+
+    height: 26px;
+  }
+
+
+  .features-grid
+  .feature-card-icon svg {
+
+    width: 13px;
+
+    height: 13px;
+  }
+
+
+  .features-grid
+  .feature-card-title {
+
+    font-size: 0.47rem;
+
+    line-height: 1.1;
+  }
+
+
+  .features-grid
+  .feature-card-text {
+
+    font-size: 0.36rem;
+
+    line-height: 1.15;
+  }
+
 }
 
+
 /* =========================================================
-   SMALL PHONES
-   480px AND BELOW
+   SMALL PHONE
 ========================================================= */
 
 @media (max-width: 480px) {
 
   .home-page .container {
+
     padding-left: 10px;
+
     padding-right: 10px;
   }
 
-  /* -------------------------------------------------------
-     HERO
-  ------------------------------------------------------- */
 
   .hero-full-inner {
+
     padding:
       12px
       10px
@@ -1908,41 +1613,21 @@
     gap: 15px;
   }
 
-  .hero-frame {
-    aspect-ratio: 16 / 8.2;
-
-    border-radius: 14px;
-  }
-
-  .hero-kicker {
-    font-size: 0.53rem;
-
-    margin-bottom: 7px;
-  }
-
-  .hero-overline {
-    font-size: 0.48rem;
-
-    margin-bottom: 5px;
-  }
 
   .hero-title {
+
     font-size: 2rem;
-
-    line-height: 1.02;
-
-    margin-bottom: 9px;
   }
+
 
   .hero-text {
+
     font-size: 0.68rem;
-
-    line-height: 1.45;
-
-    margin-bottom: 13px;
   }
 
+
   .hero-primary {
+
     padding:
       9px
       11px;
@@ -1950,196 +1635,171 @@
     font-size: 0.58rem;
   }
 
+
   .hero-text-button {
+
     font-size: 0.55rem;
   }
 
-  .hero-mini-stats {
-    gap: 5px;
-
-    margin-top: 18px;
-
-    padding-top: 12px;
-  }
 
   .hero-mini-stats strong {
+
     font-size: 0.86rem;
   }
 
+
   .hero-mini-stats span {
+
     font-size: 0.39rem;
   }
 
-  /* -------------------------------------------------------
-     FEATURES
-     
-     SMALLER
-  ------------------------------------------------------- */
 
-  .features-section {
+  /* =====================================================
+     ART OF DRAPING SMALL PHONE
+  ===================================================== */
+
+  .editorial-home {
+
+    height: 390px;
+
+    min-height: 390px;
+
+    background-size: cover !important;
+
+    background-position:
+      67% center !important;
+  }
+
+
+  .editorial-full-content {
+
     padding:
-      10px
-      6px
+      0
+      16px;
+  }
+
+
+  .editorial-copy {
+
+    width: 56%;
+
+    max-width: 56%;
+  }
+
+
+  .editorial-copy .eyebrow {
+
+    font-size: 7px;
+
+    margin-bottom: 6px;
+  }
+
+
+  .editorial-copy h2 {
+
+    font-size: 23px;
+
+    margin-bottom: 9px;
+  }
+
+
+  .editorial-copy p {
+
+    font-size: 9px;
+
+    line-height: 1.4;
+
+    margin-bottom: 11px;
+  }
+
+
+  .editorial-story-button {
+
+    min-height: 31px;
+
+    padding:
+      0
+      9px;
+
+    font-size: 7px;
+  }
+
+
+  .editorial-story-button svg {
+
+    width: 9px;
+
+    height: 9px;
+  }
+
+
+  /* FESTIVE */
+
+  .festive-horizontal-content {
+
+    width: 75%;
+
+    padding:
+      25px
       18px;
   }
 
-  .features-grid {
-    gap: 3px;
-  }
 
-  .features-grid .feature-card {
-    height: 88px;
+  .festive-horizontal-content h2 {
 
-    min-height: 88px;
-
-    padding:
-      6px
-      2px;
-
-    gap: 3px;
-
-    border-radius: 6px;
-  }
-
-  .features-grid .feature-card .feature-card-icon {
-    width: 25px;
-    height: 25px;
-
-    min-width: 25px;
-    min-height: 25px;
-  }
-
-  .features-grid
-  .feature-card
-  .feature-card-icon svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .features-grid
-  .feature-card
-  .feature-card-title {
-    font-size: 0.45rem;
-
-    line-height: 1.08;
-  }
-
-  .features-grid
-  .feature-card
-  .feature-card-text {
-    font-size: 0.36rem;
-
-    line-height: 1.12;
-  }
-
-  /* -------------------------------------------------------
-     CATEGORY
-     
-     STILL 4 ON SCREEN
-  ------------------------------------------------------- */
-
-  .home-section-soft .container {
-    padding-left: 9px;
-    padding-right: 9px;
-  }
-
-  .category-scroller {
-    gap: 8px;
-
-    padding:
-      4px
-      0
-      10px;
-  }
-
-  .category-scroller > * {
-    flex-basis: calc((100% - 24px) / 4);
-    width: calc((100% - 24px) / 4);
-    min-width: calc((100% - 24px) / 4);
-    max-width: calc((100% - 24px) / 4);
-  }
-
-  .category-scroller .category-card {
-    gap: 5px;
-  }
-
-  .category-scroller
-  .category-card-name {
-    font-size: 0.53rem;
-
-    line-height: 1.1;
-  }
-
-  /* -------------------------------------------------------
-     PRODUCTS
-  ------------------------------------------------------- */
-
-  .product-scroller-item {
-    width: 172px;
-
-    min-width: 172px;
-  }
-
-  /* -------------------------------------------------------
-     EDITORIAL
-  ------------------------------------------------------- */
-
-  .editorial-home {
-    padding:
-      34px
-      0;
-  }
-
-  .editorial-home-grid {
-    gap: 18px;
-  }
-
-  .editorial-art {
-    aspect-ratio: 16 / 10;
-  }
-
-  .editorial-copy h2 {
-    font-size: 1.9rem;
-  }
-
-  .editorial-copy p {
-    font-size: 0.73rem;
-  }
-
-  /* -------------------------------------------------------
-     PROMO
-  ------------------------------------------------------- */
-
-  .promo-banner-inner {
-    padding:
-      32px
-      12px;
-  }
-
-  .promo-banner-inner h2 {
     font-size: 1.7rem;
   }
 
-  .promo-banner-inner p {
-    font-size: 0.71rem;
+
+  /* FEATURES */
+
+  .features-section {
+
+    padding:
+      18px
+      5px
+      22px;
   }
+
+
+  .features-grid {
+
+    gap: 3px;
+  }
+
+
+  .features-grid .feature-card {
+
+    height: 84px;
+
+    min-height: 84px;
+
+    padding:
+      5px
+      2px;
+
+    gap: 3px;
+  }
+
 }
 
+
 /* =========================================================
-   VERY SMALL PHONES
-   360px AND BELOW
+   VERY SMALL PHONE
 ========================================================= */
 
 @media (max-width: 360px) {
 
   .home-page .container {
+
     padding-left: 8px;
+
     padding-right: 8px;
   }
 
-  /* HERO */
 
   .hero-full-inner {
+
     padding:
       10px
       8px
@@ -2148,19 +1808,21 @@
     gap: 13px;
   }
 
-  .hero-frame {
-    aspect-ratio: 16 / 8;
-  }
 
   .hero-title {
+
     font-size: 1.8rem;
   }
 
+
   .hero-text {
+
     font-size: 0.63rem;
   }
 
+
   .hero-primary {
+
     font-size: 0.53rem;
 
     padding:
@@ -2168,130 +1830,68 @@
       9px;
   }
 
+
   .hero-text-button {
+
     font-size: 0.50rem;
   }
 
+
   .hero-mini-stats strong {
+
     font-size: 0.78rem;
   }
 
+
   .hero-mini-stats span {
+
     font-size: 0.35rem;
   }
 
-  /* FEATURES */
 
-  .features-section {
-    padding-left: 5px;
-    padding-right: 5px;
+  .editorial-home {
+
+    height: 360px;
+
+    min-height: 360px;
+
+    background-position:
+      68% center !important;
   }
 
-  .features-grid {
-    gap: 3px;
+
+  .editorial-copy {
+
+    width: 58%;
+
+    max-width: 58%;
   }
+
+
+  .editorial-copy h2 {
+
+    font-size: 20px;
+  }
+
+
+  .editorial-copy p {
+
+    font-size: 8px;
+  }
+
 
   .features-grid .feature-card {
+
     height: 84px;
 
     min-height: 84px;
-
-    padding:
-      5px
-      1px;
-
-    border-radius: 6px;
   }
 
-  .features-grid
-  .feature-card
-  .feature-card-icon {
-    width: 23px;
-    height: 23px;
-
-    min-width: 23px;
-    min-height: 23px;
-  }
-
-  .features-grid
-  .feature-card
-  .feature-card-icon svg {
-    width: 11px;
-    height: 11px;
-  }
-
-  .features-grid
-  .feature-card
-  .feature-card-title {
-    font-size: 0.42rem;
-  }
-
-  .features-grid
-  .feature-card
-  .feature-card-text {
-    font-size: 0.34rem;
-  }
-
-  /* CATEGORY */
-
-  .home-section-soft .container {
-    padding-left: 7px;
-    padding-right: 7px;
-  }
-
-  .category-scroller {
-    gap: 7px;
-  }
-
-  .category-scroller > * {
-    flex-basis: calc((100% - 21px) / 4);
-    width: calc((100% - 21px) / 4);
-    min-width: calc((100% - 21px) / 4);
-    max-width: calc((100% - 21px) / 4);
-  }
-
-  .category-scroller
-  .category-card-name {
-    font-size: 0.48rem;
-
-    line-height: 1.05;
-  }
-
-  /* PRODUCTS */
-
-  .product-scroller-item {
-    width: 160px;
-
-    min-width: 160px;
-  }
-
-  /* EDITORIAL */
-
-  .editorial-home {
-    padding:
-      30px
-      0;
-  }
-
-  .editorial-copy h2 {
-    font-size: 1.7rem;
-  }
-
-  /* PROMO */
-
-  .promo-banner-inner {
-    padding:
-      28px
-      10px;
-  }
-
-  .promo-banner-inner h2 {
-    font-size: 1.5rem;
-  }
 }
 
+
 /* =========================================================
-   REDUCE MOTION
+   REDUCED MOTION
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -2299,6 +1899,7 @@
   .home-page *,
   .home-page *::before,
   .home-page *::after {
+
     animation-duration:
       0.01ms !important;
 
@@ -2307,154 +1908,23 @@
 
     transition-duration:
       0.01ms !important;
-
-    scroll-behavior:
-      auto !important;
   }
+
 }
-
-/* =========================================================
-   SARIKA FASHIONS
-   FEATURE CARDS - FINAL POSITION & RESPONSIVE LAYOUT
-   ========================================================= */
-
-/*
-   The feature section has been moved in Home.jsx
-   so it naturally appears immediately before the footer.
-
-   Desktop:
-   4 cards in one row.
-
-   Mobile:
-   4 compact cards in one row.
-
-   This does NOT affect the hero, category images,
-   editorial section or festive section.
-*/
-
-/* =========================================================
-   DESKTOP / LAPTOP
-   ========================================================= */
-
-.features-section {
+.editorial-home {
+  position: relative;
   width: 100%;
-  background: var(--color-cream);
-  padding-top: 42px;
-  padding-bottom: 42px;
-}
+  height: 560px;
+  min-height: 560px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 
-.features-section .features-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.features-section .features-grid > .reveal {
-  width: 100%;
-  min-width: 0;
-}
-
-.features-section .feature-card {
-  width: 100%;
-}
-
-
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 480px) {
-
-  .features-section {
-    padding: 20px 6px 25px;
-  }
-
-  .features-section .features-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 4px !important;
-  }
-
-  .features-section .feature-card {
-    height: 88px;
-    min-height: 88px;
-
-    padding: 6px 3px;
-
-    gap: 4px;
-
-    border-radius: 8px;
-  }
-
-  .features-section .feature-card-icon {
-    width: 26px;
-    height: 26px;
-
-    min-width: 26px;
-    min-height: 26px;
-  }
-
-  .features-section .feature-card-icon svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  .features-section .feature-card-title {
-    font-size: 0.47rem;
-    line-height: 1.1;
-  }
-
-  .features-section .feature-card-text {
-    font-size: 0.36rem;
-    line-height: 1.15;
-  }
-}
-
-
-/* =========================================================
-   VERY SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 360px) {
-
-  .features-section {
-    padding: 18px 5px 22px;
-  }
-
-  .features-section .features-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 3px !important;
-  }
-
-  .features-section .feature-card {
-    height: 84px;
-    min-height: 84px;
-
-    padding: 5px 2px;
-
-    gap: 3px;
-
-    border-radius: 7px;
-  }
-
-  .features-section .feature-card-icon {
-    width: 24px;
-    height: 24px;
-
-    min-width: 24px;
-    min-height: 24px;
-  }
-
-  .features-section .feature-card-icon svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .features-section .feature-card-title {
-    font-size: 0.43rem;
-  }
-
-  .features-section .feature-card-text {
-    font-size: 0.33rem;
-  }
+  /* Change background-position to right center or 90% center */
+  background-size: cover !important;
+  background-position: right center !important;
+  background-repeat: no-repeat !important;
+  background-color: #f8f0e6;
+  isolation: isolate;
 }
