@@ -1,4 +1,3 @@
-import SarikaLoader from '../components/Loader.jsx'
 import React, { useEffect, useState } from 'react'
 import {
   Package,
@@ -23,10 +22,6 @@ import {
 import { Link } from 'react-router-dom'
 import './MyOrders.css'
 
-// ============================================================
-// API CONFIG
-// ============================================================
-
 const isLocalhost =
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1'
@@ -38,37 +33,81 @@ const API_BASE =
     ? 'http://localhost:5000/api'
     : 'https://sarika-fashions-backend-rfwh.onrender.com/api')
 
-// ============================================================
-// CUSTOMER STORAGE
-// ============================================================
-
 const CUSTOMER_TOKEN_KEY = 'sarika_customer_order_token'
 const CUSTOMER_PHONE_KEY = 'sarika_customer_phone'
+const RETURN_REQUESTS_KEY = 'sarika_return_requests'
 
-function getCustomerOrderToken() {
-  try {
-    return localStorage.getItem(CUSTOMER_TOKEN_KEY)
-  } catch (error) {
-    return null
-  }
+const RETURN_REASONS = [
+  'Damaged / defective item',
+  'Wrong item received',
+  'Item does not match description',
+  'Color / design is different',
+  'Quality issue',
+  'Size / fit issue',
+  'Received a different product',
+  'Changed my mind',
+  'Other',
+]
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const getCustomerOrderToken = () => {
+  return (
+    localStorage.getItem(CUSTOMER_TOKEN_KEY) ||
+    localStorage.getItem('customer_order_token') ||
+    ''
+  )
 }
 
-function getCustomerOrderHeaders() {
+const getCustomerPhone = () => {
+  return (
+    localStorage.getItem(CUSTOMER_PHONE_KEY) ||
+    localStorage.getItem('customer_phone') ||
+    ''
+  )
+}
+
+const getCustomerOrderHeaders = () => {
   const token = getCustomerOrderToken()
-  return {
-    Accept: 'application/json',
-    ...(token ? { 'X-Customer-Order-Token': token } : {}),
+
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+      }
+    : {}
+}
+
+const getStoredReturnRequests = () => {
+  try {
+    const stored = localStorage.getItem(RETURN_REQUESTS_KEY)
+
+    if (!stored) return []
+
+    const parsed = JSON.parse(stored)
+
+    return Array.isArray(parsed) ? parsed : []
+  } catch (error) {
+    console.error('Failed to read return requests:', error)
+    return []
   }
 }
 
-// ============================================================
-// HELPERS
-// ============================================================
+const saveStoredReturnRequests = (requests) => {
+  localStorage.setItem(
+    RETURN_REQUESTS_KEY,
+    JSON.stringify(requests)
+  )
+}
 
-function formatDate(value) {
-  if (!value) return 'Date unavailable'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
+const formatDate = (dateValue) => {
+  if (!dateValue) return '—'
+
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) return '—'
+
   return date.toLocaleDateString('en-IN', {
     day: '2-digit',
     month: 'short',
@@ -76,106 +115,285 @@ function formatDate(value) {
   })
 }
 
-function formatTime(value) {
-  if (!value) return ''
-  const date = new Date(value)
+const formatTime = (dateValue) => {
+  if (!dateValue) return ''
+
+  const date = new Date(dateValue)
+
   if (Number.isNaN(date.getTime())) return ''
+
   return date.toLocaleTimeString('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
   })
 }
 
-function money(value) {
-  const number = Number(value || 0)
-  return `₹${number.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
+const money = (value) => {
+  const amount = Number(value || 0)
+
+  return `₹${amount.toLocaleString('en-IN', {
+    maximumFractionDigits: 2,
+  })}`
 }
 
-function getOrderStatus(order) {
-  return order?.order_status || order?.status || 'Placed'
-}
-
-function getPaymentStatus(order) {
-  return order?.payment_status || 'Pending'
-}
-
-function getItemName(item) {
-  return item?.name || item?.product_name || item?.title || 'Saree'
-}
-
-function getItemPrice(item) {
-  return Number(item?.price ?? item?.unit_price ?? item?.product_price ?? 0)
-}
-
-function getItemQuantity(item) {
-  return Number(item?.quantity ?? item?.qty ?? 1)
-}
-
-function getItemImage(item) {
-  return item?.image || item?.image_url || item?.product_image || item?.image2 || ''
-}
-
-function isReceived(order) {
+const getOrderId = (order) => {
   return (
-    order?.customer_received === true ||
-    order?.customer_received === 1 ||
-    Number(order?.customer_received) === 1
+    order?.id ||
+    order?._id ||
+    order?.order_id ||
+    order?.orderId ||
+    ''
   )
 }
 
-function getStatusClass(status) {
-  const value = String(status || '').toLowerCase()
-  if (value.includes('cancel') || value.includes('fail')) return 'status-cancelled'
-  if (value.includes('closed') || value.includes('deliver')) return 'status-delivered'
-  if (value.includes('ship') || value.includes('out')) return 'status-shipped'
-  if (value.includes('process') || value.includes('confirm')) return 'status-processing'
-  return 'status-placed'
+const getOrderNumber = (order) => {
+  return (
+    order?.order_number ||
+    order?.orderNumber ||
+    order?.order_no ||
+    order?.orderNo ||
+    order?.id ||
+    order?._id ||
+    'Order'
+  )
 }
 
-function getTrackingStep(status) {
+const getOrderDate = (order) => {
+  return (
+    order?.created_at ||
+    order?.createdAt ||
+    order?.order_date ||
+    order?.orderDate ||
+    order?.date ||
+    ''
+  )
+}
+
+const getOrderStatus = (order) => {
+  return String(
+    order?.status ||
+      order?.order_status ||
+      order?.orderStatus ||
+      'Pending'
+  )
+}
+
+const getPaymentStatus = (order) => {
+  return String(
+    order?.payment_status ||
+      order?.paymentStatus ||
+      order?.payment?.status ||
+      'Pending'
+  )
+}
+
+const getItemName = (item) => {
+  return (
+    item?.product_name ||
+    item?.productName ||
+    item?.name ||
+    item?.title ||
+    item?.product?.name ||
+    'Saree'
+  )
+}
+
+const getItemPrice = (item) => {
+  return Number(
+    item?.price ??
+      item?.unit_price ??
+      item?.unitPrice ??
+      item?.product?.price ??
+      0
+  )
+}
+
+const getItemQuantity = (item) => {
+  return Number(
+    item?.quantity ??
+      item?.qty ??
+      1
+  )
+}
+
+const getItemImage = (item) => {
+  return (
+    item?.image_url ||
+    item?.imageUrl ||
+    item?.image ||
+    item?.product_image ||
+    item?.productImage ||
+    item?.product?.image_url ||
+    item?.product?.image ||
+    ''
+  )
+}
+
+const getOrderItems = (order) => {
+  const items =
+    order?.items ||
+    order?.order_items ||
+    order?.orderItems ||
+    order?.products ||
+    []
+
+  return Array.isArray(items) ? items : []
+}
+
+const isReceived = (order) => {
+  const status = getOrderStatus(order).toLowerCase()
+
+  return (
+    status.includes('deliver') ||
+    status.includes('completed') ||
+    status.includes('closed') ||
+    order?.delivered === true ||
+    order?.is_delivered === true ||
+    order?.isDelivered === true
+  )
+}
+
+const isOrderDelivered = (order) => {
+  return isReceived(order)
+}
+
+const getStatusClass = (status) => {
   const value = String(status || '').toLowerCase()
-  if (value.includes('cancel')) return -1
-  if (value.includes('closed') || value.includes('deliver')) return 4
-  if (value.includes('out')) return 3
-  if (value.includes('ship')) return 2
-  if (value.includes('process') || value.includes('confirm')) return 1
+
+  if (
+    value.includes('deliver') ||
+    value.includes('complete') ||
+    value.includes('success')
+  ) {
+    return 'status-delivered'
+  }
+
+  if (
+    value.includes('cancel') ||
+    value.includes('reject')
+  ) {
+    return 'status-cancelled'
+  }
+
+  if (
+    value.includes('ship') ||
+    value.includes('process')
+  ) {
+    return 'status-processing'
+  }
+
+  return 'status-pending'
+}
+
+const getTrackingStep = (order) => {
+  const status = getOrderStatus(order).toLowerCase()
+
+  if (
+    status.includes('cancel') ||
+    status.includes('reject')
+  ) {
+    return -1
+  }
+
+  if (
+    status.includes('deliver') ||
+    status.includes('complete')
+  ) {
+    return 4
+  }
+
+  if (status.includes('ship')) {
+    return 3
+  }
+
+  if (
+    status.includes('process') ||
+    status.includes('packed')
+  ) {
+    return 2
+  }
+
+  if (
+    status.includes('confirm') ||
+    status.includes('accept')
+  ) {
+    return 1
+  }
+
   return 0
 }
 
-function getReturnStatusClass(status) {
+const getReturnStatusClass = (status) => {
   const value = String(status || '').toLowerCase()
-  if (value.includes('refund') || value.includes('complete')) return 'return-status-success'
-  if (value.includes('reject') || value.includes('cancel')) return 'return-status-rejected'
-  if (value.includes('approve') || value.includes('received')) return 'return-status-approved'
-  return 'return-status-pending'
+
+  if (value === 'approved') return 'return-approved'
+  if (value === 'rejected') return 'return-rejected'
+
+  return 'return-pending'
 }
 
-function getOrderTotals(order) {
-  const total = Number(order?.total_amount ?? order?.total ?? order?.amount ?? 0)
-  const shipping = Number(order?.shipping ?? 0)
-  const subtotal =
-    order?.subtotal !== null && order?.subtotal !== undefined
-      ? Number(order.subtotal)
-      : Math.max(total - shipping, 0)
+const getOrderTotals = (order) => {
+  const items = getOrderItems(order)
 
-  return { subtotal, shipping, total }
+  const calculatedSubtotal = items.reduce((total, item) => {
+    return total + getItemPrice(item) * getItemQuantity(item)
+  }, 0)
+
+  const subtotal = Number(
+    order?.subtotal ??
+      order?.sub_total ??
+      order?.subTotal ??
+      calculatedSubtotal
+  )
+
+  const shipping = Number(
+    order?.shipping ??
+      order?.shipping_fee ??
+      order?.shippingFee ??
+      0
+  )
+
+  const tax = Number(
+    order?.tax ??
+      order?.gst ??
+      0
+  )
+
+  const discount = Number(
+    order?.discount ??
+      0
+  )
+
+  const total = Number(
+    order?.total ??
+      order?.grand_total ??
+      order?.grandTotal ??
+      subtotal + shipping + tax - discount
+  )
+
+  return {
+    subtotal,
+    shipping,
+    tax,
+    discount,
+    total,
+  }
 }
 
-// ============================================================
-// TRACKING TIMELINE
-// ============================================================
+/* =========================================================
+   TRACKING
+========================================================= */
 
-function TrackingTimeline({ order }) {
-  const status = getOrderStatus(order)
-  const currentStep = getTrackingStep(status)
+const TrackingTimeline = ({ order }) => {
+  const currentStep = getTrackingStep(order)
 
   if (currentStep === -1) {
     return (
       <div className="tracking-cancelled">
-        <XCircle size={22} />
+        <XCircle size={20} />
         <div>
           <strong>Order Cancelled</strong>
-          <span>This order is no longer being processed.</span>
+          <span>This order has been cancelled.</span>
         </div>
       </div>
     )
@@ -183,29 +401,24 @@ function TrackingTimeline({ order }) {
 
   const steps = [
     {
-      title: 'Order Placed',
-      description: order?.created_at ? formatDate(order.created_at) : 'Order received',
+      label: 'Order Placed',
+      icon: ShoppingBag,
+    },
+    {
+      label: 'Confirmed',
+      icon: CheckCircle2,
+    },
+    {
+      label: 'Processing',
       icon: Package,
     },
     {
-      title: 'Order Confirmed',
-      description: order?.confirmed_at ? formatDate(order.confirmed_at) : 'Being prepared',
-      icon: Clock3,
-    },
-    {
-      title: 'Shipped',
-      description: order?.shipped_at ? formatDate(order.shipped_at) : 'Package on the way',
+      label: 'Shipped',
       icon: Truck,
     },
     {
-      title: 'Out for Delivery',
-      description: order?.out_for_delivery_at ? formatDate(order.out_for_delivery_at) : 'Arriving soon',
+      label: 'Delivered',
       icon: MapPin,
-    },
-    {
-      title: 'Delivered',
-      description: order?.delivered_at ? formatDate(order.delivered_at) : 'Order delivered',
-      icon: CheckCircle2,
     },
   ]
 
@@ -213,79 +426,159 @@ function TrackingTimeline({ order }) {
     <div className="tracking-timeline">
       {steps.map((step, index) => {
         const Icon = step.icon
-        const completed = index <= currentStep
-        const active = index === currentStep
+
+        const active = index <= currentStep
+        const completed = index < currentStep
 
         return (
-          <div
-            className={`tracking-step ${completed ? 'completed' : ''} ${active ? 'active' : ''}`}
-            key={step.title}
-          >
-            <div className="tracking-icon">
-              <Icon size={18} />
+          <React.Fragment key={step.label}>
+            <div
+              className={`tracking-step ${
+                active ? 'active' : ''
+              } ${completed ? 'completed' : ''}`}
+            >
+              <div className="tracking-icon">
+                <Icon size={17} />
+              </div>
+
+              <span>{step.label}</span>
             </div>
-            <div className="tracking-content">
-              <strong>{step.title}</strong>
-              <span>{step.description}</span>
-            </div>
-            {index < steps.length - 1 && <div className="tracking-line" />}
-          </div>
+
+            {index < steps.length - 1 && (
+              <div
+                className={`tracking-line ${
+                  index < currentStep ? 'active' : ''
+                }`}
+              />
+            )}
+          </React.Fragment>
         )
       })}
     </div>
   )
 }
 
-// ============================================================
-// MAIN COMPONENT
-// ============================================================
+/* =========================================================
+   MAIN COMPONENT
+========================================================= */
 
-export default function MyOrders() {
+const MyOrders = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
-  const [expandedOrder, setExpandedOrder] = useState(null)
-  const [phoneInput, setPhoneInput] = useState('')
 
-  // ==========================================================
-  // FETCH ORDERS (TOKEN + PHONE)
-  // ==========================================================
+  const [expandedOrder, setExpandedOrder] = useState(null)
+
+  const [phoneInput, setPhoneInput] = useState(
+    getCustomerPhone()
+  )
+
+  const [returnRequests, setReturnRequests] = useState([])
+
+  const [returnModalOrder, setReturnModalOrder] =
+    useState(null)
+
+  const [returnForm, setReturnForm] = useState({
+    itemId: '',
+    reason: '',
+    description: '',
+    evidence: null,
+  })
+
+  const [returnPreview, setReturnPreview] = useState('')
+  const [returnError, setReturnError] = useState('')
+  const [returnSubmitting, setReturnSubmitting] =
+    useState(false)
+  const [returnSuccess, setReturnSuccess] = useState('')
+
+  /* =========================================================
+     LOAD LOCAL RETURN REQUESTS
+  ========================================================= */
+
+  useEffect(() => {
+    setReturnRequests(getStoredReturnRequests())
+  }, [])
+
+  /* =========================================================
+     FETCH ORDERS
+  ========================================================= */
 
   const fetchOrders = async (manualPhone = null) => {
+    const phone = (
+      manualPhone !== null
+        ? manualPhone
+        : getCustomerPhone()
+    ).trim()
+
+    if (!phone) {
+      setOrders([])
+      setLoading(false)
+      return
+    }
+
     try {
-      setLoading(true)
       setError('')
 
-      const customerToken = getCustomerOrderToken()
-      const storedPhone = localStorage.getItem(CUSTOMER_PHONE_KEY) || ''
-      const phoneToUse = (manualPhone !== null ? manualPhone : storedPhone).trim()
-
-      const queryParams = new URLSearchParams()
-      if (phoneToUse) {
-        queryParams.append('phone', phoneToUse)
+      if (manualPhone !== null) {
+        setRefreshing(true)
+      } else {
+        setLoading(true)
       }
 
-      const queryString = queryParams.toString() ? `?${queryParams.toString()}` : ''
+      const url =
+        `${API_BASE}/my-orders?phone=` +
+        encodeURIComponent(phone)
 
-      console.log('📦 Fetching orders from:', `${API_BASE}/my-orders${queryString}`)
+      console.log('📦 Fetching orders from:', url)
 
-      const response = await fetch(`${API_BASE}/my-orders${queryString}`, {
+      const response = await fetch(url, {
         method: 'GET',
         credentials: 'include',
-        headers: getCustomerOrderHeaders(),
+        headers: {
+          Accept: 'application/json',
+          ...getCustomerOrderHeaders(),
+        },
       })
+
+      if (!response.ok) {
+        const text = await response.text()
+
+        throw new Error(
+          text || `Request failed with status ${response.status}`
+        )
+      }
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.message || data.error || 'Unable to load your orders.')
+      let receivedOrders = []
+
+      if (Array.isArray(data)) {
+        receivedOrders = data
+      } else if (Array.isArray(data?.orders)) {
+        receivedOrders = data.orders
+      } else if (Array.isArray(data?.data)) {
+        receivedOrders = data.data
       }
 
-      setOrders(Array.isArray(data.orders) ? data.orders : [])
+      setOrders(receivedOrders)
     } catch (err) {
       console.error('My Orders Error:', err)
-      setError(err.message || 'Unable to load your orders.')
+
+      if (
+        err?.message?.toLowerCase().includes('failed to fetch')
+      ) {
+        setError(
+          'Unable to connect to the orders server. Please make sure your backend is running.'
+        )
+      } else {
+        setError(
+          err?.message ||
+            'Unable to load your orders. Please try again.'
+        )
+      }
+
+      setOrders([])
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -293,248 +586,932 @@ export default function MyOrders() {
   }
 
   useEffect(() => {
-    fetchOrders()
+    const phone = getCustomerPhone()
+
+    if (phone) {
+      fetchOrders()
+    } else {
+      setLoading(false)
+    }
   }, [])
 
-  const handlePhoneSearch = e => {
-    e.preventDefault()
-    if (!phoneInput.trim()) return
-    localStorage.setItem(CUSTOMER_PHONE_KEY, phoneInput.trim())
-    fetchOrders(phoneInput.trim())
+  /* =========================================================
+     PHONE SEARCH
+  ========================================================= */
+
+  const handlePhoneSearch = (event) => {
+    event.preventDefault()
+
+    const phone = phoneInput.trim()
+
+    if (!phone) {
+      setError('Please enter your phone number.')
+      return
+    }
+
+    localStorage.setItem(CUSTOMER_PHONE_KEY, phone)
+
+    fetchOrders(phone)
   }
 
-  const toggleOrder = orderId => {
-    setExpandedOrder(current => (current === orderId ? null : orderId))
+  /* =========================================================
+     ORDER ACTIONS
+  ========================================================= */
+
+  const toggleOrder = (orderId) => {
+    setExpandedOrder((current) =>
+      current === orderId ? null : orderId
+    )
   }
+
+  /* =========================================================
+     RETURN HELPERS
+  ========================================================= */
+
+  const getReturnsForOrder = (orderId) => {
+    return returnRequests.filter(
+      (request) =>
+        String(request.orderId) === String(orderId)
+    )
+  }
+
+  const hasReturnedItem = (orderId, itemId) => {
+    return returnRequests.some(
+      (request) =>
+        String(request.orderId) === String(orderId) &&
+        String(request.itemId) === String(itemId)
+    )
+  }
+
+  const openReturnModal = (order) => {
+    const items = getOrderItems(order)
+
+    const availableItem =
+      items.find(
+        (item, index) =>
+          !hasReturnedItem(
+            getOrderId(order),
+            item?.id ||
+              item?._id ||
+              item?.item_id ||
+              item?.product_id ||
+              index
+          )
+      ) || items[0]
+
+    const availableIndex = availableItem
+      ? items.indexOf(availableItem)
+      : 0
+
+    const availableItemId =
+      availableItem?.id ||
+      availableItem?._id ||
+      availableItem?.item_id ||
+      availableItem?.product_id ||
+      availableIndex
+
+    setReturnModalOrder(order)
+
+    setReturnForm({
+      itemId: String(availableItemId),
+      reason: '',
+      description: '',
+      evidence: null,
+    })
+
+    setReturnPreview('')
+    setReturnError('')
+    setReturnSuccess('')
+  }
+
+  const closeReturnModal = () => {
+    if (returnSubmitting) return
+
+    setReturnModalOrder(null)
+
+    setReturnForm({
+      itemId: '',
+      reason: '',
+      description: '',
+      evidence: null,
+    })
+
+    setReturnPreview('')
+    setReturnError('')
+    setReturnSubmitting(false)
+  }
+
+  const handleReturnFieldChange = (event) => {
+    const { name, value } = event.target
+
+    setReturnForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }))
+
+    setReturnError('')
+  }
+
+  const handleEvidenceChange = (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setReturnError('Please upload an image file.')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setReturnError(
+        'Image size must be less than 5 MB.'
+      )
+      return
+    }
+
+    setReturnForm((previous) => ({
+      ...previous,
+      evidence: file,
+    }))
+
+    setReturnError('')
+
+    const reader = new FileReader()
+
+    reader.onloadend = () => {
+      setReturnPreview(reader.result)
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+  const submitReturnRequest = async (event) => {
+    event.preventDefault()
+
+    if (!returnModalOrder) return
+
+    const items = getOrderItems(returnModalOrder)
+
+    const selectedIndex = items.findIndex((item, index) => {
+      const itemId =
+        item?.id ||
+        item?._id ||
+        item?.item_id ||
+        item?.product_id ||
+        index
+
+      return String(itemId) === String(returnForm.itemId)
+    })
+
+    const selectedItem =
+      selectedIndex >= 0
+        ? items[selectedIndex]
+        : null
+
+    if (!selectedItem) {
+      setReturnError(
+        'Please select the item you want to return.'
+      )
+      return
+    }
+
+    if (!returnForm.reason) {
+      setReturnError(
+        'Please select a return reason.'
+      )
+      return
+    }
+
+    if (!returnForm.description.trim()) {
+      setReturnError(
+        'Please describe the issue with the item.'
+      )
+      return
+    }
+
+    const orderId = getOrderId(returnModalOrder)
+
+    const itemId =
+      selectedItem?.id ||
+      selectedItem?._id ||
+      selectedItem?.item_id ||
+      selectedItem?.product_id ||
+      selectedIndex
+
+    if (hasReturnedItem(orderId, itemId)) {
+      setReturnError(
+        'A return request already exists for this item.'
+      )
+      return
+    }
+
+    try {
+      setReturnSubmitting(true)
+      setReturnError('')
+
+      /*
+       * FRONTEND-ONLY RETURN SYSTEM
+       *
+       * The request is stored in localStorage for now.
+       * Later this object can be sent to the backend.
+       */
+
+      const request = {
+        id: `RET-${Date.now()}`,
+        orderId,
+        orderNumber: getOrderNumber(returnModalOrder),
+        itemId: String(itemId),
+        itemName: getItemName(selectedItem),
+        itemImage: getItemImage(selectedItem),
+        itemPrice: getItemPrice(selectedItem),
+        quantity: getItemQuantity(selectedItem),
+        reason: returnForm.reason,
+        description: returnForm.description.trim(),
+        evidenceName:
+          returnForm.evidence?.name || '',
+        status: 'Pending',
+        requestedAt: new Date().toISOString(),
+      }
+
+      const updatedRequests = [
+        ...returnRequests,
+        request,
+      ]
+
+      setReturnRequests(updatedRequests)
+
+      saveStoredReturnRequests(updatedRequests)
+
+      setReturnSuccess(
+        `Return request submitted for ${getItemName(
+          selectedItem
+        )}.`
+      )
+
+      closeReturnModal()
+    } catch (err) {
+      console.error(
+        'Return request error:',
+        err
+      )
+
+      setReturnError(
+        'Unable to submit the return request. Please try again.'
+      )
+    } finally {
+      setReturnSubmitting(false)
+    }
+  }
+
+  const getReturnStatusForOrder = (orderId) => {
+    const requests = getReturnsForOrder(orderId)
+
+    if (!requests.length) return null
+
+    return requests[requests.length - 1]
+  }
+
+  /* =========================================================
+     LOADING
+  ========================================================= */
 
   if (loading) {
     return (
       <div className="my-orders-page">
-        <div className="my-orders-container">
-          <div className="orders-loading">
-            <SarikaLoader />
-            <p>Please wait while we fetch your orders...</p>
-          </div>
+        <div className="orders-loading">
+          <div className="orders-spinner"></div>
+
+          <p>Loading your orders...</p>
         </div>
       </div>
     )
   }
 
+  /* =========================================================
+     PAGE
+  ========================================================= */
+
   return (
     <div className="my-orders-page">
-      <div className="my-orders-container">
-        {/* HEADER */}
-        <div className="my-orders-header">
+      <div className="orders-container">
+
+        {/* ===================================================
+            HEADER
+        =================================================== */}
+
+        <div className="orders-page-header">
           <div>
-            <span className="orders-eyebrow">SARIKA FASHIONS</span>
+            <span className="orders-eyebrow">
+              SARIKA FASHIONS
+            </span>
+
             <h1>My Orders</h1>
-            <p>View your order history, delivery tracking and details.</p>
+
+            <p>
+              Track your saree orders and manage
+              your purchases.
+            </p>
           </div>
 
           <button
             type="button"
-            className="refresh-orders-btn"
-            onClick={() => {
-              setRefreshing(true)
-              fetchOrders()
-            }}
+            className={`refresh-orders-btn ${
+              refreshing ? 'refreshing' : ''
+            }`}
+            onClick={() => fetchOrders()}
             disabled={refreshing}
           >
-            <RefreshCw size={17} className={refreshing ? 'refresh-spinning' : ''} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            <RefreshCw size={17} />
+            Refresh
           </button>
         </div>
 
-        {/* ERROR */}
+        {/* ===================================================
+            SUCCESS
+        =================================================== */}
+
+        {returnSuccess && (
+          <div className="orders-alert orders-alert-success">
+            <CheckCircle2 size={18} />
+
+            <span>{returnSuccess}</span>
+
+            <button
+              type="button"
+              onClick={() => setReturnSuccess('')}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* ===================================================
+            ERROR
+        =================================================== */}
+
         {error && (
-          <div className="orders-error">
-            <XCircle size={22} />
-            <div>
-              <strong>Unable to load orders</strong>
-              <p>{error}</p>
-              <button type="button" onClick={() => fetchOrders()}>
-                Try Again
-              </button>
+          <div className="orders-alert orders-alert-error">
+            <AlertCircle size={18} />
+
+            <span>{error}</span>
+
+            <button
+              type="button"
+              onClick={() => setError('')}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* ===================================================
+            PHONE SEARCH
+        =================================================== */}
+
+        {!orders.length && (
+          <div className="orders-search-card">
+            <div className="orders-search-icon">
+              <Search size={24} />
+            </div>
+
+            <div className="orders-search-content">
+              <h2>Find Your Orders</h2>
+
+              <p>
+                Enter the phone number used while
+                placing your order.
+              </p>
+
+              <form
+                className="orders-search-form"
+                onSubmit={handlePhoneSearch}
+              >
+                <input
+                  type="tel"
+                  value={phoneInput}
+                  onChange={(event) =>
+                    setPhoneInput(event.target.value)
+                  }
+                  placeholder="Enter phone number"
+                  maxLength={15}
+                />
+
+                <button type="submit">
+                  <Search size={17} />
+                  Find Orders
+                </button>
+              </form>
             </div>
           </div>
         )}
 
-        {/* EMPTY STATE WITH QUICK PHONE SEARCH */}
-        {!error && orders.length === 0 && (
+        {/* ===================================================
+            EMPTY STATE
+        =================================================== */}
+
+        {!orders.length && !error && (
           <div className="orders-empty">
-            <div className="empty-order-icon">
-              <ShoppingBag size={42} />
+            <div className="empty-bag">
+              <ShoppingBag size={44} />
             </div>
+
             <h2>No orders found</h2>
-            <p>If you recently placed an order, enter your mobile number below to view it:</p>
 
-            <form
-              onSubmit={handlePhoneSearch}
-              style={{
-                display: 'flex',
-                gap: '8px',
-                maxWidth: '380px',
-                margin: '16px auto',
-                width: '100%',
-              }}
+            <p>
+              We couldn't find any orders for this
+              phone number.
+            </p>
+
+            <Link
+              to="/shop"
+              className="shop-now-btn"
             >
-              <input
-                type="tel"
-                placeholder="Enter 10-digit phone number"
-                value={phoneInput}
-                onChange={e => setPhoneInput(e.target.value)}
-                maxLength={10}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: '8px',
-                  border: '1px solid #ccc',
-                  fontSize: '15px',
-                }}
-              />
-              <button type="submit" className="btn btn-primary" style={{ padding: '10px 16px' }}>
-                Search
-              </button>
-            </form>
-
-            <Link to="/shop" className="shop-now-btn" style={{ marginTop: '16px' }}>
-              Start Shopping
+              Continue Shopping
             </Link>
           </div>
         )}
 
-        {/* ORDERS LIST */}
-        {!error && orders.length > 0 && (
+        {/* ===================================================
+            ORDER LIST
+        =================================================== */}
+
+        {orders.length > 0 && (
           <div className="orders-list">
-            {orders.map(order => {
-              const orderId = order.id || order.order_number
-              const status = getOrderStatus(order)
-              const paymentStatus = getPaymentStatus(order)
-              const { subtotal, shipping, total } = getOrderTotals(order)
-              const isExpanded = expandedOrder === orderId
-              const customerReceived = isReceived(order)
-              const orderClosed =
-                customerReceived || String(status).toLowerCase() === 'closed'
+            {orders.map((order, orderIndex) => {
+              const orderId =
+                getOrderId(order) ||
+                `order-${orderIndex}`
+
+              const orderNumber =
+                getOrderNumber(order)
+
+              const orderStatus =
+                getOrderStatus(order)
+
+              const paymentStatus =
+                getPaymentStatus(order)
+
+              const items =
+                getOrderItems(order)
+
+              const totals =
+                getOrderTotals(order)
+
+              const isExpanded =
+                expandedOrder === orderId
+
+              const orderReturns =
+                getReturnsForOrder(orderId)
+
+              const latestReturn =
+                getReturnStatusForOrder(orderId)
 
               return (
                 <article
-                  className={`order-card ${orderClosed ? 'order-card-closed' : ''}`}
+                  className={`order-card ${
+                    isExpanded
+                      ? 'order-card-expanded'
+                      : ''
+                  }`}
                   key={orderId}
                 >
-                  <div className="order-card-header">
-                    <div className="order-main-info">
+                  {/* =========================================
+                      ORDER HEADER
+                  ========================================= */}
+
+                  <button
+                    type="button"
+                    className="order-card-header"
+                    onClick={() =>
+                      toggleOrder(orderId)
+                    }
+                  >
+                    <div className="order-header-left">
                       <div className="order-icon">
-                        {orderClosed ? <CheckCircle2 size={21} /> : <Package size={21} />}
+                        <Package size={20} />
                       </div>
+
                       <div>
-                        <span className="order-label">Order Number</span>
-                        <h2>{order.order_number || `#${order.id}`}</h2>
+                        <span className="order-label">
+                          ORDER
+                        </span>
+
+                        <h2>
+                          #{orderNumber}
+                        </h2>
+
+                        <p>
+                          {formatDate(
+                            getOrderDate(order)
+                          )}
+
+                          {getOrderDate(order) &&
+                            formatTime(
+                              getOrderDate(order)
+                            ) && (
+                              <>
+                                {' • '}
+                                {formatTime(
+                                  getOrderDate(order)
+                                )}
+                              </>
+                            )}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="order-date">
-                      <span>Ordered on</span>
-                      <strong>{formatDate(order.created_at)}</strong>
-                      {formatTime(order.created_at) && (
-                        <small>{formatTime(order.created_at)}</small>
+                    <div className="order-header-right">
+                      <span
+                        className={`order-status ${getStatusClass(
+                          orderStatus
+                        )}`}
+                      >
+                        {orderStatus}
+                      </span>
+
+                      {isExpanded ? (
+                        <ChevronUp size={20} />
+                      ) : (
+                        <ChevronDown size={20} />
                       )}
                     </div>
-                  </div>
+                  </button>
 
-                  <div className="order-summary-grid">
-                    <div className="order-summary-item">
-                      <span>Order Status</span>
-                      <strong className={`status-badge ${getStatusClass(status)}`}>
-                        {orderClosed ? 'Closed' : status}
+                  {/* =========================================
+                      SUMMARY
+                  ========================================= */}
+
+                  <div className="order-summary">
+                    <div>
+                      <span>Items</span>
+                      <strong>
+                        {items.length}
                       </strong>
                     </div>
 
-                    <div className="order-summary-item">
+                    <div>
+                      <span>Total</span>
+                      <strong>
+                        {money(totals.total)}
+                      </strong>
+                    </div>
+
+                    <div>
                       <span>Payment</span>
-                      <strong className="payment-badge payment-paid">
+                      <strong>
                         {paymentStatus}
                       </strong>
                     </div>
-
-                    <div className="order-summary-item">
-                      <span>Total Amount</span>
-                      <strong>{money(total)}</strong>
-                    </div>
                   </div>
 
-                  <div className="order-address-section">
-                    <div className="address-heading">
-                      <MapPin size={18} />
-                      <strong>Delivery Address</strong>
+                  {/* =========================================
+                      DELIVERY ADDRESS
+                  ========================================= */}
+
+                  {(order?.address ||
+                    order?.shipping_address ||
+                    order?.shippingAddress) && (
+                    <div className="delivery-address">
+                      <div className="section-icon">
+                        <MapPin size={18} />
+                      </div>
+
+                      <div>
+                        <span className="section-label">
+                          DELIVERY ADDRESS
+                        </span>
+
+                        <p>
+                          {order?.address ||
+                            order?.shipping_address ||
+                            order?.shippingAddress}
+                        </p>
+                      </div>
                     </div>
-                    <div className="address-content">
-                      <strong>{order.customer_name || 'Customer'}</strong>
-                      {order.customer_phone && <span>{order.customer_phone}</span>}
-                      <p>
-                        {order.address || order.address_line || ''}
-                        {order.city && `, ${order.city}`}
-                        {order.state && `, ${order.state}`}
-                        {order.pincode && ` - ${order.pincode}`}
-                      </p>
-                    </div>
-                  </div>
+                  )}
+
+                  {/* =========================================
+                      ACTIONS
+                  ========================================= */}
 
                   <div className="order-actions">
                     <button
                       type="button"
-                      className="track-order-btn"
-                      onClick={() => toggleOrder(orderId)}
+                      className="view-order-btn"
+                      onClick={() =>
+                        toggleOrder(orderId)
+                      }
                     >
-                      <Truck size={17} />
-                      {isExpanded ? 'Hide Details' : 'Track & View Details'}
-                      {isExpanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+                      {isExpanded
+                        ? 'Hide Details'
+                        : 'View Details'}
+
+                      {isExpanded ? (
+                        <ChevronUp size={16} />
+                      ) : (
+                        <ChevronDown size={16} />
+                      )}
                     </button>
+
+                    {isOrderDelivered(order) &&
+                      (orderReturns.length > 0 ? (
+                        <button
+                          type="button"
+                          className="return-requested-btn"
+                          onClick={() =>
+                            toggleOrder(orderId)
+                          }
+                        >
+                          <Check size={16} />
+                          Return Requested
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="return-item-btn"
+                          onClick={() =>
+                            openReturnModal(order)
+                          }
+                        >
+                          <RotateCcw size={16} />
+                          Return Item
+                        </button>
+                      ))}
                   </div>
 
+                  {/* =========================================
+                      RETURN STATUS
+                  ========================================= */}
+
+                  {latestReturn && (
+                    <div
+                      className={`return-status-card ${getReturnStatusClass(
+                        latestReturn.status
+                      )}`}
+                    >
+                      <div className="return-status-icon">
+                        {latestReturn.status ===
+                        'Approved' ? (
+                          <CheckCircle2 size={19} />
+                        ) : latestReturn.status ===
+                          'Rejected' ? (
+                          <XCircle size={19} />
+                        ) : (
+                          <Clock3 size={19} />
+                        )}
+                      </div>
+
+                      <div className="return-status-content">
+                        <div className="return-status-heading">
+                          <strong>
+                            Return Request
+                          </strong>
+
+                          <span>
+                            {latestReturn.status}
+                          </span>
+                        </div>
+
+                        <p>
+                          {latestReturn.itemName}
+                        </p>
+
+                        <small>
+                          Requested on{' '}
+                          {formatDate(
+                            latestReturn.requestedAt
+                          )}
+                        </small>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* =========================================
+                      EXPANDED DETAILS
+                  ========================================= */}
+
                   {isExpanded && (
-                    <div className="order-expanded">
-                      <div className="expanded-section">
-                        <h3><Truck size={19} /> Order Tracking</h3>
-                        <TrackingTimeline order={order} />
-                      </div>
+                    <div className="order-details">
 
-                      <div className="expanded-section">
-                        <h3><Package size={19} /> Items in this Order</h3>
-                        <div className="order-items">
-                          {Array.isArray(order.items) &&
-                            order.items.map((item, index) => (
-                              <div className="order-item" key={item.id || index}>
-                                <div className="order-item-image">
-                                  {getItemImage(item) ? (
-                                    <img src={getItemImage(item)} alt={getItemName(item)} />
-                                  ) : (
-                                    <Package size={25} />
+                      {/* TRACKING */}
+
+                      <section className="order-section">
+                        <div className="section-heading">
+                          <div>
+                            <span className="section-label">
+                              ORDER TRACKING
+                            </span>
+
+                            <h3>
+                              Track your delivery
+                            </h3>
+                          </div>
+
+                          <Truck size={22} />
+                        </div>
+
+                        <TrackingTimeline
+                          order={order}
+                        />
+                      </section>
+
+                      {/* PRODUCTS */}
+
+                      <section className="order-section">
+                        <div className="section-heading">
+                          <div>
+                            <span className="section-label">
+                              PRODUCTS
+                            </span>
+
+                            <h3>
+                              Items in this order
+                            </h3>
+                          </div>
+
+                          <ShoppingBag size={22} />
+                        </div>
+
+                        <div className="order-products">
+                          {items.length === 0 ? (
+                            <div className="no-items">
+                              No product details available.
+                            </div>
+                          ) : (
+                            items.map(
+                              (item, itemIndex) => {
+                                const itemId =
+                                  item?.id ||
+                                  item?._id ||
+                                  item?.item_id ||
+                                  item?.product_id ||
+                                  itemIndex
+
+                                const returned =
+                                  hasReturnedItem(
+                                    orderId,
+                                    itemId
+                                  )
+
+                                return (
+                                  <div
+                                    className="order-product"
+                                    key={`${orderId}-${itemId}`}
+                                  >
+                                    <div className="product-image-wrap">
+                                      {getItemImage(
+                                        item
+                                      ) ? (
+                                        <img
+                                          src={getItemImage(
+                                            item
+                                          )}
+                                          alt={getItemName(
+                                            item
+                                          )}
+                                        />
+                                      ) : (
+                                        <div className="product-image-placeholder">
+                                          <ShoppingBag
+                                            size={25}
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="product-info">
+                                      <h4>
+                                        {getItemName(
+                                          item
+                                        )}
+                                      </h4>
+
+                                      <p>
+                                        Qty:{' '}
+                                        {getItemQuantity(
+                                          item
+                                        )}
+                                      </p>
+
+                                      {returned && (
+                                        <span className="returned-badge">
+                                          <Check size={13} />
+                                          Return Requested
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <strong className="product-price">
+                                      {money(
+                                        getItemPrice(
+                                          item
+                                        ) *
+                                          getItemQuantity(
+                                            item
+                                          )
+                                      )}
+                                    </strong>
+                                  </div>
+                                )
+                              }
+                            )
+                          )}
+                        </div>
+                      </section>
+
+                      {/* PAYMENT SUMMARY */}
+
+                      <section className="order-section">
+                        <div className="section-heading">
+                          <div>
+                            <span className="section-label">
+                              PAYMENT
+                            </span>
+
+                            <h3>
+                              Payment summary
+                            </h3>
+                          </div>
+
+                          <CreditCard size={22} />
+                        </div>
+
+                        <div className="payment-summary">
+                          <div>
+                            <span>Subtotal</span>
+                            <strong>
+                              {money(
+                                totals.subtotal
+                              )}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>Shipping</span>
+                            <strong>
+                              {totals.shipping === 0
+                                ? 'FREE'
+                                : money(
+                                    totals.shipping
                                   )}
-                                </div>
-                                <div className="order-item-info">
-                                  <strong>{getItemName(item)}</strong>
-                                  <span>Qty: {getItemQuantity(item)}</span>
-                                  <small>{money(getItemPrice(item))} each</small>
-                                </div>
-                                <strong>{money(getItemPrice(item) * getItemQuantity(item))}</strong>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
+                            </strong>
+                          </div>
 
-                      <div className="expanded-section">
-                        <h3><CreditCard size={19} /> Payment & Summary</h3>
-                        <div className="details-grid">
-                          <div>
-                            <span>Payment ID</span>
-                            <strong>{order.razorpay_payment_id || 'Captured'}</strong>
-                          </div>
-                          <div>
+                          {totals.tax > 0 && (
+                            <div>
+                              <span>Tax</span>
+                              <strong>
+                                {money(totals.tax)}
+                              </strong>
+                            </div>
+                          )}
+
+                          {totals.discount > 0 && (
+                            <div className="discount-row">
+                              <span>Discount</span>
+                              <strong>
+                                -{money(
+                                  totals.discount
+                                )}
+                              </strong>
+                            </div>
+                          )}
+
+                          <div className="payment-total">
                             <span>Total Paid</span>
-                            <strong>{money(total)}</strong>
+                            <strong>
+                              {money(totals.total)}
+                            </strong>
                           </div>
                         </div>
-                      </div>
+
+                        <div className="payment-method">
+                          <LockKeyhole size={16} />
+
+                          <span>
+                            Payment Status:{' '}
+                            <strong>
+                              {paymentStatus}
+                            </strong>
+                          </span>
+                        </div>
+                      </section>
+
+                      {/* RETURN BUTTON INSIDE DETAILS */}
+
+                      {isOrderDelivered(order) &&
+                        orderReturns.length === 0 && (
+                          <button
+                            type="button"
+                            className="large-return-btn"
+                            onClick={() =>
+                              openReturnModal(order)
+                            }
+                          >
+                            <RotateCcw size={18} />
+                            Request Return
+                          </button>
+                        )}
                     </div>
                   )}
                 </article>
@@ -543,6 +1520,332 @@ export default function MyOrders() {
           </div>
         )}
       </div>
+
+      {/* =====================================================
+          RETURN MODAL
+      ===================================================== */}
+
+      {returnModalOrder && (
+        <div
+          className="return-modal-overlay"
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget
+            ) {
+              closeReturnModal()
+            }
+          }}
+        >
+          <div className="return-modal">
+
+            <div className="return-modal-header">
+              <div>
+                <span className="section-label">
+                  RETURN ITEM
+                </span>
+
+                <h2>
+                  Request a return
+                </h2>
+
+                <p>
+                  Order #{getOrderNumber(
+                    returnModalOrder
+                  )}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={closeReturnModal}
+                disabled={returnSubmitting}
+              >
+                <X size={21} />
+              </button>
+            </div>
+
+            <form
+              onSubmit={submitReturnRequest}
+              className="return-form"
+            >
+
+              {/* PRODUCT SELECT */}
+
+              <div className="return-form-group">
+                <label>
+                  Select item
+                </label>
+
+                <div className="return-product-list">
+                  {getOrderItems(
+                    returnModalOrder
+                  ).map((item, index) => {
+                    const itemId =
+                      item?.id ||
+                      item?._id ||
+                      item?.item_id ||
+                      item?.product_id ||
+                      index
+
+                    const selected =
+                      String(
+                        returnForm.itemId
+                      ) === String(itemId)
+
+                    const returned =
+                      hasReturnedItem(
+                        getOrderId(
+                          returnModalOrder
+                        ),
+                        itemId
+                      )
+
+                    return (
+                      <button
+                        type="button"
+                        key={String(itemId)}
+                        className={`return-product-option ${
+                          selected
+                            ? 'selected'
+                            : ''
+                        } ${
+                          returned
+                            ? 'already-returned'
+                            : ''
+                        }`}
+                        onClick={() => {
+                          if (returned) return
+
+                          setReturnForm(
+                            (previous) => ({
+                              ...previous,
+                              itemId:
+                                String(itemId),
+                            })
+                          )
+
+                          setReturnError('')
+                        }}
+                        disabled={returned}
+                      >
+                        <div className="return-product-image">
+                          {getItemImage(item) ? (
+                            <img
+                              src={getItemImage(item)}
+                              alt={getItemName(item)}
+                            />
+                          ) : (
+                            <ShoppingBag size={22} />
+                          )}
+                        </div>
+
+                        <div className="return-product-details">
+                          <strong>
+                            {getItemName(item)}
+                          </strong>
+
+                          <span>
+                            Qty:{' '}
+                            {getItemQuantity(item)}
+                          </span>
+
+                          {returned && (
+                            <small>
+                              Already requested
+                            </small>
+                          )}
+                        </div>
+
+                        <div className="return-radio">
+                          {selected && (
+                            <Check size={14} />
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* REASON */}
+
+              <div className="return-form-group">
+                <label htmlFor="return-reason">
+                  Reason for return
+                </label>
+
+                <select
+                  id="return-reason"
+                  name="reason"
+                  value={returnForm.reason}
+                  onChange={
+                    handleReturnFieldChange
+                  }
+                >
+                  <option value="">
+                    Select a reason
+                  </option>
+
+                  {RETURN_REASONS.map(
+                    (reason) => (
+                      <option
+                        key={reason}
+                        value={reason}
+                      >
+                        {reason}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+
+              {/* DESCRIPTION */}
+
+              <div className="return-form-group">
+                <label htmlFor="return-description">
+                  Describe the issue
+                </label>
+
+                <textarea
+                  id="return-description"
+                  name="description"
+                  value={
+                    returnForm.description
+                  }
+                  onChange={
+                    handleReturnFieldChange
+                  }
+                  placeholder="Please tell us what went wrong with the item..."
+                  rows={4}
+                  maxLength={500}
+                />
+
+                <span className="character-count">
+                  {
+                    returnForm.description.length
+                  }
+                  /500
+                </span>
+              </div>
+
+              {/* EVIDENCE */}
+
+              <div className="return-form-group">
+                <label>
+                  Add photo evidence{' '}
+                  <span>(optional)</span>
+                </label>
+
+                <label
+                  htmlFor="return-evidence"
+                  className="evidence-upload"
+                >
+                  <Send size={20} />
+
+                  <div>
+                    <strong>
+                      Upload an image
+                    </strong>
+
+                    <span>
+                      JPG, PNG or WEBP • Max 5 MB
+                    </span>
+                  </div>
+
+                  <input
+                    id="return-evidence"
+                    type="file"
+                    accept="image/*"
+                    onChange={
+                      handleEvidenceChange
+                    }
+                  />
+                </label>
+
+                {returnPreview && (
+                  <div className="evidence-preview">
+                    <img
+                      src={returnPreview}
+                      alt="Return evidence preview"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReturnPreview('')
+                        setReturnForm(
+                          (previous) => ({
+                            ...previous,
+                            evidence: null,
+                          })
+                        )
+                      }}
+                    >
+                      <X size={15} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* INFO */}
+
+              <div className="return-info-box">
+                <AlertCircle size={18} />
+
+                <p>
+                  Your return request will be reviewed
+                  by our team. Keep the product unused
+                  and in its original packaging where
+                  possible.
+                </p>
+              </div>
+
+              {/* ERROR */}
+
+              {returnError && (
+                <div className="return-form-error">
+                  <AlertCircle size={17} />
+                  <span>{returnError}</span>
+                </div>
+              )}
+
+              {/* ACTIONS */}
+
+              <div className="return-modal-actions">
+                <button
+                  type="button"
+                  className="cancel-return-btn"
+                  onClick={closeReturnModal}
+                  disabled={returnSubmitting}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="submit-return-btn"
+                  disabled={returnSubmitting}
+                >
+                  {returnSubmitting ? (
+                    <>
+                      <span className="button-spinner" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw size={17} />
+                      Submit Return Request
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
+export default MyOrders
