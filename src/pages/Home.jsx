@@ -360,56 +360,46 @@ export default function Home() {
       </section>
 
 
+{/* ===================================================
+    THE ART OF DRAPING
+=================================================== */}
 
-      {/* ===================================================
-          THE ART OF DRAPING
-      =================================================== */}
+<section
+  className="editorial-home"
+  style={{
+    backgroundImage: "url('/art-of-draping.jpeg')",
+  }}
+>
+  <div className="editorial-image-overlay" />
 
-      <section
-        className="editorial-home"
-        style={{
-          backgroundImage: `url('/editorial.jpg')`,
-        }}
+  <div className="editorial-full-content">
+    <div className="editorial-copy">
+
+      <span className="eyebrow">
+        THE ART OF TRADITION
+      </span>
+
+      <h2>
+        The Art <em>of Draping.</em>
+      </h2>
+
+      <p>
+        Every saree carries a story of heritage,
+        artistry and generations of timeless
+        craftsmanship.
+      </p>
+
+      <Link
+        to="/about"
+        className="btn editorial-story-button"
       >
+        DISCOVER OUR STORY
+        <ArrowUpRight size={16} />
+      </Link>
 
-        <div className="editorial-image-overlay" />
-
-
-        <div className="editorial-full-content">
-
-          <div className="editorial-copy">
-
-            <span className="eyebrow">
-              THE ART OF TRADITION
-            </span>
-
-
-            <h2>
-              The Art <em>of Draping.</em>
-            </h2>
-
-
-            <p>
-              Every saree carries a story of heritage,
-              artistry and generations of timeless
-              craftsmanship.
-            </p>
-
-
-            <Link
-              to="/about"
-              className="btn editorial-story-button"
-            >
-              DISCOVER OUR STORY
-              <ArrowUpRight size={16} />
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
-
+    </div>
+  </div>
+</section>
 
 
       {/* ===================================================

@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 
+import AddToCartPopUp from './components/AddToCartPopUp';
 import ScrollToTop from './components/ScrollToTop.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import SarikaLoader from './components/Loader.jsx'
-import AddToCartPopup from './components/AddToCartPopup.jsx'
 
 import { useCart } from './context/CartContext.jsx'
 
@@ -48,7 +48,6 @@ import AdminInfo from './pages/admin/AdminInfo.jsx'
 import AdminEditProduct from './pages/admin/AdminEditProduct.jsx'
 import AdminReturns from './pages/admin/AdminReturns.jsx'
 
-
 function App() {
   const { showPopup, addedItem, closePopup, itemCount, subtotal } = useCart()
 
@@ -65,7 +64,7 @@ function App() {
       ====================================================== */}
 
       {showPopup && addedItem && (
-        <AddToCartPopup
+        <AddToCartPopUp
           item={addedItem}
           cartCount={itemCount}
           cartSubtotal={subtotal}
