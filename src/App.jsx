@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import AddToCartPopUp from './components/AddToCartPopUp';
+import AddToCartPopUp from "./components/AddToCartPopup";
 import ScrollToTop from './components/ScrollToTop.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import SarikaLoader from './components/Loader.jsx'
