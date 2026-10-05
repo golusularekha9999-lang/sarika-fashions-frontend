@@ -134,8 +134,8 @@ export default function Footer() {
 
             <li>
               <Phone size={15} />
-              <a href="tel:+919100389240">
-                +91 9100389240
+              <a href="tel:+919989450304">
+                +91 9989450304
               </a>
             </li>
 
