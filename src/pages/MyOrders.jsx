@@ -69,12 +69,18 @@ const getCustomerPhone = () => {
   )
 }
 
+/*
+ * IMPORTANT:
+ * Send the customer token in both places because the backend
+ * supports both Authorization and X-Customer-Order-Token.
+ */
 const getCustomerOrderHeaders = () => {
   const token = getCustomerOrderToken()
 
   return token
     ? {
         Authorization: `Bearer ${token}`,
+        'X-Customer-Order-Token': token,
       }
     : {}
 }
@@ -95,10 +101,14 @@ const getStoredReturnRequests = () => {
 }
 
 const saveStoredReturnRequests = (requests) => {
-  localStorage.setItem(
-    RETURN_REQUESTS_KEY,
-    JSON.stringify(requests)
-  )
+  try {
+    localStorage.setItem(
+      RETURN_REQUESTS_KEY,
+      JSON.stringify(requests)
+    )
+  } catch (error) {
+    console.error('Failed to save return requests:', error)
+  }
 }
 
 const formatDate = (dateValue) => {
@@ -391,6 +401,7 @@ const TrackingTimeline = ({ order }) => {
     return (
       <div className="tracking-cancelled">
         <XCircle size={20} />
+
         <div>
           <strong>Order Cancelled</strong>
           <span>This order has been cancelled.</span>
@@ -505,13 +516,23 @@ const MyOrders = () => {
   ========================================================= */
 
   const fetchOrders = async (manualPhone = null) => {
+    const storedPhone = getCustomerPhone()
+    const customerToken = getCustomerOrderToken()
+
     const phone = (
       manualPhone !== null
         ? manualPhone
-        : getCustomerPhone()
+        : storedPhone
     ).trim()
 
-    if (!phone) {
+    /*
+     * We can fetch orders using either:
+     * 1. phone number
+     * 2. customer order token
+     *
+     * This makes My Orders more reliable after payment.
+     */
+    if (!phone && !customerToken) {
       setOrders([])
       setLoading(false)
       return
@@ -526,9 +547,11 @@ const MyOrders = () => {
         setLoading(true)
       }
 
-      const url =
-        `${API_BASE}/my-orders?phone=` +
-        encodeURIComponent(phone)
+      let url = `${API_BASE}/my-orders`
+
+      if (phone) {
+        url += `?phone=${encodeURIComponent(phone)}`
+      }
 
       console.log('📦 Fetching orders from:', url)
 
@@ -544,8 +567,22 @@ const MyOrders = () => {
       if (!response.ok) {
         const text = await response.text()
 
+        let message = text
+
+        try {
+          const errorData = JSON.parse(text)
+
+          message =
+            errorData?.error ||
+            errorData?.message ||
+            text
+        } catch {
+          // Keep text response
+        }
+
         throw new Error(
-          text || `Request failed with status ${response.status}`
+          message ||
+            `Request failed with status ${response.status}`
         )
       }
 
@@ -587,8 +624,9 @@ const MyOrders = () => {
 
   useEffect(() => {
     const phone = getCustomerPhone()
+    const token = getCustomerOrderToken()
 
-    if (phone) {
+    if (phone || token) {
       fetchOrders()
     } else {
       setLoading(false)
@@ -609,7 +647,10 @@ const MyOrders = () => {
       return
     }
 
-    localStorage.setItem(CUSTOMER_PHONE_KEY, phone)
+    localStorage.setItem(
+      CUSTOMER_PHONE_KEY,
+      phone
+    )
 
     fetchOrders(phone)
   }
@@ -745,6 +786,19 @@ const MyOrders = () => {
     reader.readAsDataURL(file)
   }
 
+  /* =========================================================
+     SUBMIT RETURN REQUEST
+     
+     IMPORTANT:
+     This now sends the request to the Flask backend.
+     
+     Backend:
+       POST /api/returns
+     
+     This is what makes the return appear in:
+       Admin Panel → Return Requests
+  ========================================================= */
+
   const submitReturnRequest = async (event) => {
     event.preventDefault()
 
@@ -760,7 +814,10 @@ const MyOrders = () => {
         item?.product_id ||
         index
 
-      return String(itemId) === String(returnForm.itemId)
+      return (
+        String(itemId) ===
+        String(returnForm.itemId)
+      )
     })
 
     const selectedItem =
@@ -798,6 +855,13 @@ const MyOrders = () => {
       selectedItem?.product_id ||
       selectedIndex
 
+    if (!orderId) {
+      setReturnError(
+        'Unable to identify this order. Please refresh your orders and try again.'
+      )
+      return
+    }
+
     if (hasReturnedItem(orderId, itemId)) {
       setReturnError(
         'A return request already exists for this item.'
@@ -805,32 +869,157 @@ const MyOrders = () => {
       return
     }
 
+    const customerToken =
+      getCustomerOrderToken()
+
+    if (!customerToken) {
+      setReturnError(
+        'Your customer order session was not found. Please open My Orders again after placing the order.'
+      )
+      return
+    }
+
     try {
       setReturnSubmitting(true)
       setReturnError('')
+      setReturnSuccess('')
 
       /*
-       * FRONTEND-ONLY RETURN SYSTEM
-       *
-       * The request is stored in localStorage for now.
-       * Later this object can be sent to the backend.
+       * Product ID:
+       * Prefer product_id because that is what the backend
+       * return_requests table stores.
        */
+      const productId =
+        selectedItem?.product_id ??
+        selectedItem?.productId ??
+        selectedItem?.product?.id ??
+        selectedItem?.product?._id ??
+        selectedItem?.id ??
+        null
 
-      const request = {
-        id: `RET-${Date.now()}`,
-        orderId,
-        orderNumber: getOrderNumber(returnModalOrder),
-        itemId: String(itemId),
-        itemName: getItemName(selectedItem),
-        itemImage: getItemImage(selectedItem),
-        itemPrice: getItemPrice(selectedItem),
+      const orderNumber =
+        getOrderNumber(returnModalOrder)
+
+      const requestBody = {
+        order_id: orderId,
+        order_number: orderNumber,
+        product_id: productId,
+        product_name: getItemName(selectedItem),
         quantity: getItemQuantity(selectedItem),
         reason: returnForm.reason,
-        description: returnForm.description.trim(),
+        description:
+          returnForm.description.trim(),
+      }
+
+      console.log(
+        '↩️ Submitting return request:',
+        requestBody
+      )
+
+      /*
+       * SEND RETURN TO FLASK BACKEND
+       */
+      const response = await fetch(
+        `${API_BASE}/returns`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+
+            /*
+             * Send token both ways so the backend can
+             * identify the customer.
+             */
+            Authorization: `Bearer ${customerToken}`,
+            'X-Customer-Order-Token': customerToken,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      )
+
+      const responseText =
+        await response.text()
+
+      let data = {}
+
+      try {
+        data = responseText
+          ? JSON.parse(responseText)
+          : {}
+      } catch {
+        data = {
+          message: responseText,
+        }
+      }
+
+      console.log(
+        '↩️ Return API response:',
+        data
+      )
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+            data?.message ||
+            `Return request failed with status ${response.status}`
+        )
+      }
+
+      /*
+       * Backend successfully saved the return.
+       *
+       * Now create a local copy only for immediate
+       * display inside My Orders.
+       */
+      const request = {
+        id:
+          data?.return_id ||
+          data?.id ||
+          `RET-${Date.now()}`,
+
+        orderId,
+
+        orderNumber,
+
+        itemId: String(itemId),
+
+        itemName:
+          getItemName(selectedItem),
+
+        itemImage:
+          getItemImage(selectedItem),
+
+        itemPrice:
+          getItemPrice(selectedItem),
+
+        quantity:
+          getItemQuantity(selectedItem),
+
+        reason:
+          returnForm.reason,
+
+        description:
+          returnForm.description.trim(),
+
         evidenceName:
           returnForm.evidence?.name || '',
-        status: 'Pending',
-        requestedAt: new Date().toISOString(),
+
+        /*
+         * Backend uses "Return Requested".
+         * Keep the same status in the customer UI.
+         */
+        status:
+          data?.return_status ||
+          data?.status ||
+          'Return Requested',
+
+        requestedAt:
+          data?.requested_at ||
+          new Date().toISOString(),
+
+        backendSaved: true,
       }
 
       const updatedRequests = [
@@ -838,17 +1027,43 @@ const MyOrders = () => {
         request,
       ]
 
-      setReturnRequests(updatedRequests)
+      setReturnRequests(
+        updatedRequests
+      )
 
-      saveStoredReturnRequests(updatedRequests)
+      saveStoredReturnRequests(
+        updatedRequests
+      )
 
+      /*
+       * Show success message on the page.
+       */
       setReturnSuccess(
-        `Return request submitted for ${getItemName(
+        `Return request submitted successfully for ${getItemName(
           selectedItem
         )}.`
       )
 
-      closeReturnModal()
+      /*
+       * Close modal after successful backend save.
+       */
+      setReturnModalOrder(null)
+
+      setReturnForm({
+        itemId: '',
+        reason: '',
+        description: '',
+        evidence: null,
+      })
+
+      setReturnPreview('')
+
+      /*
+       * Refresh orders after successful return.
+       * This does not affect the return record already
+       * saved in the backend.
+       */
+      await fetchOrders()
     } catch (err) {
       console.error(
         'Return request error:',
@@ -856,7 +1071,8 @@ const MyOrders = () => {
       )
 
       setReturnError(
-        'Unable to submit the return request. Please try again.'
+        err?.message ||
+          'Unable to submit the return request. Please try again.'
       )
     } finally {
       setReturnSubmitting(false)
@@ -864,7 +1080,8 @@ const MyOrders = () => {
   }
 
   const getReturnStatusForOrder = (orderId) => {
-    const requests = getReturnsForOrder(orderId)
+    const requests =
+      getReturnsForOrder(orderId)
 
     if (!requests.length) return null
 
@@ -938,7 +1155,9 @@ const MyOrders = () => {
 
             <button
               type="button"
-              onClick={() => setReturnSuccess('')}
+              onClick={() =>
+                setReturnSuccess('')
+              }
             >
               <X size={16} />
             </button>
@@ -990,7 +1209,9 @@ const MyOrders = () => {
                   type="tel"
                   value={phoneInput}
                   onChange={(event) =>
-                    setPhoneInput(event.target.value)
+                    setPhoneInput(
+                      event.target.value
+                    )
                   }
                   placeholder="Enter phone number"
                   maxLength={15}
@@ -1064,7 +1285,9 @@ const MyOrders = () => {
                 getReturnsForOrder(orderId)
 
               const latestReturn =
-                getReturnStatusForOrder(orderId)
+                getReturnStatusForOrder(
+                  orderId
+                )
 
               return (
                 <article
@@ -1144,6 +1367,7 @@ const MyOrders = () => {
                   <div className="order-summary">
                     <div>
                       <span>Items</span>
+
                       <strong>
                         {items.length}
                       </strong>
@@ -1151,6 +1375,7 @@ const MyOrders = () => {
 
                     <div>
                       <span>Total</span>
+
                       <strong>
                         {money(totals.total)}
                       </strong>
@@ -1158,6 +1383,7 @@ const MyOrders = () => {
 
                     <div>
                       <span>Payment</span>
+
                       <strong>
                         {paymentStatus}
                       </strong>
@@ -1250,11 +1476,15 @@ const MyOrders = () => {
                       )}`}
                     >
                       <div className="return-status-icon">
-                        {latestReturn.status ===
-                        'Approved' ? (
+                        {String(
+                          latestReturn.status
+                        ).toLowerCase() ===
+                        'approved' ? (
                           <CheckCircle2 size={19} />
-                        ) : latestReturn.status ===
-                          'Rejected' ? (
+                        ) : String(
+                            latestReturn.status
+                          ).toLowerCase() ===
+                          'rejected' ? (
                           <XCircle size={19} />
                         ) : (
                           <Clock3 size={19} />
@@ -1439,6 +1669,7 @@ const MyOrders = () => {
                         <div className="payment-summary">
                           <div>
                             <span>Subtotal</span>
+
                             <strong>
                               {money(
                                 totals.subtotal
@@ -1448,6 +1679,7 @@ const MyOrders = () => {
 
                           <div>
                             <span>Shipping</span>
+
                             <strong>
                               {totals.shipping === 0
                                 ? 'FREE'
@@ -1460,6 +1692,7 @@ const MyOrders = () => {
                           {totals.tax > 0 && (
                             <div>
                               <span>Tax</span>
+
                               <strong>
                                 {money(totals.tax)}
                               </strong>
@@ -1469,6 +1702,7 @@ const MyOrders = () => {
                           {totals.discount > 0 && (
                             <div className="discount-row">
                               <span>Discount</span>
+
                               <strong>
                                 -{money(
                                   totals.discount
@@ -1479,6 +1713,7 @@ const MyOrders = () => {
 
                           <div className="payment-total">
                             <span>Total Paid</span>
+
                             <strong>
                               {money(totals.total)}
                             </strong>
@@ -1530,7 +1765,8 @@ const MyOrders = () => {
           className="return-modal-overlay"
           onMouseDown={(event) => {
             if (
-              event.target === event.currentTarget
+              event.target ===
+              event.currentTarget
             ) {
               closeReturnModal()
             }
@@ -1549,7 +1785,8 @@ const MyOrders = () => {
                 </h2>
 
                 <p>
-                  Order #{getOrderNumber(
+                  Order #
+                  {getOrderNumber(
                     returnModalOrder
                   )}
                 </p>
@@ -1774,6 +2011,7 @@ const MyOrders = () => {
                       type="button"
                       onClick={() => {
                         setReturnPreview('')
+
                         setReturnForm(
                           (previous) => ({
                             ...previous,
@@ -1806,7 +2044,10 @@ const MyOrders = () => {
               {returnError && (
                 <div className="return-form-error">
                   <AlertCircle size={17} />
-                  <span>{returnError}</span>
+
+                  <span>
+                    {returnError}
+                  </span>
                 </div>
               )}
 
