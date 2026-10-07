@@ -422,6 +422,7 @@ const TrackingTimeline = ({ order }) => {
 
         <div>
           <strong>Order Cancelled</strong>
+
           <span>
             This order has been cancelled.
           </span>
@@ -457,8 +458,10 @@ const TrackingTimeline = ({ order }) => {
     <div className="tracking-timeline">
       {steps.map((step, index) => {
         const Icon = step.icon
+
         const active =
           index <= currentStep
+
         const completed =
           index < currentStep
 
@@ -508,6 +511,7 @@ const TrackingTimeline = ({ order }) => {
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([])
+
   const [returnRequests, setReturnRequests] =
     useState([])
 
@@ -523,8 +527,23 @@ const MyOrders = () => {
   const [expandedOrder, setExpandedOrder] =
     useState(null)
 
+  /*
+   * IMPORTANT:
+   * Do NOT restore the phone from localStorage
+   * when the page loads.
+   *
+   * After browser refresh the customer must
+   * enter their phone number again.
+   */
   const [phoneInput, setPhoneInput] =
-    useState(getCustomerPhone())
+    useState('')
+
+  /*
+   * Used to prevent "No orders found"
+   * from appearing before the user searches.
+   */
+  const [hasSearched, setHasSearched] =
+    useState(false)
 
   const [returnModalOrder, setReturnModalOrder] =
     useState(null)
@@ -550,7 +569,7 @@ const MyOrders = () => {
     useState('')
 
   /* =======================================================
-     FETCH RETURNS FROM BACKEND
+     FETCH RETURNS
   ======================================================= */
 
   const fetchReturns = async (phone) => {
@@ -619,8 +638,8 @@ const MyOrders = () => {
       )
 
       /*
-       * Do NOT erase orders if returns
-       * fail. Orders must continue working.
+       * Do not erase orders if returns
+       * fail.
        */
       setReturnRequests([])
     }
@@ -648,32 +667,22 @@ const MyOrders = () => {
     try {
       setError('')
 
-      if (
-        manualPhone !== null
-      ) {
+      if (manualPhone !== null) {
         setRefreshing(true)
       } else {
         setLoading(true)
       }
 
-      /*
-       * IMPORTANT:
-       * Phone number is the common
-       * customer identifier.
-       */
       const url =
         `${API_BASE}/my-orders` +
-        `?phone=${encodeURIComponent(
-          phone
-        )}`
+        `?phone=${encodeURIComponent(phone)}`
 
       const response =
         await fetch(url, {
           method: 'GET',
           credentials: 'include',
           headers: {
-            Accept:
-              'application/json',
+            Accept: 'application/json',
             ...getCustomerOrderHeaders(),
           },
         })
@@ -719,24 +728,25 @@ const MyOrders = () => {
           data.data
       }
 
-      setOrders(
-        receivedOrders
-      )
+      setOrders(receivedOrders)
 
       /*
-       * Save phone for convenience.
-       * This is NOT used as the return
-       * database anymore.
+       * Search has now happened.
+       */
+      setHasSearched(true)
+
+      /*
+       * Save the searched phone so the
+       * current session can use it.
+       *
+       * Browser refresh will clear it
+       * in the initial useEffect below.
        */
       localStorage.setItem(
         CUSTOMER_PHONE_KEY,
         phone
       )
 
-      /*
-       * Fetch actual returns from
-       * production backend/database.
-       */
       await fetchReturns(phone)
     } catch (err) {
       console.error(
@@ -751,6 +761,7 @@ const MyOrders = () => {
 
       setOrders([])
       setReturnRequests([])
+      setHasSearched(true)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -759,18 +770,49 @@ const MyOrders = () => {
 
   /* =======================================================
      INITIAL LOAD
+     
+     IMPORTANT:
+     Every browser/page refresh starts
+     from the mobile-number search screen.
   ======================================================= */
 
   useEffect(() => {
-    const savedPhone =
-      getCustomerPhone()
+    /*
+     * Clear customer session data on
+     * browser refresh.
+     */
+    localStorage.removeItem(
+      CUSTOMER_PHONE_KEY
+    )
 
-    if (savedPhone) {
-      setPhoneInput(savedPhone)
-      fetchOrders(savedPhone)
-    } else {
-      setLoading(false)
-    }
+    localStorage.removeItem(
+      'customer_phone'
+    )
+
+    localStorage.removeItem(
+      CUSTOMER_TOKEN_KEY
+    )
+
+    localStorage.removeItem(
+      'customer_order_token'
+    )
+
+    /*
+     * Reset all customer order data.
+     */
+    setPhoneInput('')
+    setOrders([])
+    setReturnRequests([])
+    setExpandedOrder(null)
+    setError('')
+    setReturnSuccess('')
+    setHasSearched(false)
+
+    /*
+     * Stop loading and show the
+     * mobile-number search screen.
+     */
+    setLoading(false)
   }, [])
 
   /* =======================================================
@@ -790,10 +832,14 @@ const MyOrders = () => {
       return
     }
 
+    setError('')
+
     localStorage.setItem(
       CUSTOMER_PHONE_KEY,
       phone
     )
+
+    setHasSearched(true)
 
     fetchOrders(phone)
   }
@@ -803,6 +849,9 @@ const MyOrders = () => {
   ======================================================= */
 
   const handleChangeNumber = () => {
+    /*
+     * Clear both phone keys.
+     */
     localStorage.removeItem(
       CUSTOMER_PHONE_KEY
     )
@@ -811,12 +860,24 @@ const MyOrders = () => {
       'customer_phone'
     )
 
+    /*
+     * Also clear customer token.
+     */
+    localStorage.removeItem(
+      CUSTOMER_TOKEN_KEY
+    )
+
+    localStorage.removeItem(
+      'customer_order_token'
+    )
+
     setPhoneInput('')
     setOrders([])
     setReturnRequests([])
     setExpandedOrder(null)
     setError('')
     setReturnSuccess('')
+    setHasSearched(false)
 
     window.scrollTo({
       top: 0,
@@ -825,7 +886,7 @@ const MyOrders = () => {
   }
 
   /* =======================================================
-     REFRESH
+     REFRESH CURRENT ORDERS
   ======================================================= */
 
   const handleRefresh = async () => {
@@ -1250,11 +1311,8 @@ const MyOrders = () => {
         }
 
         /*
-         * DO NOT save the return to
-         * localStorage.
-         *
-         * Backend is the source
-         * of truth.
+         * Backend is the source of truth.
+         * Do not save returns to localStorage.
          */
 
         setReturnSuccess(
@@ -1275,8 +1333,7 @@ const MyOrders = () => {
         setReturnPreview('')
 
         /*
-         * Reload BOTH orders and
-         * returns from backend.
+         * Reload orders and returns.
          */
         await fetchOrders(
           customerPhone
@@ -1324,6 +1381,7 @@ const MyOrders = () => {
       <div className="my-orders-page">
         <div className="orders-loading">
           <div className="orders-spinner" />
+
           <p>
             Loading your orders...
           </p>
@@ -1348,7 +1406,9 @@ const MyOrders = () => {
               SARIKA FASHIONS
             </span>
 
-            <h1>My Orders</h1>
+            <h1>
+              My Orders
+            </h1>
 
             <p>
               Track your saree orders and
@@ -1371,6 +1431,7 @@ const MyOrders = () => {
               disabled={refreshing}
             >
               <RefreshCw size={17} />
+
               Refresh
             </button>
 
@@ -1383,6 +1444,7 @@ const MyOrders = () => {
                 }
               >
                 <Search size={17} />
+
                 Change Number
               </button>
             )}
@@ -1417,7 +1479,9 @@ const MyOrders = () => {
           <div className="orders-alert orders-alert-error">
             <AlertCircle size={18} />
 
-            <span>{error}</span>
+            <span>
+              {error}
+            </span>
 
             <button
               type="button"
@@ -1434,11 +1498,13 @@ const MyOrders = () => {
 
         {!orders.length && (
           <div className="orders-search-card">
+
             <div className="orders-search-icon">
               <Search size={24} />
             </div>
 
             <div className="orders-search-content">
+
               <h2>
                 Find Your Orders
               </h2>
@@ -1474,9 +1540,11 @@ const MyOrders = () => {
                   }
                 >
                   <Search size={17} />
+
                   Find Orders
                 </button>
               </form>
+
             </div>
           </div>
         )}
@@ -1484,8 +1552,10 @@ const MyOrders = () => {
         {/* EMPTY */}
 
         {!orders.length &&
+          hasSearched &&
           !error && (
             <div className="orders-empty">
+
               <div className="empty-bag">
                 <ShoppingBag size={44} />
               </div>
@@ -1505,6 +1575,7 @@ const MyOrders = () => {
               >
                 Continue Shopping
               </Link>
+
             </div>
           )}
 
@@ -1515,6 +1586,7 @@ const MyOrders = () => {
 
             {orders.map(
               (order, orderIndex) => {
+
                 const orderId =
                   getOrderId(
                     order
@@ -1581,12 +1653,15 @@ const MyOrders = () => {
                         )
                       }
                     >
+
                       <div className="order-header-left">
+
                         <div className="order-icon">
                           <Package size={20} />
                         </div>
 
                         <div>
+
                           <span className="order-label">
                             ORDER
                           </span>
@@ -1612,6 +1687,7 @@ const MyOrders = () => {
                               ) && (
                                 <>
                                   {' • '}
+
                                   {formatTime(
                                     getOrderDate(
                                       order
@@ -1620,6 +1696,7 @@ const MyOrders = () => {
                                 </>
                               )}
                           </p>
+
                         </div>
                       </div>
 
@@ -1640,6 +1717,7 @@ const MyOrders = () => {
                         )}
 
                       </div>
+
                     </button>
 
                     {/* SUMMARY */}
@@ -1686,11 +1764,13 @@ const MyOrders = () => {
                       order?.shipping_address ||
                       order?.shippingAddress) && (
                       <div className="delivery-address">
+
                         <div className="section-icon">
                           <MapPin size={18} />
                         </div>
 
                         <div>
+
                           <span className="section-label">
                             DELIVERY ADDRESS
                           </span>
@@ -1700,7 +1780,9 @@ const MyOrders = () => {
                               order?.shipping_address ||
                               order?.shippingAddress}
                           </p>
+
                         </div>
+
                       </div>
                     )}
 
@@ -1743,6 +1825,7 @@ const MyOrders = () => {
                             }
                           >
                             <Check size={16} />
+
                             Return Requested
                           </button>
                         ) : (
@@ -1756,9 +1839,11 @@ const MyOrders = () => {
                             }
                           >
                             <RotateCcw size={16} />
+
                             Return Item
                           </button>
                         ))}
+
                     </div>
 
                     {/* RETURN STATUS */}
@@ -1771,7 +1856,9 @@ const MyOrders = () => {
                           )
                         )}`}
                       >
+
                         <div className="return-status-icon">
+
                           {String(
                             getReturnStatus(
                               latestReturn
@@ -1795,11 +1882,13 @@ const MyOrders = () => {
                           ) : (
                             <Clock3 size={19} />
                           )}
+
                         </div>
 
                         <div className="return-status-content">
 
                           <div className="return-status-heading">
+
                             <strong>
                               Return Request
                             </strong>
@@ -1809,6 +1898,7 @@ const MyOrders = () => {
                                 latestReturn
                               )}
                             </span>
+
                           </div>
 
                           <p>
@@ -1827,6 +1917,7 @@ const MyOrders = () => {
                           </small>
 
                         </div>
+
                       </div>
                     )}
 
@@ -1838,8 +1929,11 @@ const MyOrders = () => {
                         {/* TRACKING */}
 
                         <section className="order-section">
+
                           <div className="section-heading">
+
                             <div>
+
                               <span className="section-label">
                                 ORDER TRACKING
                               </span>
@@ -1847,14 +1941,17 @@ const MyOrders = () => {
                               <h3>
                                 Track your delivery
                               </h3>
+
                             </div>
 
                             <Truck size={22} />
+
                           </div>
 
                           <TrackingTimeline
                             order={order}
                           />
+
                         </section>
 
                         {/* PRODUCTS */}
@@ -1862,7 +1959,9 @@ const MyOrders = () => {
                         <section className="order-section">
 
                           <div className="section-heading">
+
                             <div>
+
                               <span className="section-label">
                                 PRODUCTS
                               </span>
@@ -1870,9 +1969,11 @@ const MyOrders = () => {
                               <h3>
                                 Items in this order
                               </h3>
+
                             </div>
 
                             <ShoppingBag size={22} />
+
                           </div>
 
                           <div className="order-products">
@@ -1888,6 +1989,7 @@ const MyOrders = () => {
                                   item,
                                   itemIndex
                                 ) => {
+
                                   const itemId =
                                     item?.id ||
                                     item?._id ||
@@ -1906,7 +2008,9 @@ const MyOrders = () => {
                                       className="order-product"
                                       key={`${orderId}-${itemId}`}
                                     >
+
                                       <div className="product-image-wrap">
+
                                         {getItemImage(
                                           item
                                         ) ? (
@@ -1923,9 +2027,11 @@ const MyOrders = () => {
                                             <ShoppingBag size={25} />
                                           </div>
                                         )}
+
                                       </div>
 
                                       <div className="product-info">
+
                                         <h4>
                                           {getItemName(
                                             item
@@ -1941,13 +2047,18 @@ const MyOrders = () => {
 
                                         {returned && (
                                           <span className="returned-badge">
+
                                             <Check size={13} />
+
                                             Return Requested
+
                                           </span>
                                         )}
+
                                       </div>
 
                                       <strong className="product-price">
+
                                         {money(
                                           getItemPrice(
                                             item
@@ -1956,7 +2067,9 @@ const MyOrders = () => {
                                               item
                                             )
                                         )}
+
                                       </strong>
+
                                     </div>
                                   )
                                 }
@@ -1964,6 +2077,7 @@ const MyOrders = () => {
                             )}
 
                           </div>
+
                         </section>
 
                         {/* PAYMENT */}
@@ -1971,7 +2085,9 @@ const MyOrders = () => {
                         <section className="order-section">
 
                           <div className="section-heading">
+
                             <div>
+
                               <span className="section-label">
                                 PAYMENT
                               </span>
@@ -1979,9 +2095,11 @@ const MyOrders = () => {
                               <h3>
                                 Payment summary
                               </h3>
+
                             </div>
 
                             <CreditCard size={22} />
+
                           </div>
 
                           <div className="payment-summary">
@@ -2014,6 +2132,7 @@ const MyOrders = () => {
 
                             {totals.tax > 0 && (
                               <div>
+
                                 <span>
                                   Tax
                                 </span>
@@ -2023,11 +2142,13 @@ const MyOrders = () => {
                                     totals.tax
                                   )}
                                 </strong>
+
                               </div>
                             )}
 
                             {totals.discount > 0 && (
                               <div className="discount-row">
+
                                 <span>
                                   Discount
                                 </span>
@@ -2038,10 +2159,12 @@ const MyOrders = () => {
                                     totals.discount
                                   )}
                                 </strong>
+
                               </div>
                             )}
 
                             <div className="payment-total">
+
                               <span>
                                 Total Paid
                               </span>
@@ -2051,11 +2174,13 @@ const MyOrders = () => {
                                   totals.total
                                 )}
                               </strong>
+
                             </div>
 
                           </div>
 
                           <div className="payment-method">
+
                             <LockKeyhole size={16} />
 
                             <span>
@@ -2064,6 +2189,7 @@ const MyOrders = () => {
                                 {paymentStatus}
                               </strong>
                             </span>
+
                           </div>
 
                         </section>
@@ -2085,6 +2211,7 @@ const MyOrders = () => {
                               }
                             >
                               <RotateCcw size={18} />
+
                               Request Return
                             </button>
                           )}
@@ -2124,6 +2251,7 @@ const MyOrders = () => {
             <div className="return-modal-header">
 
               <div>
+
                 <span className="section-label">
                   RETURN ITEM
                 </span>
@@ -2138,6 +2266,7 @@ const MyOrders = () => {
                     returnModalOrder
                   )}
                 </p>
+
               </div>
 
               <button
@@ -2179,6 +2308,7 @@ const MyOrders = () => {
                       item,
                       index
                     ) => {
+
                       const itemId =
                         item?.id ||
                         item?._id ||
@@ -2218,6 +2348,7 @@ const MyOrders = () => {
                               : ''
                           }`}
                           onClick={() => {
+
                             if (returned)
                               return
 
@@ -2234,6 +2365,7 @@ const MyOrders = () => {
                             )
 
                             setReturnError('')
+
                           }}
                           disabled={
                             returned
@@ -2241,6 +2373,7 @@ const MyOrders = () => {
                         >
 
                           <div className="return-product-image">
+
                             {getItemImage(
                               item
                             ) ? (
@@ -2255,6 +2388,7 @@ const MyOrders = () => {
                             ) : (
                               <ShoppingBag size={22} />
                             )}
+
                           </div>
 
                           <div className="return-product-details">
@@ -2281,9 +2415,11 @@ const MyOrders = () => {
                           </div>
 
                           <div className="return-radio">
+
                             {selected && (
                               <Check size={14} />
                             )}
+
                           </div>
 
                         </button>
@@ -2292,6 +2428,7 @@ const MyOrders = () => {
                   )}
 
                 </div>
+
               </div>
 
               {/* REASON */}
@@ -2312,6 +2449,7 @@ const MyOrders = () => {
                     handleReturnFieldChange
                   }
                 >
+
                   <option value="">
                     Select a reason
                   </option>
@@ -2326,6 +2464,7 @@ const MyOrders = () => {
                       </option>
                     )
                   )}
+
                 </select>
 
               </div>
@@ -2378,9 +2517,11 @@ const MyOrders = () => {
                   htmlFor="return-evidence"
                   className="evidence-upload"
                 >
+
                   <Send size={20} />
 
                   <div>
+
                     <strong>
                       Upload an image
                     </strong>
@@ -2388,6 +2529,7 @@ const MyOrders = () => {
                     <span>
                       JPG, PNG or WEBP • Max 5 MB
                     </span>
+
                   </div>
 
                   <input
@@ -2398,6 +2540,7 @@ const MyOrders = () => {
                       handleEvidenceChange
                     }
                   />
+
                 </label>
 
                 {returnPreview && (
@@ -2413,7 +2556,9 @@ const MyOrders = () => {
                     <button
                       type="button"
                       onClick={() => {
+
                         setReturnPreview('')
+
                         setReturnForm(
                           (
                             previous
@@ -2423,6 +2568,7 @@ const MyOrders = () => {
                               null,
                           })
                         )
+
                       }}
                     >
                       <X size={15} />
@@ -2483,17 +2629,21 @@ const MyOrders = () => {
                     returnSubmitting
                   }
                 >
+
                   {returnSubmitting ? (
                     <>
                       <span className="button-spinner" />
+
                       Submitting...
                     </>
                   ) : (
                     <>
                       <RotateCcw size={17} />
+
                       Submit Return Request
                     </>
                   )}
+
                 </button>
 
               </div>
@@ -2501,6 +2651,7 @@ const MyOrders = () => {
             </form>
 
           </div>
+
         </div>
       )}
 
