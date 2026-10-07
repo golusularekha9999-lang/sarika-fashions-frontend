@@ -1607,3 +1607,56 @@
     font-size: 9px;
   }
 }
+/* =========================================
+   ADMIN RETURNS - SCROLLBAR
+========================================= */
+
+.admin-returns-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #8e1748 #f3e7ed;
+}
+
+/* Chrome / Edge / Safari */
+.admin-returns-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.admin-returns-table-wrapper::-webkit-scrollbar-track {
+  background: #f3e7ed;
+  border-radius: 10px;
+}
+
+.admin-returns-table-wrapper::-webkit-scrollbar-thumb {
+  background: #8e1748;
+  border-radius: 10px;
+}
+
+.admin-returns-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #671037;
+}
+.admin-returns-page {
+  min-height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #8e1748 #f5e9ee;
+}
+
+.admin-returns-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-returns-page::-webkit-scrollbar-track {
+  background: #f5e9ee;
+}
+
+.admin-returns-page::-webkit-scrollbar-thumb {
+  background: #8e1748;
+  border-radius: 10px;
+}
+
+.admin-returns-page::-webkit-scrollbar-thumb:hover {
+  background: #671037;
+}
