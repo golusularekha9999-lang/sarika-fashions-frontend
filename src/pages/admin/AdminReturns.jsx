@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 import "./AdminReturns.css";
 
+/* =========================================================
+   API BASE
+========================================================= */
+
 const API_BASE =
   import.meta.env.VITE_API_URL ||
   import.meta.env.VITE_API_BASE_URL ||
@@ -37,6 +41,10 @@ const REFUND_STATUSES = [
 
 const FILTER_OPTIONS = ["All", ...RETURN_STATUSES];
 
+/* =========================================================
+   DATE FORMATTER
+========================================================= */
+
 function formatDate(value) {
   if (!value) return "—";
 
@@ -55,10 +63,14 @@ function formatDate(value) {
   });
 }
 
+/* =========================================================
+   STATUS CLASS
+========================================================= */
+
 function getStatusClass(status) {
   if (!status) return "status-default";
 
-  const value = status.toLowerCase();
+  const value = String(status).toLowerCase();
 
   if (value.includes("requested")) return "status-requested";
   if (value.includes("approved")) return "status-approved";
@@ -73,14 +85,24 @@ function getStatusClass(status) {
   return "status-default";
 }
 
-function StatusIcon({ status }) {
-  const value = (status || "").toLowerCase();
+/* =========================================================
+   STATUS ICON
+========================================================= */
 
-  if (value.includes("completed") || value.includes("refunded")) {
+function StatusIcon({ status }) {
+  const value = String(status || "").toLowerCase();
+
+  if (
+    value.includes("completed") ||
+    value.includes("refunded")
+  ) {
     return <CheckCircle2 size={15} />;
   }
 
-  if (value.includes("rejected") || value.includes("failed")) {
+  if (
+    value.includes("rejected") ||
+    value.includes("failed")
+  ) {
     return <XCircle size={15} />;
   }
 
@@ -92,17 +114,26 @@ function StatusIcon({ status }) {
     return <CheckCircle2 size={15} />;
   }
 
-  if (value.includes("pending") || value.includes("processing")) {
+  if (
+    value.includes("pending") ||
+    value.includes("processing")
+  ) {
     return <Clock3 size={15} />;
   }
 
   return <AlertCircle size={15} />;
 }
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function AdminReturns() {
   const [returns, setReturns] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
@@ -111,9 +142,41 @@ export default function AdminReturns() {
   const [selectedReturn, setSelectedReturn] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
 
-  // --------------------------------------------------
-  // FETCH RETURN REQUESTS
-  // --------------------------------------------------
+  /* =======================================================
+     CHECK ADMIN SESSION
+  ======================================================= */
+
+  const checkAdminSession = async () => {
+    const response = await fetch(`${API_BASE}/admin/me`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    let data = {};
+
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+
+    if (!response.ok || !data.logged_in) {
+      throw new Error(
+        data.message ||
+          "Admin session expired. Please login again."
+      );
+    }
+
+    return data;
+  };
+
+  /* =======================================================
+     FETCH RETURNS
+  ======================================================= */
+
   const fetchReturns = async (showRefresh = false) => {
     try {
       if (showRefresh) {
@@ -124,13 +187,24 @@ export default function AdminReturns() {
 
       setError("");
 
-      const response = await fetch(`${API_BASE}/admin/returns`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
+      /*
+        First verify that the admin session exists.
+
+        This makes it much easier to identify whether
+        the problem is authentication or return data.
+      */
+      await checkAdminSession();
+
+      const response = await fetch(
+        `${API_BASE}/admin/returns`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
 
       let data = {};
 
@@ -141,6 +215,12 @@ export default function AdminReturns() {
       }
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "Admin session expired. Please login again."
+          );
+        }
+
         throw new Error(
           data.message ||
             data.error ||
@@ -148,13 +228,25 @@ export default function AdminReturns() {
         );
       }
 
+      /*
+        Backend returns:
+
+        {
+          success: true,
+          returns: [...]
+        }
+      */
+
       const returnList = Array.isArray(data.returns)
         ? data.returns
         : [];
 
       setReturns(returnList);
     } catch (err) {
-      console.error("Admin returns fetch error:", err);
+      console.error(
+        "ADMIN RETURNS FETCH ERROR:",
+        err
+      );
 
       setError(
         err.message ||
@@ -168,16 +260,18 @@ export default function AdminReturns() {
     }
   };
 
-  // --------------------------------------------------
-  // INITIAL LOAD
-  // --------------------------------------------------
+  /* =======================================================
+     INITIAL LOAD
+  ======================================================= */
+
   useEffect(() => {
     fetchReturns();
   }, []);
 
-  // --------------------------------------------------
-  // FILTER + SEARCH
-  // --------------------------------------------------
+  /* =======================================================
+     FILTER + SEARCH
+  ======================================================= */
+
   const filteredReturns = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -208,7 +302,11 @@ export default function AdminReturns() {
         item.return_status,
         item.refund_status,
       ]
-        .filter(Boolean)
+        .filter(
+          (value) =>
+            value !== null &&
+            value !== undefined
+        )
         .join(" ")
         .toLowerCase();
 
@@ -216,43 +314,54 @@ export default function AdminReturns() {
     });
   }, [returns, search, statusFilter]);
 
-  // --------------------------------------------------
-  // SUMMARY COUNTS
-  // --------------------------------------------------
+  /* =======================================================
+     SUMMARY
+  ======================================================= */
+
   const summary = useMemo(() => {
     return {
       total: returns.length,
 
       requested: returns.filter(
-        (item) => item.return_status === REQUESTED
+        (item) =>
+          item.return_status === REQUESTED
       ).length,
 
       approved: returns.filter(
-        (item) => item.return_status === "Approved"
+        (item) =>
+          item.return_status === "Approved"
       ).length,
 
       received: returns.filter(
-        (item) => item.return_status === "Received"
+        (item) =>
+          item.return_status === "Received"
       ).length,
 
       completed: returns.filter(
-        (item) => item.return_status === "Completed"
+        (item) =>
+          item.return_status === "Completed"
       ).length,
 
       rejected: returns.filter(
-        (item) => item.return_status === "Rejected"
+        (item) =>
+          item.return_status === "Rejected"
       ).length,
 
       refunded: returns.filter(
-        (item) => item.refund_status === "Refunded"
+        (item) =>
+          item.refund_status === "Refunded"
       ).length,
     };
   }, [returns]);
 
-  // --------------------------------------------------
-  // UPDATE RETURN
-  // --------------------------------------------------
-  const updateReturn = async (returnId, changes) => {
+  /* =======================================================
+     UPDATE RETURN
+  ======================================================= */
+
+  const updateReturn = async (
+    returnId,
+    changes
+  ) => {
     try {
       setUpdatingId(returnId);
       setError("");
@@ -279,6 +388,12 @@ export default function AdminReturns() {
       }
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "Admin session expired. Please login again."
+          );
+        }
+
         throw new Error(
           data.message ||
             data.error ||
@@ -286,31 +401,43 @@ export default function AdminReturns() {
         );
       }
 
-      // Update table immediately
+      /*
+        Prefer backend response if available.
+      */
+
+      const updatedReturn =
+        data.return || data.data || null;
+
       setReturns((current) =>
         current.map((item) =>
           Number(item.id) === Number(returnId)
             ? {
                 ...item,
-                ...changes,
+                ...(updatedReturn || changes),
               }
             : item
         )
       );
 
-      // Update opened modal also
       setSelectedReturn((current) => {
-        if (!current || Number(current.id) !== Number(returnId)) {
+        if (
+          !current ||
+          Number(current.id) !==
+            Number(returnId)
+        ) {
           return current;
         }
 
         return {
           ...current,
-          ...changes,
+          ...(updatedReturn || changes),
         };
       });
     } catch (err) {
-      console.error("Update return error:", err);
+      console.error(
+        "ADMIN RETURN UPDATE ERROR:",
+        err
+      );
 
       setError(
         err.message ||
@@ -321,23 +448,32 @@ export default function AdminReturns() {
     }
   };
 
-  // --------------------------------------------------
-  // CLOSE MODAL
-  // --------------------------------------------------
+  /* =======================================================
+     CLOSE MODAL
+  ======================================================= */
+
   const closeModal = () => {
     setSelectedReturn(null);
   };
 
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
   return (
     <div className="admin-returns-page">
 
-      {/* HEADER */}
+      {/* =================================================
+          HEADER
+      ================================================= */}
+
       <div className="admin-returns-header">
         <div>
           <h1>Return Requests</h1>
 
           <p>
-            Manage customer return requests and refund status.
+            Manage customer return requests and
+            refund status.
           </p>
         </div>
 
@@ -349,14 +485,21 @@ export default function AdminReturns() {
         >
           <RefreshCw
             size={17}
-            className={refreshing ? "spin" : ""}
+            className={
+              refreshing ? "spin" : ""
+            }
           />
 
-          {refreshing ? "Refreshing..." : "Refresh"}
+          {refreshing
+            ? "Refreshing..."
+            : "Refresh"}
         </button>
       </div>
 
-      {/* ERROR */}
+      {/* =================================================
+          ERROR
+      ================================================= */}
+
       {error && (
         <div className="admin-returns-error">
           <AlertCircle size={18} />
@@ -372,7 +515,10 @@ export default function AdminReturns() {
         </div>
       )}
 
-      {/* SUMMARY */}
+      {/* =================================================
+          SUMMARY
+      ================================================= */}
+
       <div className="admin-returns-summary">
 
         <div className="return-summary-card">
@@ -407,7 +553,10 @@ export default function AdminReturns() {
 
       </div>
 
-      {/* FILTERS */}
+      {/* =================================================
+          FILTERS
+      ================================================= */}
+
       <div className="admin-returns-toolbar">
 
         <div className="return-search-box">
@@ -426,12 +575,17 @@ export default function AdminReturns() {
         <select
           value={statusFilter}
           onChange={(event) =>
-            setStatusFilter(event.target.value)
+            setStatusFilter(
+              event.target.value
+            )
           }
           className="return-status-filter"
         >
           {FILTER_OPTIONS.map((status) => (
-            <option key={status} value={status}>
+            <option
+              key={status}
+              value={status}
+            >
               {status}
             </option>
           ))}
@@ -439,25 +593,38 @@ export default function AdminReturns() {
 
       </div>
 
-      {/* TABLE */}
+      {/* =================================================
+          TABLE
+      ================================================= */}
+
       <div className="admin-returns-table-wrapper">
 
         {loading ? (
           <div className="admin-returns-loading">
-            <RefreshCw size={24} className="spin" />
-            <p>Loading return requests...</p>
+            <RefreshCw
+              size={24}
+              className="spin"
+            />
+
+            <p>
+              Loading return requests...
+            </p>
           </div>
         ) : filteredReturns.length === 0 ? (
           <div className="admin-returns-empty">
+
             <PackageCheck size={42} />
 
-            <h3>No return requests found</h3>
+            <h3>
+              No return requests found
+            </h3>
 
             <p>
               {returns.length === 0
                 ? "There are currently no return requests in the database."
                 : "No return requests match your current search or filter."}
             </p>
+
           </div>
         ) : (
           <table className="admin-returns-table">
@@ -481,7 +648,9 @@ export default function AdminReturns() {
                 <tr key={item.id}>
 
                   <td>
-                    <strong>#{item.id}</strong>
+                    <strong>
+                      #{item.id}
+                    </strong>
                   </td>
 
                   <td>
@@ -493,12 +662,15 @@ export default function AdminReturns() {
 
                   <td>
                     <div className="return-customer-cell">
+
                       <strong>
-                        {item.customer_name || "—"}
+                        {item.customer_name ||
+                          "—"}
                       </strong>
 
                       <span>
-                        {item.customer_email || "—"}
+                        {item.customer_email ||
+                          "—"}
                       </span>
 
                       {item.customer_phone && (
@@ -506,18 +678,23 @@ export default function AdminReturns() {
                           {item.customer_phone}
                         </small>
                       )}
+
                     </div>
                   </td>
 
                   <td>
                     <div className="return-product-cell">
+
                       <strong>
-                        {item.product_name || "—"}
+                        {item.product_name ||
+                          "—"}
                       </strong>
 
                       <span>
-                        Qty: {item.quantity || 1}
+                        Qty:{" "}
+                        {item.quantity || 1}
                       </span>
+
                     </div>
                   </td>
 
@@ -526,7 +703,9 @@ export default function AdminReturns() {
                   </td>
 
                   <td>
-                    {formatDate(item.requested_at)}
+                    {formatDate(
+                      item.requested_at
+                    )}
                   </td>
 
                   <td>
@@ -536,10 +715,13 @@ export default function AdminReturns() {
                       )}`}
                     >
                       <StatusIcon
-                        status={item.return_status}
+                        status={
+                          item.return_status
+                        }
                       />
 
-                      {item.return_status || REQUESTED}
+                      {item.return_status ||
+                        REQUESTED}
                     </span>
                   </td>
 
@@ -550,7 +732,9 @@ export default function AdminReturns() {
                       )}`}
                     >
                       <StatusIcon
-                        status={item.refund_status}
+                        status={
+                          item.refund_status
+                        }
                       />
 
                       {item.refund_status ||
@@ -580,22 +764,32 @@ export default function AdminReturns() {
 
       </div>
 
-      {/* DETAILS MODAL */}
+      {/* =================================================
+          DETAILS MODAL
+      ================================================= */}
+
       {selectedReturn && (
         <div
           className="return-modal-overlay"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
               closeModal();
             }
           }}
         >
           <div className="return-modal">
 
+            {/* HEADER */}
+
             <div className="return-modal-header">
 
               <div>
-                <span>Return Request</span>
+                <span>
+                  Return Request
+                </span>
 
                 <h2>
                   #{selectedReturn.id}
@@ -613,9 +807,12 @@ export default function AdminReturns() {
             </div>
 
             {/* CUSTOMER */}
+
             <div className="return-modal-section">
 
-              <h3>Customer Details</h3>
+              <h3>
+                Customer Details
+              </h3>
 
               <div className="return-details-grid">
 
@@ -648,14 +845,20 @@ export default function AdminReturns() {
             </div>
 
             {/* ORDER */}
+
             <div className="return-modal-section">
 
-              <h3>Order Details</h3>
+              <h3>
+                Order Details
+              </h3>
 
               <div className="return-details-grid">
 
                 <div>
-                  <label>Order Number</label>
+                  <label>
+                    Order Number
+                  </label>
+
                   <p>
                     {selectedReturn.order_number ||
                       `#${selectedReturn.order_id}`}
@@ -663,7 +866,10 @@ export default function AdminReturns() {
                 </div>
 
                 <div>
-                  <label>Product</label>
+                  <label>
+                    Product
+                  </label>
+
                   <p>
                     {selectedReturn.product_name ||
                       "—"}
@@ -671,14 +877,21 @@ export default function AdminReturns() {
                 </div>
 
                 <div>
-                  <label>Quantity</label>
+                  <label>
+                    Quantity
+                  </label>
+
                   <p>
-                    {selectedReturn.quantity || 1}
+                    {selectedReturn.quantity ||
+                      1}
                   </p>
                 </div>
 
                 <div>
-                  <label>Requested At</label>
+                  <label>
+                    Requested At
+                  </label>
+
                   <p>
                     {formatDate(
                       selectedReturn.requested_at
@@ -691,17 +904,23 @@ export default function AdminReturns() {
             </div>
 
             {/* REASON */}
+
             <div className="return-modal-section">
 
-              <h3>Return Reason</h3>
+              <h3>
+                Return Reason
+              </h3>
 
               <p className="return-reason-text">
-                {selectedReturn.reason || "—"}
+                {selectedReturn.reason ||
+                  "—"}
               </p>
 
               {selectedReturn.description && (
                 <>
-                  <h4>Description</h4>
+                  <h4>
+                    Description
+                  </h4>
 
                   <p className="return-description-text">
                     {selectedReturn.description}
@@ -711,16 +930,23 @@ export default function AdminReturns() {
 
             </div>
 
-            {/* STATUS */}
+            {/* MANAGEMENT */}
+
             <div className="return-modal-section">
 
-              <h3>Manage Return</h3>
+              <h3>
+                Manage Return
+              </h3>
 
               <div className="return-management-grid">
 
+                {/* RETURN STATUS */}
+
                 <div className="return-management-field">
 
-                  <label>Return Status</label>
+                  <label>
+                    Return Status
+                  </label>
 
                   <select
                     value={
@@ -728,7 +954,8 @@ export default function AdminReturns() {
                       REQUESTED
                     }
                     disabled={
-                      updatingId === selectedReturn.id
+                      updatingId ===
+                      selectedReturn.id
                     }
                     onChange={(event) =>
                       updateReturn(
@@ -740,21 +967,27 @@ export default function AdminReturns() {
                       )
                     }
                   >
-                    {RETURN_STATUSES.map((status) => (
-                      <option
-                        key={status}
-                        value={status}
-                      >
-                        {status}
-                      </option>
-                    ))}
+                    {RETURN_STATUSES.map(
+                      (status) => (
+                        <option
+                          key={status}
+                          value={status}
+                        >
+                          {status}
+                        </option>
+                      )
+                    )}
                   </select>
 
                 </div>
 
+                {/* REFUND STATUS */}
+
                 <div className="return-management-field">
 
-                  <label>Refund Status</label>
+                  <label>
+                    Refund Status
+                  </label>
 
                   <select
                     value={
@@ -762,7 +995,8 @@ export default function AdminReturns() {
                       "Not Initiated"
                     }
                     disabled={
-                      updatingId === selectedReturn.id
+                      updatingId ===
+                      selectedReturn.id
                     }
                     onChange={(event) =>
                       updateReturn(
@@ -774,14 +1008,16 @@ export default function AdminReturns() {
                       )
                     }
                   >
-                    {REFUND_STATUSES.map((status) => (
-                      <option
-                        key={status}
-                        value={status}
-                      >
-                        {status}
-                      </option>
-                    ))}
+                    {REFUND_STATUSES.map(
+                      (status) => (
+                        <option
+                          key={status}
+                          value={status}
+                        >
+                          {status}
+                        </option>
+                      )
+                    )}
                   </select>
 
                 </div>
@@ -789,34 +1025,43 @@ export default function AdminReturns() {
               </div>
 
               {/* ADMIN NOTE */}
+
               <div className="return-management-field">
 
-                <label>Admin Note</label>
+                <label>
+                  Admin Note
+                </label>
 
                 <textarea
                   rows="4"
                   defaultValue={
-                    selectedReturn.admin_note || ""
+                    selectedReturn.admin_note ||
+                    ""
                   }
                   placeholder="Add an internal note..."
                   onBlur={(event) => {
                     const newNote =
                       event.target.value;
 
+                    const oldNote =
+                      selectedReturn.admin_note ||
+                      "";
+
                     if (
-                      newNote !==
-                      (selectedReturn.admin_note || "")
+                      newNote !== oldNote
                     ) {
                       updateReturn(
                         selectedReturn.id,
                         {
-                          admin_note: newNote,
+                          admin_note:
+                            newNote,
                         }
                       );
                     }
                   }}
                   disabled={
-                    updatingId === selectedReturn.id
+                    updatingId ===
+                    selectedReturn.id
                   }
                 />
 
@@ -824,9 +1069,12 @@ export default function AdminReturns() {
 
             </div>
 
+            {/* FOOTER */}
+
             <div className="return-modal-footer">
 
-              {updatingId === selectedReturn.id && (
+              {updatingId ===
+                selectedReturn.id && (
                 <span className="return-updating-text">
                   Saving changes...
                 </span>
