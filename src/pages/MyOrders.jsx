@@ -22,6 +22,10 @@ import {
 import { Link } from 'react-router-dom'
 import './MyOrders.css'
 
+/* =========================================================
+   API
+========================================================= */
+
 const isLocalhost =
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1'
@@ -33,9 +37,37 @@ const API_BASE =
     ? 'http://localhost:5000/api'
     : 'https://sarika-fashions-backend-rfwh.onrender.com/api')
 
+/* =========================================================
+   CUSTOMER STORAGE
+========================================================= */
+
 const CUSTOMER_TOKEN_KEY = 'sarika_customer_order_token'
 const CUSTOMER_PHONE_KEY = 'sarika_customer_phone'
-const RETURN_REQUESTS_KEY = 'sarika_return_requests'
+
+const getCustomerOrderToken = () =>
+  localStorage.getItem(CUSTOMER_TOKEN_KEY) ||
+  localStorage.getItem('customer_order_token') ||
+  ''
+
+const getCustomerPhone = () =>
+  localStorage.getItem(CUSTOMER_PHONE_KEY) ||
+  localStorage.getItem('customer_phone') ||
+  ''
+
+const getCustomerOrderHeaders = () => {
+  const token = getCustomerOrderToken()
+
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+        'X-Customer-Order-Token': token,
+      }
+    : {}
+}
+
+/* =========================================================
+   RETURN REASONS
+========================================================= */
 
 const RETURN_REASONS = [
   'Damaged / defective item',
@@ -50,67 +82,6 @@ const RETURN_REASONS = [
 ]
 
 /* =========================================================
-   CUSTOMER SESSION HELPERS
-========================================================= */
-
-const getCustomerOrderToken = () =>
-  localStorage.getItem(CUSTOMER_TOKEN_KEY) ||
-  localStorage.getItem('customer_order_token') ||
-  ''
-
-const getCustomerPhone = () =>
-  localStorage.getItem(CUSTOMER_PHONE_KEY) ||
-  localStorage.getItem('customer_phone') ||
-  ''
-
-const clearCustomerOrderLogin = () => {
-  localStorage.removeItem(CUSTOMER_TOKEN_KEY)
-  localStorage.removeItem('customer_order_token')
-  localStorage.removeItem(CUSTOMER_PHONE_KEY)
-  localStorage.removeItem('customer_phone')
-
-  sessionStorage.removeItem('sarika_orders_loaded')
-}
-
-const getCustomerOrderHeaders = () => {
-  const token = getCustomerOrderToken()
-
-  return token
-    ? {
-        Authorization: `Bearer ${token}`,
-        'X-Customer-Order-Token': token,
-      }
-    : {}
-}
-
-/* =========================================================
-   RETURN STORAGE
-========================================================= */
-
-const getStoredReturnRequests = () => {
-  try {
-    const stored = localStorage.getItem(RETURN_REQUESTS_KEY)
-
-    if (!stored) return []
-
-    const parsed = JSON.parse(stored)
-
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
-
-const saveStoredReturnRequests = (requests) => {
-  try {
-    localStorage.setItem(
-      RETURN_REQUESTS_KEY,
-      JSON.stringify(requests)
-    )
-  } catch {}
-}
-
-/* =========================================================
    FORMATTERS
 ========================================================= */
 
@@ -119,9 +90,7 @@ const formatDate = (d) => {
 
   const date = new Date(d)
 
-  if (Number.isNaN(date.getTime())) {
-    return '—'
-  }
+  if (Number.isNaN(date.getTime())) return '—'
 
   return date.toLocaleDateString('en-IN', {
     day: '2-digit',
@@ -135,9 +104,7 @@ const formatTime = (d) => {
 
   const date = new Date(d)
 
-  if (Number.isNaN(date.getTime())) {
-    return ''
-  }
+  if (Number.isNaN(date.getTime())) return ''
 
   return date.toLocaleTimeString('en-IN', {
     hour: '2-digit',
@@ -240,10 +207,10 @@ const getOrderItems = (o) => {
 }
 
 /* =========================================================
-   STATUS HELPERS
+   ORDER STATUS
 ========================================================= */
 
-const isReceived = (o) => {
+const isOrderDelivered = (o) => {
   const s = getOrderStatus(o).toLowerCase()
 
   return (
@@ -255,8 +222,6 @@ const isReceived = (o) => {
     o?.isDelivered === true
   )
 }
-
-const isOrderDelivered = (o) => isReceived(o)
 
 const getStatusClass = (s) => {
   const v = String(s || '').toLowerCase()
@@ -303,9 +268,7 @@ const getTrackingStep = (o) => {
     return 4
   }
 
-  if (s.includes('ship')) {
-    return 3
-  }
+  if (s.includes('ship')) return 3
 
   if (
     s.includes('process') ||
@@ -324,14 +287,62 @@ const getTrackingStep = (o) => {
   return 0
 }
 
+/* =========================================================
+   RETURN HELPERS
+========================================================= */
+
+const getReturnId = (r) =>
+  r?.id ||
+  r?.return_id ||
+  r?._id ||
+  ''
+
+const getReturnOrderId = (r) =>
+  r?.order_id ||
+  r?.orderId ||
+  r?.order?.id ||
+  ''
+
+const getReturnItemId = (r) =>
+  r?.product_id ||
+  r?.productId ||
+  r?.item_id ||
+  r?.itemId ||
+  ''
+
+const getReturnStatus = (r) =>
+  r?.return_status ||
+  r?.status ||
+  'Return Requested'
+
+const getReturnItemName = (r) =>
+  r?.product_name ||
+  r?.productName ||
+  r?.item_name ||
+  r?.itemName ||
+  'Saree'
+
+const getReturnDate = (r) =>
+  r?.requested_at ||
+  r?.requestedAt ||
+  r?.created_at ||
+  r?.createdAt ||
+  ''
+
 const getReturnStatusClass = (s) => {
   const v = String(s || '').toLowerCase()
 
-  if (v === 'approved') {
+  if (
+    v.includes('approved') ||
+    v.includes('completed')
+  ) {
     return 'return-approved'
   }
 
-  if (v === 'rejected') {
+  if (
+    v.includes('rejected') ||
+    v.includes('cancelled')
+  ) {
     return 'return-rejected'
   }
 
@@ -345,11 +356,11 @@ const getReturnStatusClass = (s) => {
 const getOrderTotals = (o) => {
   const items = getOrderItems(o)
 
-  const calc = items.reduce(
-    (t, i) =>
-      t +
-      getItemPrice(i) *
-        getItemQuantity(i),
+  const calculatedSubtotal = items.reduce(
+    (total, item) =>
+      total +
+      getItemPrice(item) *
+        getItemQuantity(item),
     0
   )
 
@@ -357,7 +368,7 @@ const getOrderTotals = (o) => {
     o?.subtotal ??
       o?.sub_total ??
       o?.subTotal ??
-      calc
+      calculatedSubtotal
   )
 
   const shipping = Number(
@@ -398,7 +409,7 @@ const getOrderTotals = (o) => {
 }
 
 /* =========================================================
-   TRACKING TIMELINE
+   TRACKING
 ========================================================= */
 
 const TrackingTimeline = ({ order }) => {
@@ -411,7 +422,6 @@ const TrackingTimeline = ({ order }) => {
 
         <div>
           <strong>Order Cancelled</strong>
-
           <span>
             This order has been cancelled.
           </span>
@@ -447,10 +457,8 @@ const TrackingTimeline = ({ order }) => {
     <div className="tracking-timeline">
       {steps.map((step, index) => {
         const Icon = step.icon
-
         const active =
           index <= currentStep
-
         const completed =
           index < currentStep
 
@@ -495,15 +503,16 @@ const TrackingTimeline = ({ order }) => {
 }
 
 /* =========================================================
-   MAIN COMPONENT
+   MAIN
 ========================================================= */
 
 const MyOrders = () => {
-  const [orders, setOrders] =
+  const [orders, setOrders] = useState([])
+  const [returnRequests, setReturnRequests] =
     useState([])
 
   const [loading, setLoading] =
-    useState(false)
+    useState(true)
 
   const [refreshing, setRefreshing] =
     useState(false)
@@ -514,19 +523,8 @@ const MyOrders = () => {
   const [expandedOrder, setExpandedOrder] =
     useState(null)
 
-  /*
-   * IMPORTANT:
-   * Do NOT initialize phoneInput from
-   * localStorage anymore.
-   *
-   * This forces mobile login when
-   * My Orders opens.
-   */
   const [phoneInput, setPhoneInput] =
-    useState('')
-
-  const [returnRequests, setReturnRequests] =
-    useState([])
+    useState(getCustomerPhone())
 
   const [returnModalOrder, setReturnModalOrder] =
     useState(null)
@@ -552,44 +550,81 @@ const MyOrders = () => {
     useState('')
 
   /* =======================================================
-     INITIAL LOAD
+     FETCH RETURNS FROM BACKEND
   ======================================================= */
 
-  useEffect(() => {
-    /*
-     * Clear previously saved customer
-     * order login whenever My Orders opens.
-     *
-     * This means:
-     *
-     * Refresh
-     * ↓
-     * Mobile login again
-     *
-     * Leave page
-     * ↓
-     * Come back
-     * ↓
-     * Mobile login again
-     */
-    clearCustomerOrderLogin()
-
-    setPhoneInput('')
-    setOrders([])
-    setLoading(false)
-    setError('')
-
-    setReturnRequests(
-      getStoredReturnRequests()
-    )
-
-    /*
-     * Cleanup when leaving My Orders.
-     */
-    return () => {
-      clearCustomerOrderLogin()
+  const fetchReturns = async (phone) => {
+    if (!phone) {
+      setReturnRequests([])
+      return
     }
-  }, [])
+
+    try {
+      const query =
+        `?phone=${encodeURIComponent(phone)}`
+
+      const response = await fetch(
+        `${API_BASE}/my-returns${query}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json',
+            ...getCustomerOrderHeaders(),
+          },
+        }
+      )
+
+      if (!response.ok) {
+        const text =
+          await response.text()
+
+        let data = {}
+
+        try {
+          data = text
+            ? JSON.parse(text)
+            : {}
+        } catch {}
+
+        throw new Error(
+          data?.error ||
+            data?.message ||
+            `Return request fetch failed: ${response.status}`
+        )
+      }
+
+      const data =
+        await response.json()
+
+      let returns = []
+
+      if (Array.isArray(data)) {
+        returns = data
+      } else if (
+        Array.isArray(data?.returns)
+      ) {
+        returns = data.returns
+      } else if (
+        Array.isArray(data?.data)
+      ) {
+        returns = data.data
+      }
+
+      setReturnRequests(returns)
+    } catch (err) {
+      console.error(
+        'MY RETURNS ERROR:',
+        err
+      )
+
+      /*
+       * Do NOT erase orders if returns
+       * fail. Orders must continue working.
+       */
+      setReturnRequests([])
+    }
+  }
 
   /* =======================================================
      FETCH ORDERS
@@ -605,6 +640,7 @@ const MyOrders = () => {
 
     if (!phone) {
       setOrders([])
+      setReturnRequests([])
       setLoading(false)
       return
     }
@@ -621,10 +657,11 @@ const MyOrders = () => {
       }
 
       /*
-       * Only use the phone number that
-       * the customer explicitly entered.
+       * IMPORTANT:
+       * Phone number is the common
+       * customer identifier.
        */
-      let url =
+      const url =
         `${API_BASE}/my-orders` +
         `?phone=${encodeURIComponent(
           phone
@@ -648,12 +685,12 @@ const MyOrders = () => {
         let message = text
 
         try {
-          const d =
+          const data =
             JSON.parse(text)
 
           message =
-            d?.error ||
-            d?.message ||
+            data?.error ||
+            data?.message ||
             text
         } catch {}
 
@@ -682,21 +719,25 @@ const MyOrders = () => {
           data.data
       }
 
-      setOrders(receivedOrders)
+      setOrders(
+        receivedOrders
+      )
 
       /*
-       * Save only while this page/session
-       * is being used.
+       * Save phone for convenience.
+       * This is NOT used as the return
+       * database anymore.
        */
       localStorage.setItem(
         CUSTOMER_PHONE_KEY,
         phone
       )
 
-      sessionStorage.setItem(
-        'sarika_orders_loaded',
-        'true'
-      )
+      /*
+       * Fetch actual returns from
+       * production backend/database.
+       */
+      await fetchReturns(phone)
     } catch (err) {
       console.error(
         'MY ORDERS ERROR:',
@@ -709,6 +750,7 @@ const MyOrders = () => {
       )
 
       setOrders([])
+      setReturnRequests([])
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -716,12 +758,26 @@ const MyOrders = () => {
   }
 
   /* =======================================================
+     INITIAL LOAD
+  ======================================================= */
+
+  useEffect(() => {
+    const savedPhone =
+      getCustomerPhone()
+
+    if (savedPhone) {
+      setPhoneInput(savedPhone)
+      fetchOrders(savedPhone)
+    } else {
+      setLoading(false)
+    }
+  }, [])
+
+  /* =======================================================
      PHONE SEARCH
   ======================================================= */
 
-  const handlePhoneSearch = (
-    e
-  ) => {
+  const handlePhoneSearch = (e) => {
     e.preventDefault()
 
     const phone =
@@ -731,11 +787,13 @@ const MyOrders = () => {
       setError(
         'Please enter your phone number.'
       )
-
       return
     }
 
-    setError('')
+    localStorage.setItem(
+      CUSTOMER_PHONE_KEY,
+      phone
+    )
 
     fetchOrders(phone)
   }
@@ -745,36 +803,21 @@ const MyOrders = () => {
   ======================================================= */
 
   const handleChangeNumber = () => {
-    /*
-     * Remove current login.
-     */
-    clearCustomerOrderLogin()
+    localStorage.removeItem(
+      CUSTOMER_PHONE_KEY
+    )
 
-    /*
-     * Remove displayed orders.
-     */
-    setOrders([])
+    localStorage.removeItem(
+      'customer_phone'
+    )
 
-    /*
-     * Clear phone field.
-     */
     setPhoneInput('')
-
-    /*
-     * Close expanded order.
-     */
+    setOrders([])
+    setReturnRequests([])
     setExpandedOrder(null)
-
-    /*
-     * Clear errors/messages.
-     */
     setError('')
     setReturnSuccess('')
 
-    /*
-     * Scroll to top so the
-     * mobile login is visible.
-     */
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -785,24 +828,17 @@ const MyOrders = () => {
      REFRESH
   ======================================================= */
 
-  const handleRefresh = () => {
-    /*
-     * User specifically wants refresh
-     * to show mobile login again.
-     */
-    clearCustomerOrderLogin()
+  const handleRefresh = async () => {
+    const phone =
+      phoneInput.trim()
 
-    setOrders([])
-    setPhoneInput('')
-    setExpandedOrder(null)
-    setError('')
-    setReturnSuccess('')
-    setRefreshing(false)
+    if (!phone) {
+      setOrders([])
+      setReturnRequests([])
+      return
+    }
 
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    })
+    await fetchOrders(phone)
   }
 
   /* =======================================================
@@ -822,14 +858,15 @@ const MyOrders = () => {
      RETURN HELPERS
   ======================================================= */
 
-  const getReturnsForOrder = (
-    orderId
-  ) =>
-    returnRequests.filter(
-      (r) =>
-        String(r.orderId) ===
-        String(orderId)
-    )
+  const getReturnsForOrder =
+    (orderId) =>
+      returnRequests.filter(
+        (r) =>
+          String(
+            getReturnOrderId(r)
+          ) ===
+          String(orderId)
+      )
 
   const hasReturnedItem = (
     orderId,
@@ -837,9 +874,13 @@ const MyOrders = () => {
   ) =>
     returnRequests.some(
       (r) =>
-        String(r.orderId) ===
+        String(
+          getReturnOrderId(r)
+        ) ===
           String(orderId) &&
-        String(r.itemId) ===
+        String(
+          getReturnItemId(r)
+        ) ===
           String(itemId)
     )
 
@@ -864,8 +905,7 @@ const MyOrders = () => {
               item?.product_id ||
               index
           )
-      ) ||
-      items[0]
+      ) || items[0]
 
     const availableIndex =
       availableItem
@@ -881,14 +921,13 @@ const MyOrders = () => {
       availableItem?.product_id ||
       availableIndex
 
-    setReturnModalOrder(
-      order
-    )
+    setReturnModalOrder(order)
 
     setReturnForm({
-      itemId: String(
-        availableItemId
-      ),
+      itemId:
+        String(
+          availableItemId
+        ),
       reason: '',
       description: '',
       evidence: null,
@@ -904,9 +943,7 @@ const MyOrders = () => {
   ======================================================= */
 
   const closeReturnModal = () => {
-    if (returnSubmitting) {
-      return
-    }
+    if (returnSubmitting) return
 
     setReturnModalOrder(null)
 
@@ -919,11 +956,10 @@ const MyOrders = () => {
 
     setReturnPreview('')
     setReturnError('')
-    setReturnSubmitting(false)
   }
 
   /* =======================================================
-     RETURN FORM CHANGE
+     RETURN FORM
   ======================================================= */
 
   const handleReturnFieldChange = (
@@ -944,19 +980,13 @@ const MyOrders = () => {
     setReturnError('')
   }
 
-  /* =======================================================
-     EVIDENCE
-  ======================================================= */
-
   const handleEvidenceChange = (
     e
   ) => {
     const file =
       e.target.files?.[0]
 
-    if (!file) {
-      return
-    }
+    if (!file) return
 
     if (
       !file.type.startsWith(
@@ -966,7 +996,6 @@ const MyOrders = () => {
       setReturnError(
         'Please upload an image file.'
       )
-
       return
     }
 
@@ -977,7 +1006,6 @@ const MyOrders = () => {
       setReturnError(
         'Image size must be less than 5 MB.'
       )
-
       return
     }
 
@@ -1009,9 +1037,8 @@ const MyOrders = () => {
     async (e) => {
       e.preventDefault()
 
-      if (!returnModalOrder) {
+      if (!returnModalOrder)
         return
-      }
 
       const items =
         getOrderItems(
@@ -1046,7 +1073,6 @@ const MyOrders = () => {
         setReturnError(
           'Please select the item you want to return.'
         )
-
         return
       }
 
@@ -1054,7 +1080,6 @@ const MyOrders = () => {
         setReturnError(
           'Please select a return reason.'
         )
-
         return
       }
 
@@ -1064,7 +1089,6 @@ const MyOrders = () => {
         setReturnError(
           'Please describe the issue.'
         )
-
         return
       }
 
@@ -1084,7 +1108,6 @@ const MyOrders = () => {
         setReturnError(
           'Unable to identify order. Refresh.'
         )
-
         return
       }
 
@@ -1097,7 +1120,6 @@ const MyOrders = () => {
         setReturnError(
           'Return already exists for this item.'
         )
-
         return
       }
 
@@ -1110,10 +1132,10 @@ const MyOrders = () => {
           getCustomerOrderToken()
 
         const customerPhone =
-          getCustomerPhone() ||
           phoneInput.trim() ||
-          returnModalOrder?.phone ||
+          getCustomerPhone() ||
           returnModalOrder?.customer_phone ||
+          returnModalOrder?.phone ||
           ''
 
         const productId =
@@ -1130,25 +1152,34 @@ const MyOrders = () => {
           )
 
         const requestBody = {
-          order_id: orderId,
+          order_id:
+            orderId,
+
           order_number:
             orderNumber,
+
           product_id:
             productId,
+
           product_name:
             getItemName(
               selectedItem
             ),
+
           quantity:
             getItemQuantity(
               selectedItem
             ),
+
           reason:
             returnForm.reason,
+
           description:
             returnForm.description.trim(),
+
           phone:
             customerPhone,
+
           customer_phone:
             customerPhone,
         }
@@ -1164,23 +1195,29 @@ const MyOrders = () => {
             {
               method: 'POST',
               credentials: 'include',
+
               headers: {
                 'Content-Type':
                   'application/json',
+
                 Accept:
                   'application/json',
 
                 ...(customerToken
                   ? {
-                      Authorization: `Bearer ${customerToken}`,
+                      Authorization:
+                        `Bearer ${customerToken}`,
+
                       'X-Customer-Order-Token':
                         customerToken,
                     }
                   : {}),
               },
-              body: JSON.stringify(
-                requestBody
-              ),
+
+              body:
+                JSON.stringify(
+                  requestBody
+                ),
             }
           )
 
@@ -1212,73 +1249,13 @@ const MyOrders = () => {
           )
         }
 
-        const request = {
-          id:
-            data?.return_id ||
-            data?.id ||
-            `RET-${Date.now()}`,
-
-          orderId,
-
-          orderNumber,
-
-          itemId:
-            String(itemId),
-
-          itemName:
-            getItemName(
-              selectedItem
-            ),
-
-          itemImage:
-            getItemImage(
-              selectedItem
-            ),
-
-          itemPrice:
-            getItemPrice(
-              selectedItem
-            ),
-
-          quantity:
-            getItemQuantity(
-              selectedItem
-            ),
-
-          reason:
-            returnForm.reason,
-
-          description:
-            returnForm.description.trim(),
-
-          evidenceName:
-            returnForm.evidence
-              ?.name || '',
-
-          status:
-            data?.return_status ||
-            data?.status ||
-            'Return Requested',
-
-          requestedAt:
-            data?.requested_at ||
-            new Date().toISOString(),
-
-          backendSaved: true,
-        }
-
-        const updated = [
-          ...returnRequests,
-          request,
-        ]
-
-        setReturnRequests(
-          updated
-        )
-
-        saveStoredReturnRequests(
-          updated
-        )
+        /*
+         * DO NOT save the return to
+         * localStorage.
+         *
+         * Backend is the source
+         * of truth.
+         */
 
         setReturnSuccess(
           `Return request submitted for ${getItemName(
@@ -1286,9 +1263,7 @@ const MyOrders = () => {
           )}.`
         )
 
-        setReturnModalOrder(
-          null
-        )
+        setReturnModalOrder(null)
 
         setReturnForm({
           itemId: '',
@@ -1300,14 +1275,17 @@ const MyOrders = () => {
         setReturnPreview('')
 
         /*
-         * Refresh current orders
-         * using the current entered number.
+         * Reload BOTH orders and
+         * returns from backend.
          */
         await fetchOrders(
-          phoneInput.trim()
+          customerPhone
         )
       } catch (err) {
-        console.error(err)
+        console.error(
+          'RETURN SUBMIT ERROR:',
+          err
+        )
 
         setReturnError(
           err?.message ||
@@ -1324,17 +1302,16 @@ const MyOrders = () => {
 
   const getReturnStatusForOrder =
     (orderId) => {
-      const reqs =
+      const requests =
         getReturnsForOrder(
           orderId
         )
 
-      if (!reqs.length) {
+      if (!requests.length)
         return null
-      }
 
-      return reqs[
-        reqs.length - 1
+      return requests[
+        requests.length - 1
       ]
     }
 
@@ -1346,8 +1323,7 @@ const MyOrders = () => {
     return (
       <div className="my-orders-page">
         <div className="orders-loading">
-          <div className="orders-spinner"></div>
-
+          <div className="orders-spinner" />
           <p>
             Loading your orders...
           </p>
@@ -1364,9 +1340,7 @@ const MyOrders = () => {
     <div className="my-orders-page">
       <div className="orders-container">
 
-        {/* =================================================
-            HEADER
-        ================================================= */}
+        {/* HEADER */}
 
         <div className="orders-page-header">
           <div>
@@ -1374,12 +1348,11 @@ const MyOrders = () => {
               SARIKA FASHIONS
             </span>
 
-            <h1>
-              My Orders
-            </h1>
+            <h1>My Orders</h1>
 
             <p>
-              Track your saree orders and manage your purchases.
+              Track your saree orders and
+              manage your purchases.
             </p>
           </div>
 
@@ -1397,15 +1370,11 @@ const MyOrders = () => {
               }
               disabled={refreshing}
             >
-              <RefreshCw
-                size={17}
-              />
-
+              <RefreshCw size={17} />
               Refresh
             </button>
 
-            {orders.length >
-              0 && (
+            {orders.length > 0 && (
               <button
                 type="button"
                 className="change-number-btn"
@@ -1413,10 +1382,7 @@ const MyOrders = () => {
                   handleChangeNumber
                 }
               >
-                <Search
-                  size={17}
-                />
-
+                <Search size={17} />
                 Change Number
               </button>
             )}
@@ -1424,15 +1390,11 @@ const MyOrders = () => {
           </div>
         </div>
 
-        {/* =================================================
-            SUCCESS
-        ================================================= */}
+        {/* SUCCESS */}
 
         {returnSuccess && (
           <div className="orders-alert orders-alert-success">
-            <CheckCircle2
-              size={18}
-            />
+            <CheckCircle2 size={18} />
 
             <span>
               {returnSuccess}
@@ -1449,19 +1411,13 @@ const MyOrders = () => {
           </div>
         )}
 
-        {/* =================================================
-            ERROR
-        ================================================= */}
+        {/* ERROR */}
 
         {error && (
           <div className="orders-alert orders-alert-error">
-            <AlertCircle
-              size={18}
-            />
+            <AlertCircle size={18} />
 
-            <span>
-              {error}
-            </span>
+            <span>{error}</span>
 
             <button
               type="button"
@@ -1474,9 +1430,7 @@ const MyOrders = () => {
           </div>
         )}
 
-        {/* =================================================
-            PHONE LOGIN
-        ================================================= */}
+        {/* PHONE SEARCH */}
 
         {!orders.length && (
           <div className="orders-search-card">
@@ -1490,7 +1444,8 @@ const MyOrders = () => {
               </h2>
 
               <p>
-                Enter the phone number used while placing your order.
+                Enter the phone number used
+                while placing your order.
               </p>
 
               <form
@@ -1501,9 +1456,7 @@ const MyOrders = () => {
               >
                 <input
                   type="tel"
-                  value={
-                    phoneInput
-                  }
+                  value={phoneInput}
                   onChange={(e) =>
                     setPhoneInput(
                       e.target.value
@@ -1520,10 +1473,7 @@ const MyOrders = () => {
                     !phoneInput.trim()
                   }
                 >
-                  <Search
-                    size={17}
-                  />
-
+                  <Search size={17} />
                   Find Orders
                 </button>
               </form>
@@ -1531,17 +1481,13 @@ const MyOrders = () => {
           </div>
         )}
 
-        {/* =================================================
-            EMPTY
-        ================================================= */}
+        {/* EMPTY */}
 
         {!orders.length &&
           !error && (
             <div className="orders-empty">
               <div className="empty-bag">
-                <ShoppingBag
-                  size={44}
-                />
+                <ShoppingBag size={44} />
               </div>
 
               <h2>
@@ -1549,7 +1495,8 @@ const MyOrders = () => {
               </h2>
 
               <p>
-                We couldn't find any orders for this phone number.
+                We couldn't find any orders
+                for this phone number.
               </p>
 
               <Link
@@ -1561,18 +1508,13 @@ const MyOrders = () => {
             </div>
           )}
 
-        {/* =================================================
-            ORDERS
-        ================================================= */}
+        {/* ORDERS */}
 
         {orders.length > 0 && (
           <div className="orders-list">
 
             {orders.map(
-              (
-                order,
-                orderIndex
-              ) => {
+              (order, orderIndex) => {
                 const orderId =
                   getOrderId(
                     order
@@ -1625,12 +1567,10 @@ const MyOrders = () => {
                         ? 'order-card-expanded'
                         : ''
                     }`}
-                    key={
-                      orderId
-                    }
+                    key={orderId}
                   >
 
-                    {/* ORDER HEADER */}
+                    {/* HEADER */}
 
                     <button
                       type="button"
@@ -1643,9 +1583,7 @@ const MyOrders = () => {
                     >
                       <div className="order-header-left">
                         <div className="order-icon">
-                          <Package
-                            size={20}
-                          />
+                          <Package size={20} />
                         </div>
 
                         <div>
@@ -1654,10 +1592,7 @@ const MyOrders = () => {
                           </span>
 
                           <h2>
-                            #
-                            {
-                              orderNumber
-                            }
+                            #{orderNumber}
                           </h2>
 
                           <p>
@@ -1695,19 +1630,13 @@ const MyOrders = () => {
                             orderStatus
                           )}`}
                         >
-                          {
-                            orderStatus
-                          }
+                          {orderStatus}
                         </span>
 
                         {isExpanded ? (
-                          <ChevronUp
-                            size={20}
-                          />
+                          <ChevronUp size={20} />
                         ) : (
-                          <ChevronDown
-                            size={20}
-                          />
+                          <ChevronDown size={20} />
                         )}
 
                       </div>
@@ -1723,9 +1652,7 @@ const MyOrders = () => {
                         </span>
 
                         <strong>
-                          {
-                            items.length
-                          }
+                          {items.length}
                         </strong>
                       </div>
 
@@ -1747,9 +1674,7 @@ const MyOrders = () => {
                         </span>
 
                         <strong>
-                          {
-                            paymentStatus
-                          }
+                          {paymentStatus}
                         </strong>
                       </div>
 
@@ -1762,9 +1687,7 @@ const MyOrders = () => {
                       order?.shippingAddress) && (
                       <div className="delivery-address">
                         <div className="section-icon">
-                          <MapPin
-                            size={18}
-                          />
+                          <MapPin size={18} />
                         </div>
 
                         <div>
@@ -1799,13 +1722,9 @@ const MyOrders = () => {
                           : 'View Details'}
 
                         {isExpanded ? (
-                          <ChevronUp
-                            size={16}
-                          />
+                          <ChevronUp size={16} />
                         ) : (
-                          <ChevronDown
-                            size={16}
-                          />
+                          <ChevronDown size={16} />
                         )}
                       </button>
 
@@ -1823,10 +1742,7 @@ const MyOrders = () => {
                               )
                             }
                           >
-                            <Check
-                              size={16}
-                            />
-
+                            <Check size={16} />
                             Return Requested
                           </button>
                         ) : (
@@ -1839,10 +1755,7 @@ const MyOrders = () => {
                               )
                             }
                           >
-                            <RotateCcw
-                              size={16}
-                            />
-
+                            <RotateCcw size={16} />
                             Return Item
                           </button>
                         ))}
@@ -1853,31 +1766,35 @@ const MyOrders = () => {
                     {latestReturn && (
                       <div
                         className={`return-status-card ${getReturnStatusClass(
-                          latestReturn.status
+                          getReturnStatus(
+                            latestReturn
+                          )
                         )}`}
                       >
                         <div className="return-status-icon">
-
                           {String(
-                            latestReturn.status
-                          ).toLowerCase() ===
-                          'approved' ? (
-                            <CheckCircle2
-                              size={19}
-                            />
+                            getReturnStatus(
+                              latestReturn
+                            )
+                          )
+                            .toLowerCase()
+                            .includes(
+                              'approved'
+                            ) ? (
+                            <CheckCircle2 size={19} />
                           ) : String(
-                              latestReturn.status
-                            ).toLowerCase() ===
-                            'rejected' ? (
-                            <XCircle
-                              size={19}
-                            />
+                              getReturnStatus(
+                                latestReturn
+                              )
+                            )
+                              .toLowerCase()
+                              .includes(
+                                'reject'
+                              ) ? (
+                            <XCircle size={19} />
                           ) : (
-                            <Clock3
-                              size={19}
-                            />
+                            <Clock3 size={19} />
                           )}
-
                         </div>
 
                         <div className="return-status-content">
@@ -1888,22 +1805,24 @@ const MyOrders = () => {
                             </strong>
 
                             <span>
-                              {
-                                latestReturn.status
-                              }
+                              {getReturnStatus(
+                                latestReturn
+                              )}
                             </span>
                           </div>
 
                           <p>
-                            {
-                              latestReturn.itemName
-                            }
+                            {getReturnItemName(
+                              latestReturn
+                            )}
                           </p>
 
                           <small>
                             Requested on{' '}
                             {formatDate(
-                              latestReturn.requestedAt
+                              getReturnDate(
+                                latestReturn
+                              )
                             )}
                           </small>
 
@@ -1911,7 +1830,7 @@ const MyOrders = () => {
                       </div>
                     )}
 
-                    {/* EXPANDED DETAILS */}
+                    {/* DETAILS */}
 
                     {isExpanded && (
                       <div className="order-details">
@@ -1930,9 +1849,7 @@ const MyOrders = () => {
                               </h3>
                             </div>
 
-                            <Truck
-                              size={22}
-                            />
+                            <Truck size={22} />
                           </div>
 
                           <TrackingTimeline
@@ -1955,17 +1872,15 @@ const MyOrders = () => {
                               </h3>
                             </div>
 
-                            <ShoppingBag
-                              size={22}
-                            />
+                            <ShoppingBag size={22} />
                           </div>
 
                           <div className="order-products">
 
-                            {items.length ===
-                            0 ? (
+                            {items.length === 0 ? (
                               <div className="no-items">
-                                No product details available.
+                                No product details
+                                available.
                               </div>
                             ) : (
                               items.map(
@@ -1991,7 +1906,6 @@ const MyOrders = () => {
                                       className="order-product"
                                       key={`${orderId}-${itemId}`}
                                     >
-
                                       <div className="product-image-wrap">
                                         {getItemImage(
                                           item
@@ -2006,17 +1920,12 @@ const MyOrders = () => {
                                           />
                                         ) : (
                                           <div className="product-image-placeholder">
-                                            <ShoppingBag
-                                              size={
-                                                25
-                                              }
-                                            />
+                                            <ShoppingBag size={25} />
                                           </div>
                                         )}
                                       </div>
 
                                       <div className="product-info">
-
                                         <h4>
                                           {getItemName(
                                             item
@@ -2032,16 +1941,10 @@ const MyOrders = () => {
 
                                         {returned && (
                                           <span className="returned-badge">
-                                            <Check
-                                              size={
-                                                13
-                                              }
-                                            />
-
+                                            <Check size={13} />
                                             Return Requested
                                           </span>
                                         )}
-
                                       </div>
 
                                       <strong className="product-price">
@@ -2054,7 +1957,6 @@ const MyOrders = () => {
                                             )
                                         )}
                                       </strong>
-
                                     </div>
                                   )
                                 }
@@ -2079,9 +1981,7 @@ const MyOrders = () => {
                               </h3>
                             </div>
 
-                            <CreditCard
-                              size={22}
-                            />
+                            <CreditCard size={22} />
                           </div>
 
                           <div className="payment-summary">
@@ -2104,8 +2004,7 @@ const MyOrders = () => {
                               </span>
 
                               <strong>
-                                {totals.shipping ===
-                                0
+                                {totals.shipping === 0
                                   ? 'FREE'
                                   : money(
                                       totals.shipping
@@ -2113,8 +2012,7 @@ const MyOrders = () => {
                               </strong>
                             </div>
 
-                            {totals.tax >
-                              0 && (
+                            {totals.tax > 0 && (
                               <div>
                                 <span>
                                   Tax
@@ -2128,8 +2026,7 @@ const MyOrders = () => {
                               </div>
                             )}
 
-                            {totals.discount >
-                              0 && (
+                            {totals.discount > 0 && (
                               <div className="discount-row">
                                 <span>
                                   Discount
@@ -2159,23 +2056,19 @@ const MyOrders = () => {
                           </div>
 
                           <div className="payment-method">
-                            <LockKeyhole
-                              size={16}
-                            />
+                            <LockKeyhole size={16} />
 
                             <span>
                               Payment Status:{' '}
                               <strong>
-                                {
-                                  paymentStatus
-                                }
+                                {paymentStatus}
                               </strong>
                             </span>
                           </div>
 
                         </section>
 
-                        {/* RETURN */}
+                        {/* RETURN BUTTON */}
 
                         {isOrderDelivered(
                           order
@@ -2191,10 +2084,7 @@ const MyOrders = () => {
                                 )
                               }
                             >
-                              <RotateCcw
-                                size={18}
-                              />
-
+                              <RotateCcw size={18} />
                               Request Return
                             </button>
                           )}
@@ -2212,9 +2102,9 @@ const MyOrders = () => {
 
       </div>
 
-      {/* =================================================
+      {/* ===================================================
           RETURN MODAL
-      ================================================= */}
+      =================================================== */}
 
       {returnModalOrder && (
         <div
@@ -2272,7 +2162,7 @@ const MyOrders = () => {
               className="return-form"
             >
 
-              {/* SELECT ITEM */}
+              {/* ITEM */}
 
               <div className="return-form-group">
 
@@ -2328,11 +2218,8 @@ const MyOrders = () => {
                               : ''
                           }`}
                           onClick={() => {
-                            if (
-                              returned
-                            ) {
+                            if (returned)
                               return
-                            }
 
                             setReturnForm(
                               (
@@ -2346,9 +2233,7 @@ const MyOrders = () => {
                               })
                             )
 
-                            setReturnError(
-                              ''
-                            )
+                            setReturnError('')
                           }}
                           disabled={
                             returned
@@ -2368,11 +2253,7 @@ const MyOrders = () => {
                                 )}
                               />
                             ) : (
-                              <ShoppingBag
-                                size={
-                                  22
-                                }
-                              />
+                              <ShoppingBag size={22} />
                             )}
                           </div>
 
@@ -2401,11 +2282,7 @@ const MyOrders = () => {
 
                           <div className="return-radio">
                             {selected && (
-                              <Check
-                                size={
-                                  14
-                                }
-                              />
+                              <Check size={14} />
                             )}
                           </div>
 
@@ -2449,7 +2326,6 @@ const MyOrders = () => {
                       </option>
                     )
                   )}
-
                 </select>
 
               </div>
@@ -2537,10 +2413,7 @@ const MyOrders = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        setReturnPreview(
-                          ''
-                        )
-
+                        setReturnPreview('')
                         setReturnForm(
                           (
                             previous
@@ -2564,9 +2437,7 @@ const MyOrders = () => {
 
               <div className="return-info-box">
 
-                <AlertCircle
-                  size={18}
-                />
+                <AlertCircle size={18} />
 
                 <p>
                   Your return request will be reviewed by our team. Keep the product unused and in its original packaging where possible.
@@ -2579,9 +2450,7 @@ const MyOrders = () => {
               {returnError && (
                 <div className="return-form-error">
 
-                  <AlertCircle
-                    size={17}
-                  />
+                  <AlertCircle size={17} />
 
                   <span>
                     {returnError}
@@ -2617,15 +2486,11 @@ const MyOrders = () => {
                   {returnSubmitting ? (
                     <>
                       <span className="button-spinner" />
-
                       Submitting...
                     </>
                   ) : (
                     <>
-                      <RotateCcw
-                        size={17}
-                      />
-
+                      <RotateCcw size={17} />
                       Submit Return Request
                     </>
                   )}
@@ -2636,7 +2501,6 @@ const MyOrders = () => {
             </form>
 
           </div>
-
         </div>
       )}
 
